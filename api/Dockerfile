@@ -30,7 +30,7 @@ RUN useradd --system --no-create-home --uid 10001 app
 
 WORKDIR /app
 COPY --from=build /opt/venv /opt/venv
-COPY --chown=app:app api/ ./api/
+COPY --chown=app:app api/src/ ./src/
 
 # Set by CI (--build-arg GIT_COMMIT=<sha>) and reported by /health. Declared last so
 # a new commit doesn't invalidate the cached dependency layers above.
@@ -46,4 +46,4 @@ HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 \
 
 # Hosts like Render set $PORT; locally it defaults to 8000. --proxy-headers makes the
 # app see the original https scheme and client IP behind the host's load balancer.
-CMD ["sh", "-c", "exec uvicorn api.main:app --host 0.0.0.0 --port $PORT --workers 2 --proxy-headers --forwarded-allow-ips='*'"]
+CMD ["sh", "-c", "exec uvicorn src.main:app --host 0.0.0.0 --port $PORT --workers 2 --proxy-headers --forwarded-allow-ips='*'"]

@@ -28,4 +28,5 @@ async def test_openapi_lists_all_endpoints(client):
         "/devices/{device_id}/recalls",
         "/devices/{device_id}/adverse-events",
         "/search",
+        "/places",
     }

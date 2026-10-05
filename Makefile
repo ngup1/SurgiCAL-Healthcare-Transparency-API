@@ -37,7 +37,7 @@ format:
 
 ## Run the API with auto-reload on http://localhost:8000
 run-api:
-	$(VENV)/bin/uvicorn api.main:app --reload
+	cd api && ../$(VENV)/bin/uvicorn src.main:app --reload
 
 ## Start the database and API in Docker (API on http://localhost:8000)
 up:

@@ -1,5 +1,5 @@
 import pytest
-from conftest import BAYSHORE_CCN, DOWNTOWN_LA, NO_QUALITY_CCN, UNKNOWN_CCN
+from conftest import BAYSHORE_CCN, NO_QUALITY_CCN, UNKNOWN_CCN
 from geo import within
 
 SUMMARY_FIELDS = {
@@ -37,22 +37,37 @@ async def test_list_pagination_slices_the_full_list(client):
     assert [r["ccn"] for r in page] == [r["ccn"] for r in full[5:10]]
 
 
-async def test_list_within_radius_sorted_by_distance(client, seed):
-    rows = (await client.get("/hospitals", params={**DOWNTOWN_LA, "radius_miles": 25})).json()
+async def test_list_reports_total_count(client, seed):
+    response = await client.get("/hospitals", params={"limit": 5})
+    assert len(response.json()) == 5
+    assert response.headers["X-Total-Count"] == str(len(seed["hospitals"]))
+
+
+async def test_city_filter(client, seed):
+    expected = {h["ccn"] for h in seed["hospitals"] if h["city"] == "Los Angeles"}
+    response = await client.get("/hospitals", params={"city": "los angeles"})  # case-insensitive
+    assert {r["ccn"] for r in response.json()} == expected
+    assert response.headers["X-Total-Count"] == str(len(expected))
+
+
+async def test_city_with_radius_sorted_by_distance(client, seed):
+    center = next(p for p in seed["ca_places"] if p["place_type"] == "city" and p["name"] == "Pasadena")
+    rows = (await client.get("/hospitals", params={"city": "Pasadena", "radius_miles": 15})).json()
     ccns = {r["ccn"] for r in rows}
     # Tolerance band: PostGIS measures on a spheroid, the helper on a sphere.
-    assert within(seed["hospitals"], **DOWNTOWN_LA, miles=24.5) <= ccns
-    assert ccns <= within(seed["hospitals"], **DOWNTOWN_LA, miles=25.5)
+    assert within(seed["hospitals"], center["lat"], center["lng"], miles=14.5) <= ccns
+    assert ccns <= within(seed["hospitals"], center["lat"], center["lng"], miles=15.5)
     distances = [r["distance_miles"] for r in rows]
     assert distances == sorted(distances)
-    assert all(d <= 25 for d in distances)
+    assert all(d <= 15 for d in distances)
 
 
-async def test_list_other_state_returns_empty(client):
-    # Current behavior; Phase 5 rejects non-CA states with a 422.
-    response = await client.get("/hospitals", params={"state": "NV"})
-    assert response.status_code == 200
-    assert response.json() == []
+async def test_county_filter(client, seed):
+    county_cities = {p["name"] for p in seed["ca_places"] if p["place_type"] == "city" and p["county"] == "Orange"}
+    expected = {h["ccn"] for h in seed["hospitals"] if h["city"] in county_cities}
+    rows = (await client.get("/hospitals", params={"county": "Orange County"})).json()
+    assert expected
+    assert {r["ccn"] for r in rows} == expected
 
 
 async def test_detail_includes_quality_metrics(client, seed):
@@ -93,8 +108,7 @@ async def test_hospital_providers_match_affiliations(client, seed):
     assert wrvus[: len(known)] == known
 
 
-async def test_hospital_providers_unknown_ccn_returns_empty(client):
-    # Current behavior; Phase 5 changes this to a 404.
+async def test_hospital_providers_unknown_ccn_is_404(client):
     response = await client.get(f"/hospitals/{UNKNOWN_CCN}/providers")
-    assert response.status_code == 200
-    assert response.json() == []
+    assert response.status_code == 404
+    assert response.json() == {"detail": "Hospital not found"}

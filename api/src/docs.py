@@ -7,7 +7,7 @@ examples into the form, and a pre-filled optional filter would silently narrow r
 
 from typing import Any
 
-from api.exceptions import NotFoundResponse, ValidationErrorResponse
+from src.exceptions import NotFoundResponse, ValidationErrorResponse
 
 API_DESCRIPTION = """
 
@@ -45,6 +45,11 @@ TAGS_METADATA = [
         "description": "Medical devices with FDA recalls and adverse-event (MAUDE) reports, "
         "and which devices are used in each procedure.",
     },
+    {
+        "name": "places",
+        "description": "California cities, counties, and ZIP codes, for the `city` / `county` / `zip` "
+        "filters. Coverage is California only; other states return `422 location_outside_coverage`.",
+    },
     {"name": "health", "description": "Service status and the deployed commit."},
 ]
 
@@ -64,9 +69,14 @@ CPT_EXAMPLES = examples(
     ("27130", "Total hip replacement"),
     ("66984", "Cataract surgery"),
 )
-CCNS_EXAMPLES = examples(("050801,050802,050803", "Three San Francisco Bay Area hospitals"))
+CCNS_EXAMPLES = examples((["050801", "050802", "050803"], "Three San Francisco Bay Area hospitals"))
 DEVICE_ID_EXAMPLES = examples(
     ("68670191-dbe2-5dbd-a693-5f7118cab2c2", "Cardiovance Pulse DR Pacemaker"),
+)
+PLACE_EXAMPLES = examples(
+    ("san", "Places starting with San"),
+    ("los angeles", "A city and a county"),
+    ("orange", "A county"),
 )
 SEARCH_EXAMPLES = examples(
     ("knee", "Procedures and devices"),

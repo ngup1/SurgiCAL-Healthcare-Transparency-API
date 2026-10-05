@@ -156,7 +156,7 @@ A city name alone can't prove the place is outside California: "Reno" could be a
 
 **Production data:** fill `ca_places` from the Census Gazetteer files (places, counties and ZIP code areas, filtered to California). That is one new ETL extractor; the mock version is already generated.
 
-**Behavior changes visible to existing callers** (all approved):
+**Behavior changes visible to existing callers** (all approved, all implemented):
 
 1. **Location by place name.** `lat`/`lng` are removed from `/hospitals`, `/providers` and `/prices` and replaced by `city`/`county`/`zip` (§3a). `state` only accepts `CA`.
 2. **Unknown parent resource.** `/hospitals/{ccn}/providers` and `/devices/{id}/recalls|adverse-events` return 404 for an unknown ID instead of an empty list.
@@ -188,28 +188,38 @@ Each phase ends in a working, testable state.
 - [x] Checked that the tests can fail: putting back the old `%` search operator fails 3 search tests.
 - **Result:** `make test` takes about 1 second, and all 85 tests pass against the current code.
 
-### Phase 3: Restructure into `src/` by domain
-- [ ] Create the layout from §2. Move each router's SQL into `service.py` and keep `router.py` limited to HTTP concerns.
-- [ ] `src/config.py`: `Settings(BaseSettings)` with `DATABASE_URL` (or the separate `DB_*` variables), `ENVIRONMENT`, `SHOW_DOCS`, `CORS_ORIGINS: list[str]`, `APP_VERSION`.
-- [ ] `src/schemas.py`: a `CustomModel(BaseModel)` with shared `model_config` (`from_attributes=True`, `populate_by_name=True`), and `Decimal` → `float` and `date` serialization.
-- [ ] Update `uvicorn api.main:app` → `uvicorn src.main:app` in the Dockerfile, Makefile and compose file.
-- **Done when:** the Phase 2 tests pass unchanged.
+### Phase 3: Restructure into `src/` by domain ✅ done
+- [x] `api/src/` organized by domain, following the guide: `hospitals/`, `providers/`, `prices/`, `devices/`, `search/`, `health/`. Each has a `router.py` (HTTP only) and a `service.py` (the SQL, moved over unchanged), plus `exceptions.py`, `constants.py` and `dependencies.py` where needed. Shared modules: `config.py`, `database.py` (connection plus `fetch_all` and `fetch_one`), `constants.py` (ID formats), `exceptions.py`, `geo.py`, `docs.py`.
+- [x] `src/config.py`: `Settings(BaseSettings)` from `pydantic-settings`, covering `DATABASE_URL` or `DB_*`, `SHOW_DOCS`, `CORS_ORIGINS` (no longer hard-coded) and `GIT_COMMIT`.
+- [x] Domain errors (`HospitalNotFound`, `ProviderNotFound`, `DeviceNotFound`) subclass `NotFound`; a single handler turns them into 404s.
+- [x] `ccns` parsing moved into a reusable dependency (`prices/dependencies.py: valid_ccn_list`). The geo helpers take a column name instead of string-replacing `location`.
+- [x] Entry point is now `src.main:app` (Dockerfile, Makefile). The tests import `src.*`; `conftest.py` clears `DATABASE_URL` unless `TEST_DATABASE_URL` is set, so a hosted database in `api/.env` is never used by the tests.
+- **Result:** all 95 tests pass with no changes apart from imports, and the 25/25 smoke checks pass against the rebuilt image.
 
-### Phase 4: Async database and connection pool
-- [ ] `src/database.py`: create an `AsyncConnectionPool` in the app's `lifespan` and close it on shutdown. `async def get_db()` yields a pooled connection.
-- [ ] Turn every route and service function into `async def`, using `await cur.execute(...)` and a `dict_row` row factory. Following the guide's async rules, no blocking calls are left inside async routes.
-- [ ] Rewrite `/search` to run its four queries concurrently.
-- **Done when:** tests pass, and a quick load test (`hey -n 2000 -c 50 /hospitals`) shows no new database connection per request.
+### Phase 4: Async database and connection pool ✅ done
+- [x] `psycopg2` replaced by **psycopg 3** plus `psycopg_pool`. `src/database.py` creates an `AsyncConnectionPool`, which the app's `lifespan` opens at startup (`wait=False`, so `/health` answers even if the database is briefly down) and closes at shutdown. `get_db` borrows a connection for each request.
+- [x] Pool connections use `autocommit` (read-only queries) and `prepare_threshold=None`. The latter matters because transaction-mode poolers like Neon's `-pooler` endpoint can send the next query to a different server connection, where a prepared statement wouldn't exist.
+- [x] Every route, service and dependency is `async def` with `await`ed queries (the guide's async rules: no blocking calls in async routes). `/prices/compare` uses `= ANY(%s)` with a list instead of building placeholders.
+- [x] `/search` runs its four queries concurrently (`asyncio.gather`), each on its own pooled connection.
+- [x] `conftest.py` runs the app lifespan around the test client (ASGITransport doesn't send lifespan events). `db/seed_remote.py` was ported to psycopg 3, so the project no longer depends on psycopg2.
+- **Result** (old sync image vs new, same local database, 500 requests at 25 concurrent):
 
-### Phase 5: Response models, validation, dependencies
-- [ ] Write the Pydantic response models listed in §3 for every endpoint, and set `response_model` on each route.
-- [ ] Add the `Pagination` dependency, plus `valid_hospital_ccn`, `valid_provider_npi` and `valid_device_id`. Following the guide's REST section, the path variable has the same name everywhere so these dependencies can be reused and chained.
-- [ ] Add pattern checks for CPT, CCN and NPI, plus the `event_type` enum.
-- [x] Switch fuzzy search to `<%` / `word_similarity` (behavior change 4). Still to do: a test that `/search?q=knee` returns procedure `27447`.
-- [ ] Build the `locations` module (§3a): `LocationQuery`, the `valid_location` dependency, coverage errors with `code` and `suggestions`, and `GET /places`. Replace `lat`/`lng` on `/hospitals`, `/providers` and `/prices`.
-- [ ] Tests for every row of the §3a error table.
-- [ ] Apply the other behavior changes from §3 and update the Phase 2 tests to match.
-- **Done when:** every endpoint in `/docs` shows its response schema, and invalid input never produces a 500.
+  | | Before | After |
+  |---|---|---|
+  | New DB connections | 501 | **17** |
+  | Throughput | 236 req/s | **369 req/s** |
+  | p50 / p95 latency | 75 / 272 ms | **46 / 187 ms** |
+
+  Against Neon, where every new connection also does a TLS handshake, the difference should be larger. All 95 tests and the 25/25 smoke checks pass.
+
+### Phase 5: Response models, validation, dependencies ✅ done
+- [x] **Response models** for every endpoint (`<domain>/schemas.py` on a shared `CustomModel`). Swagger now shows each response's fields, with descriptions of the less obvious ones (`negotiated_min`, `psi90_composite`, `wrvu_estimate`, ...). Responses keep their JSON shapes.
+- [x] **Paging**: a `pagination` dependency (`limit` 1–200, `offset` ≥ 0) and `paginate()`, which runs a count query plus the page query. List endpoints return `X-Total-Count` (documented in OpenAPI and exposed through CORS). Sort orders now include tie-breakers, so pages are stable.
+- [x] **Locations** (`src/locations/`, §3a): the `valid_location` dependency resolves `city` / `county` / `zip` / `radius_miles` against `ca_places`, replacing `lat`/`lng` on `/hospitals`, `/providers` and `/prices`. It returns 422s with codes `location_outside_coverage` (`state` other than CA, ZIP outside 90001–96162), `location_not_found` (with trigram `suggestions`) and `invalid_location_query`, all using the same error shape as other validation errors. New `GET /places` for autocomplete.
+- [x] **404 for unknown parents**: `valid_hospital_ccn`, `valid_provider_npi` and `valid_device_id` are shared by detail and sub-resource routes (the guide's dependency-validation pattern).
+- [x] `/prices/compare` takes `ccns` repeated or comma-separated (max 10, de-duplicated).
+- [x] Dependencies are plain functions with individual `Query` parameters, not Pydantic query models: wrapped in a dependency, a query model shows up in Swagger as one opaque parameter.
+- **Result:** 121 tests (new: `test_locations.py`, plus response-schema and header checks in `test_docs.py`). 30/30 container smoke checks pass. Throughput is unchanged at ~369 req/s despite the extra count query and response validation.
 
 ### Phase 6: Errors, health, observability
 - [ ] `src/exceptions.py`: domain exceptions (`HospitalNotFound`, ...) inherit from a `NotFound` base that the app turns into a 404. A `psycopg.OperationalError` becomes **503** `{"detail": "Database unavailable"}`, and any other unexpected error becomes 500 with the details logged only on the server.

@@ -29,11 +29,29 @@ async def test_payer_filter_is_partial_and_case_insensitive(client, seed):
     assert all("Aetna" in r["payer"] for r in rows)
 
 
-async def test_prices_within_radius(client):
-    params = {"cpt": KNEE_CPT, "lat": 37.7749, "lng": -122.4194, "radius_miles": 30, "limit": 200}
+async def test_prices_within_radius_of_a_city(client):
+    params = {"cpt": KNEE_CPT, "city": "San Francisco", "radius_miles": 30, "limit": 200}
     rows = (await client.get("/prices", params=params)).json()
     assert rows
     assert all(r["distance_miles"] <= 30 for r in rows)
+
+
+async def test_prices_in_a_county_with_total(client, seed):
+    cities = {p["name"] for p in seed["ca_places"] if p["place_type"] == "city" and p["county"] == "Los Angeles"}
+    ccns = {h["ccn"] for h in seed["hospitals"] if h["city"] in cities}
+    expected = [p for p in seed_prices(seed, KNEE_CPT) if p["ccn"] in ccns]
+    response = await client.get("/prices", params={"cpt": KNEE_CPT, "county": "Los Angeles", "limit": 5})
+    assert response.headers["X-Total-Count"] == str(len(expected))
+    assert {r["ccn"] for r in response.json()} <= ccns
+
+
+async def test_compare_accepts_repeated_and_comma_separated_ccns(client):
+    repeated = await client.get(
+        "/prices/compare", params=[("cpt", KNEE_CPT), ("ccns", BAYSHORE_CCN), ("ccns", SECOND_CCN)]
+    )
+    commas = await client.get("/prices/compare", params={"cpt": KNEE_CPT, "ccns": f"{BAYSHORE_CCN},{SECOND_CCN}"})
+    assert repeated.status_code == commas.status_code == 200
+    assert repeated.json() == commas.json()
 
 
 async def test_unknown_procedure_returns_empty(client):
