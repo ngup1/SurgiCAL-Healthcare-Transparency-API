@@ -257,10 +257,9 @@ push ──► GitHub Actions ──► ghcr.io (image registry) ──► Rende
 - [x] First runs green. Actions pinned to `checkout@v7` and `setup-python@v7` (Node 24).
 - Note: a push that changes `.github/workflows/` needs a token with the `workflow` scope. The `gh` CLI login has it (run `gh auth setup-git` once to make git use it).
 
-**Stage B: Registry (merges to `main`)**
+**Stage B: Registry (merges to `main`) ✅ done**
 - [x] `publish` job in `api-ci.yml`: runs only on pushes to `main`, after `lint` and `test` pass. Logs in to `ghcr.io` with the built-in `GITHUB_TOKEN` (`packages: write`) and pushes `ghcr.io/<owner>/surgical-api` tagged `:sha-<commit>` (fixed, for deploys and rollbacks) and `:latest`. Builds for both `linux/amd64` (Render) and `linux/arm64` (Apple Silicon). Reuses cached layers between runs. Runs on `main` are never cancelled midway.
-- [ ] First publish happens when the PR merges. **Done when:** the image appears under the repo's Packages and runs with `docker run -p 8000:8000 ghcr.io/...` (it needs `DB_*` pointing at a database).
-- The package starts **private**, like the repo. Render will need a GitHub token with `read:packages` to pull it, or the package can be made public under Package settings.
+- [x] Published from the public repo `ngup1/surgical-api`. The package is **public**, inheriting the repo's visibility: an anonymous `docker pull ghcr.io/ngup1/surgical-api:latest` works, with no credentials needed by Render. The pulled image passes the 25-check smoke test, and its `org.opencontainers.image.revision` label matches the commit.
 
 **Stage C: Deploy to Render**
 - [ ] Create a Render Postgres instance, then run `CREATE EXTENSION postgis; CREATE EXTENSION pg_trgm; CREATE EXTENSION "uuid-ossp";`. Add `make seed-db DATABASE_URL=...`, which runs `migrations/*.sql` and then `seed.sql` with `psql`. **The local `api/db/Dockerfile` isn't used here:** a managed database is set up once by hand rather than built from an image.
