@@ -4,7 +4,7 @@ from src.database import fetch_all, fetch_one
 from src.geo import distance_select, spatial_where
 
 
-def list_providers(
+async def list_providers(
     conn,
     *,
     specialty: str | None,
@@ -44,10 +44,10 @@ def list_providers(
         ORDER BY {order}
         LIMIT %s OFFSET %s
     """
-    return fetch_all(conn, sql, params + [limit, offset])
+    return await fetch_all(conn, sql, params + [limit, offset])
 
 
-def get_provider(conn, npi: str) -> dict | None:
+async def get_provider(conn, npi: str) -> dict | None:
     sql = """
         SELECT p.npi, p.first_name, p.last_name, p.credential, p.specialty,
                p.taxonomy_code, p.gender, p.medical_school, p.graduation_year,
@@ -61,10 +61,10 @@ def get_provider(conn, npi: str) -> dict | None:
         LEFT JOIN provider_metrics pm ON p.npi = pm.npi
         WHERE p.npi = %s
     """
-    return fetch_one(conn, sql, (npi,))
+    return await fetch_one(conn, sql, (npi,))
 
 
-def list_affiliations(conn, npi: str) -> list[dict]:
+async def list_affiliations(conn, npi: str) -> list[dict]:
     sql = """
         SELECT h.ccn, h.name, h.city, h.state,
                hq.overall_stars, hq.psi90_composite,
@@ -75,4 +75,4 @@ def list_affiliations(conn, npi: str) -> list[dict]:
         WHERE pa.npi = %s
         ORDER BY pa.is_primary DESC, h.name ASC
     """
-    return fetch_all(conn, sql, (npi,))
+    return await fetch_all(conn, sql, (npi,))

@@ -13,7 +13,7 @@ router = APIRouter()
 
 
 @router.get("", summary="List providers")
-def list_providers(
+async def list_providers(
     specialty: str | None = Query(None, description="Partial match, e.g. `ortho` or `cardio`"),
     state: str = Query("CA", pattern=STATE_PATTERN, description="Two-letter state code"),
     city: str | None = Query(None, description="Partial match, e.g. `san` or `los angeles`"),
@@ -29,7 +29,7 @@ def list_providers(
     `lng` together to search within `radius_miles` (nearest first).
     """
     require_lat_lng_pair(lat, lng)
-    return service.list_providers(
+    return await service.list_providers(
         conn,
         specialty=specialty,
         state=state,
@@ -43,14 +43,14 @@ def list_providers(
 
 
 @router.get("/{npi}", summary="Get a provider", responses=not_found("No provider has this NPI"))
-def get_provider(
+async def get_provider(
     npi: str = Path(
         ..., pattern=NPI_PATTERN, description="National Provider Identifier", openapi_examples=NPI_EXAMPLES
     ),
     conn=Depends(get_db),
 ):
     """Provider details, volume and rating metrics, and hospital affiliations (primary first)."""
-    provider = service.get_provider(conn, npi)
+    provider = await service.get_provider(conn, npi)
     if provider is None:
         raise ProviderNotFound()
-    return {**provider, "affiliations": service.list_affiliations(conn, npi)}
+    return {**provider, "affiliations": await service.list_affiliations(conn, npi)}

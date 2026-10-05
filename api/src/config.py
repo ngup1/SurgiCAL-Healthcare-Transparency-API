@@ -1,7 +1,6 @@
 """Application settings, read from environment variables (and api/.env when present)."""
 
-from typing import Any
-
+from psycopg.conninfo import make_conninfo
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -16,6 +15,9 @@ class Settings(BaseSettings):
     db_user: str = "postgres"
     db_password: str = ""
     db_ssl_mode: str = "require"
+    # Connections per worker process (uvicorn runs 2 workers in the image).
+    db_pool_min_size: int = 1
+    db_pool_max_size: int = 10
 
     # fastapi-best-practices: be able to hide docs; on by default for the public demo.
     show_docs: bool = True
@@ -24,18 +26,18 @@ class Settings(BaseSettings):
     git_commit: str = "unknown"
 
     @property
-    def db_connect_args(self) -> dict[str, Any]:
-        """Keyword arguments for the database driver's connect()."""
+    def db_conninfo(self) -> str:
+        """libpq connection string: DATABASE_URL as-is, or built from DB_*."""
         if self.database_url:
-            return {"dsn": self.database_url}
-        return {
-            "host": self.db_host,
-            "port": self.db_port,
-            "dbname": self.db_name,
-            "user": self.db_user,
-            "password": self.db_password,
-            "sslmode": self.db_ssl_mode,
-        }
+            return self.database_url
+        return make_conninfo(
+            host=self.db_host,
+            port=self.db_port,
+            dbname=self.db_name,
+            user=self.db_user,
+            password=self.db_password,
+            sslmode=self.db_ssl_mode,
+        )
 
 
 settings = Settings()

@@ -8,7 +8,7 @@ from src.exceptions import raise_validation_error
 from src.prices.constants import MAX_COMPARE_HOSPITALS
 
 
-def valid_ccn_list(
+async def valid_ccn_list(
     ccns: str = Query(..., description="Comma-separated hospital CCNs (up to 10)", openapi_examples=CCNS_EXAMPLES),
 ) -> list[str]:
     """Parse and validate the comma-separated `ccns` parameter."""

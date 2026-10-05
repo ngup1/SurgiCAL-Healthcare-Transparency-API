@@ -4,6 +4,10 @@ Matching uses pg_trgm word similarity (`q <% column`), so a short query like "kn
 matches the word inside a long name.
 """
 
+import asyncio
+
+from psycopg_pool import AsyncConnectionPool
+
 from src.database import fetch_all
 
 # group name -> query; each takes (q, q, limit)
@@ -43,5 +47,12 @@ QUERIES = {
 }
 
 
-def search(conn, q: str, limit: int) -> dict[str, list[dict]]:
-    return {group: fetch_all(conn, sql, (q, q, limit)) for group, sql in QUERIES.items()}
+async def search(pool: AsyncConnectionPool, q: str, limit: int) -> dict[str, list[dict]]:
+    """Run the four group queries concurrently, each on its own pooled connection."""
+
+    async def run(sql: str) -> list[dict]:
+        async with pool.connection() as conn:
+            return await fetch_all(conn, sql, (q, q, limit))
+
+    results = await asyncio.gather(*(run(sql) for sql in QUERIES.values()))
+    return dict(zip(QUERIES, results, strict=True))

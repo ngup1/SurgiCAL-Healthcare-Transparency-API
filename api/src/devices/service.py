@@ -5,7 +5,7 @@ from uuid import UUID
 from src.database import fetch_all, fetch_one
 
 
-def list_devices(
+async def list_devices(
     conn,
     *,
     product_code: str | None,
@@ -43,10 +43,10 @@ def list_devices(
         ORDER BY {order}
         LIMIT %s OFFSET %s
     """
-    return fetch_all(conn, sql, params + [limit, offset])
+    return await fetch_all(conn, sql, params + [limit, offset])
 
 
-def devices_by_procedure(conn, cpt: str) -> list[dict]:
+async def devices_by_procedure(conn, cpt: str) -> list[dict]:
     sql = """
         SELECT d.id, d.fda_product_code, d.brand_name, d.generic_name,
                d.manufacturer, d.device_class, d.medical_specialty,
@@ -56,20 +56,20 @@ def devices_by_procedure(conn, cpt: str) -> list[dict]:
         WHERE dpm.cpt = %s
         ORDER BY d.brand_name
     """
-    return fetch_all(conn, sql, (cpt,))
+    return await fetch_all(conn, sql, (cpt,))
 
 
-def get_device(conn, device_id: UUID) -> dict | None:
+async def get_device(conn, device_id: UUID) -> dict | None:
     sql = """
         SELECT id, fda_product_code, brand_name, generic_name,
                manufacturer, device_class, medical_specialty,
                premarket_number, description
         FROM devices WHERE id = %s
     """
-    return fetch_one(conn, sql, (str(device_id),))
+    return await fetch_one(conn, sql, (device_id,))
 
 
-def recent_recalls(conn, device_id: UUID, limit: int = 10) -> list[dict]:
+async def recent_recalls(conn, device_id: UUID, limit: int = 10) -> list[dict]:
     sql = """
         SELECT recall_number, recall_class, reason, status,
                recall_date, termination_date
@@ -78,10 +78,10 @@ def recent_recalls(conn, device_id: UUID, limit: int = 10) -> list[dict]:
         ORDER BY recall_date DESC NULLS LAST
         LIMIT %s
     """
-    return fetch_all(conn, sql, (str(device_id), limit))
+    return await fetch_all(conn, sql, (device_id, limit))
 
 
-def adverse_event_summary(conn, device_id: UUID) -> list[dict]:
+async def adverse_event_summary(conn, device_id: UUID) -> list[dict]:
     sql = """
         SELECT event_type, COUNT(*) AS count
         FROM device_adverse_events
@@ -89,10 +89,10 @@ def adverse_event_summary(conn, device_id: UUID) -> list[dict]:
         GROUP BY event_type
         ORDER BY count DESC
     """
-    return fetch_all(conn, sql, (str(device_id),))
+    return await fetch_all(conn, sql, (device_id,))
 
 
-def list_recalls(conn, device_id: UUID, *, limit: int, offset: int) -> list[dict]:
+async def list_recalls(conn, device_id: UUID, *, limit: int, offset: int) -> list[dict]:
     sql = """
         SELECT recall_number, product_code, brand_name, manufacturer,
                recall_class, reason, status, recall_date, termination_date,
@@ -102,12 +102,12 @@ def list_recalls(conn, device_id: UUID, *, limit: int, offset: int) -> list[dict
         ORDER BY recall_date DESC NULLS LAST
         LIMIT %s OFFSET %s
     """
-    return fetch_all(conn, sql, (str(device_id), limit, offset))
+    return await fetch_all(conn, sql, (device_id, limit, offset))
 
 
-def list_adverse_events(conn, device_id: UUID, *, event_type: str | None, limit: int, offset: int) -> list[dict]:
+async def list_adverse_events(conn, device_id: UUID, *, event_type: str | None, limit: int, offset: int) -> list[dict]:
     where_parts = ["device_id = %s"]
-    params: list = [str(device_id)]
+    params: list = [device_id]
     if event_type:
         where_parts.append("event_type = %s")
         params.append(event_type)
@@ -121,4 +121,4 @@ def list_adverse_events(conn, device_id: UUID, *, event_type: str | None, limit:
         ORDER BY event_date DESC NULLS LAST
         LIMIT %s OFFSET %s
     """
-    return fetch_all(conn, sql, params + [limit, offset])
+    return await fetch_all(conn, sql, params + [limit, offset])

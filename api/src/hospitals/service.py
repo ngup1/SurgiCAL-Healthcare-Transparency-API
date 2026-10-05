@@ -4,7 +4,7 @@ from src.database import fetch_all, fetch_one
 from src.geo import distance_select, spatial_where
 
 
-def list_hospitals(
+async def list_hospitals(
     conn, *, state: str, lat: float | None, lng: float | None, radius_miles: float, limit: int, offset: int
 ) -> list[dict]:
     dist_sql, dist_params = distance_select(lat, lng)
@@ -28,10 +28,10 @@ def list_hospitals(
         ORDER BY {order}
         LIMIT %s OFFSET %s
     """
-    return fetch_all(conn, sql, params + [limit, offset])
+    return await fetch_all(conn, sql, params + [limit, offset])
 
 
-def get_hospital(conn, ccn: str) -> dict | None:
+async def get_hospital(conn, ccn: str) -> dict | None:
     sql = """
         SELECT h.ccn, h.name, h.address, h.city, h.state, h.zip, h.phone,
                h.hospital_type, h.ownership, h.emergency_services,
@@ -45,10 +45,10 @@ def get_hospital(conn, ccn: str) -> dict | None:
         LEFT JOIN hospital_quality hq ON h.ccn = hq.ccn
         WHERE h.ccn = %s
     """
-    return fetch_one(conn, sql, (ccn,))
+    return await fetch_one(conn, sql, (ccn,))
 
 
-def list_hospital_providers(conn, ccn: str, *, limit: int, offset: int) -> list[dict]:
+async def list_hospital_providers(conn, ccn: str, *, limit: int, offset: int) -> list[dict]:
     sql = """
         SELECT p.npi, p.first_name, p.last_name, p.credential, p.specialty,
                pm.patient_rating, pm.num_reviews, pm.volume_bucket, pm.wrvu_estimate,
@@ -60,4 +60,4 @@ def list_hospital_providers(conn, ccn: str, *, limit: int, offset: int) -> list[
         ORDER BY pm.wrvu_estimate DESC NULLS LAST
         LIMIT %s OFFSET %s
     """
-    return fetch_all(conn, sql, (ccn, limit, offset))
+    return await fetch_all(conn, sql, (ccn, limit, offset))

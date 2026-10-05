@@ -1,11 +1,15 @@
 """SurgiCAL FastAPI application entry point."""
 
+from collections.abc import AsyncIterator
+from contextlib import asynccontextmanager
+
 from fastapi import FastAPI
 from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import RedirectResponse
 
 from src.config import settings
+from src.database import create_pool
 from src.devices.router import router as devices_router
 from src.docs import API_DESCRIPTION, TAGS_METADATA, VALIDATION_RESPONSES
 from src.exceptions import NotFound, not_found_handler, validation_exception_handler
@@ -15,7 +19,23 @@ from src.prices.router import router as prices_router
 from src.providers.router import router as providers_router
 from src.search.router import router as search_router
 
+
+@asynccontextmanager
+async def lifespan(app: FastAPI) -> AsyncIterator[None]:
+    """Open the connection pool at startup and close it at shutdown."""
+    pool = create_pool()
+    # wait=False: the app starts (and /health answers) even if the database is
+    # briefly unreachable; requests wait for a connection instead.
+    await pool.open(wait=False)
+    app.state.pool = pool
+    try:
+        yield
+    finally:
+        await pool.close()
+
+
 app = FastAPI(
+    lifespan=lifespan,
     title="SurgiCAL API",
     summary="Healthcare transparency API",
     description=API_DESCRIPTION,
@@ -53,5 +73,5 @@ app.include_router(health_router, prefix="/health", tags=["health"])
 
 
 @app.get("/", include_in_schema=False)
-def root():
+async def root():
     return RedirectResponse("/docs") if settings.show_docs else {"name": app.title, "health": "/health"}

@@ -29,10 +29,10 @@ for key, value in {
 }.items():
     os.environ.setdefault(key, value)
 
-import psycopg2  # noqa: E402
+import psycopg  # noqa: E402
 from httpx import ASGITransport, AsyncClient  # noqa: E402
 
-from src.database import get_db_connection  # noqa: E402
+from src.config import settings  # noqa: E402
 from src.main import app  # noqa: E402
 
 SEED_DATA_DIR = Path(__file__).resolve().parents[1] / "seed" / "data"
@@ -53,8 +53,8 @@ DOWNTOWN_LA = {"lat": 34.0522, "lng": -118.2437}
 @pytest.fixture(scope="session", autouse=True)
 def require_database() -> None:
     try:
-        get_db_connection().close()
-    except psycopg2.OperationalError as exc:
+        psycopg.connect(settings.db_conninfo, connect_timeout=5).close()
+    except psycopg.OperationalError as exc:
         pytest.exit(
             f"Test database is not reachable ({exc}). Start it with `make db-up`.",
             returncode=2,
@@ -69,6 +69,9 @@ def seed() -> dict[str, list[dict]]:
 
 @pytest.fixture
 async def client() -> AsyncGenerator[AsyncClient, None]:
-    transport = ASGITransport(app=app)
-    async with AsyncClient(transport=transport, base_url="http://test") as ac:
-        yield ac
+    # ASGITransport doesn't send lifespan events, so run the app's lifespan here:
+    # it opens the database pool the routes borrow connections from.
+    async with app.router.lifespan_context(app):
+        transport = ASGITransport(app=app)
+        async with AsyncClient(transport=transport, base_url="http://test") as ac:
+            yield ac

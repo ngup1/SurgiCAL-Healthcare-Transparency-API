@@ -196,11 +196,21 @@ Each phase ends in a working, testable state.
 - [x] Entry point is now `src.main:app` (Dockerfile, Makefile). The tests import `src.*`; `conftest.py` clears `DATABASE_URL` unless `TEST_DATABASE_URL` is set, so a hosted database in `api/.env` is never used by the tests.
 - **Result:** all 95 tests pass with no changes apart from imports, and the 25/25 smoke checks pass against the rebuilt image.
 
-### Phase 4: Async database and connection pool
-- [ ] `src/database.py`: create an `AsyncConnectionPool` in the app's `lifespan` and close it on shutdown. `async def get_db()` yields a pooled connection.
-- [ ] Turn every route and service function into `async def`, using `await cur.execute(...)` and a `dict_row` row factory. Following the guide's async rules, no blocking calls are left inside async routes.
-- [ ] Rewrite `/search` to run its four queries concurrently.
-- **Done when:** tests pass, and a quick load test (`hey -n 2000 -c 50 /hospitals`) shows no new database connection per request.
+### Phase 4: Async database and connection pool ✅ done
+- [x] `psycopg2` replaced by **psycopg 3** plus `psycopg_pool`. `src/database.py` creates an `AsyncConnectionPool`, which the app's `lifespan` opens at startup (`wait=False`, so `/health` answers even if the database is briefly down) and closes at shutdown. `get_db` borrows a connection for each request.
+- [x] Pool connections use `autocommit` (read-only queries) and `prepare_threshold=None`. The latter matters because transaction-mode poolers like Neon's `-pooler` endpoint can send the next query to a different server connection, where a prepared statement wouldn't exist.
+- [x] Every route, service and dependency is `async def` with `await`ed queries (the guide's async rules: no blocking calls in async routes). `/prices/compare` uses `= ANY(%s)` with a list instead of building placeholders.
+- [x] `/search` runs its four queries concurrently (`asyncio.gather`), each on its own pooled connection.
+- [x] `conftest.py` runs the app lifespan around the test client (ASGITransport doesn't send lifespan events). `db/seed_remote.py` was ported to psycopg 3, so the project no longer depends on psycopg2.
+- **Result** (old sync image vs new, same local database, 500 requests at 25 concurrent):
+
+  | | Before | After |
+  |---|---|---|
+  | New DB connections | 501 | **17** |
+  | Throughput | 236 req/s | **369 req/s** |
+  | p50 / p95 latency | 75 / 272 ms | **46 / 187 ms** |
+
+  Against Neon, where every new connection also does a TLS handshake, the difference should be larger. All 95 tests and the 25/25 smoke checks pass.
 
 ### Phase 5: Response models, validation, dependencies
 - [ ] Write the Pydantic response models listed in §3 for every endpoint, and set `response_model` on each route.

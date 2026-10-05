@@ -4,7 +4,7 @@ from src.database import fetch_all
 from src.geo import distance_select, spatial_where
 
 
-def search_prices(
+async def search_prices(
     conn,
     *,
     cpt: str,
@@ -44,12 +44,11 @@ def search_prices(
         ORDER BY pr.negotiated_rate ASC NULLS LAST
         LIMIT %s OFFSET %s
     """
-    return fetch_all(conn, sql, params + [limit, offset])
+    return await fetch_all(conn, sql, params + [limit, offset])
 
 
-def compare_prices(conn, *, cpt: str, ccns: list[str]) -> list[dict]:
-    placeholders = ", ".join(["%s"] * len(ccns))
-    sql = f"""
+async def compare_prices(conn, *, cpt: str, ccns: list[str]) -> list[dict]:
+    sql = """
         SELECT pr.cpt, c.description AS procedure_name,
                h.ccn, h.name AS hospital_name, h.city,
                pr.payer, pr.plan_name, pr.billing_class,
@@ -59,7 +58,7 @@ def compare_prices(conn, *, cpt: str, ccns: list[str]) -> list[dict]:
         JOIN hospitals h ON pr.ccn = h.ccn
         JOIN cpt_codes c ON pr.cpt = c.code
         LEFT JOIN hospital_quality hq ON h.ccn = hq.ccn
-        WHERE pr.cpt = %s AND pr.ccn IN ({placeholders})
+        WHERE pr.cpt = %s AND pr.ccn = ANY(%s)
         ORDER BY h.name, pr.payer
     """
-    return fetch_all(conn, sql, [cpt, *ccns])
+    return await fetch_all(conn, sql, (cpt, ccns))
