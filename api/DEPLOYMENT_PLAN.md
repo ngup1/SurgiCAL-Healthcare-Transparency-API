@@ -266,9 +266,9 @@ Neon instead of Render Postgres: Render's free databases expire after ~30 days a
 - [x] The API accepts `DATABASE_URL` (a single connection string), which takes precedence over the `DB_*` variables.
 - [x] `make seed-db` (`api/db/seed_remote.py`): records applied migrations in `schema_migrations`, applies each new file in its own transaction, then loads `seed.sql`. Safe to re-run. Tested on an empty database: 11 migrations applied, then all 85 tests pass against it through `DATABASE_URL`.
 - [x] The `publish` job calls Render's deploy hook (the `RENDER_DEPLOY_HOOK` secret) with `imgURL=…:sha-<commit>`, so Render runs the exact image CI built. The step is skipped while the secret is unset.
-- [ ] Neon project (Postgres 16, AWS US West 2 / Oregon). Seed it with the **direct** connection string.
-- [ ] Render web service from the existing image `ghcr.io/ngup1/surgical-api:latest`, in the Oregon region, with `DATABASE_URL` set to Neon's **pooled** connection string and health check path `/health`.
-- [ ] Copy the service's deploy hook URL into the GitHub secret `RENDER_DEPLOY_HOOK`.
+- [x] Neon project (Postgres 16, AWS US East 2 / Ohio), seeded with `make seed-db` over the **direct** connection string. Note: ProtonVPN blocked the Postgres handshake (TCP connected, but there was no reply to the SSL request), so seeding from the Mac needs the VPN off.
+- [x] Render web service `https://surgical-api.onrender.com`, created from the existing image, in the Ohio region (same as Neon), with `DATABASE_URL` set to Neon's **pooled** string and health check `/health`. 25/25 smoke checks pass against it, with responses in about 0.1–0.2 s.
+- [x] `RENDER_DEPLOY_HOOK` secret set. `/health` reports `commit` (baked into the image via the `GIT_COMMIT` build argument), so you can check which commit is live.
 - **Done when:** merging to `main` updates `https://<name>.onrender.com/docs` with no manual steps.
 
 **Demo fallback:** run `make up`, then `cloudflared tunnel --url http://localhost:8000` for a temporary public HTTPS URL from your laptop.

@@ -32,6 +32,11 @@ WORKDIR /app
 COPY --from=build /opt/venv /opt/venv
 COPY --chown=app:app api/ ./api/
 
+# Set by CI (--build-arg GIT_COMMIT=<sha>) and reported by /health. Declared last so
+# a new commit doesn't invalidate the cached dependency layers above.
+ARG GIT_COMMIT=unknown
+ENV GIT_COMMIT=$GIT_COMMIT
+
 USER app
 EXPOSE 8000
 

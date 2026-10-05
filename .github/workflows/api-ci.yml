@@ -138,6 +138,7 @@ jobs:
           file: api/Dockerfile
           platforms: linux/amd64,linux/arm64
           push: true
+          build-args: GIT_COMMIT=${{ github.sha }}
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
           # Reuse unchanged layers from earlier runs (stored in the Actions cache).

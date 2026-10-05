@@ -1,7 +1,8 @@
 async def test_health(client):
     response = await client.get("/health")
     assert response.status_code == 200
-    assert response.json() == {"status": "ok"}
+    assert response.json()["status"] == "ok"
+    assert "commit" in response.json()
 
 
 async def test_swagger_ui_is_served(client):

@@ -1,5 +1,7 @@
 """SurgiCAL FastAPI application entry point."""
 
+import os
+
 from fastapi import FastAPI
 from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
@@ -32,4 +34,5 @@ app.include_router(search.router, prefix="/search", tags=["search"])
 
 @app.get("/health")
 def health_check():
-    return {"status": "ok"}
+    # GIT_COMMIT is baked into the image by CI, so a deploy can be traced to its commit.
+    return {"status": "ok", "commit": os.getenv("GIT_COMMIT", "unknown")}
