@@ -10,7 +10,6 @@ from typing import Any
 from api.exceptions import NotFoundResponse, ValidationErrorResponse
 
 API_DESCRIPTION = """
-Healthcare transparency API for surgical pricing, quality, and device data.
 
 Compare what a procedure costs across hospitals and insurers, look up hospital and
 surgeon quality, and check medical devices for recalls and adverse events.
