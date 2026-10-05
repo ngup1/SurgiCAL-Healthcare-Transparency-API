@@ -1,7 +1,7 @@
 # CI/CD for the SurgiCAL API (DEPLOYMENT_PLAN.md, Phase 9).
 #
 #   lint ─┐
-#         ├─► publish   (main only: push the image to ghcr.io)
+#         ├─► publish   (main only: push the image to ghcr.io, then deploy to Render)
 #   test ─┘
 #   test = seeded PostGIS via docker compose → pytest → build + smoke-test the API image
 name: API CI
@@ -102,6 +102,10 @@ jobs:
     permissions:
       contents: read
       packages: write # lets GITHUB_TOKEN push to this repo's container registry
+    env:
+      # Repo secret (Settings → Secrets and variables → Actions). If unset, the
+      # deploy step is skipped and the image is only published.
+      RENDER_DEPLOY_HOOK: ${{ secrets.RENDER_DEPLOY_HOOK }}
     steps:
       - uses: actions/checkout@v7
 
@@ -139,6 +143,17 @@ jobs:
           # Reuse unchanged layers from earlier runs (stored in the Actions cache).
           cache-from: type=gha
           cache-to: type=gha,mode=max
+
+      # Tell Render to deploy this exact build (the immutable sha tag, not :latest),
+      # so the running service always maps to a commit.
+      - name: Deploy to Render
+        if: env.RENDER_DEPLOY_HOOK != ''
+        run: |
+          set -euo pipefail
+          image="ghcr.io/${{ github.repository_owner }}/surgical-api:sha-${GITHUB_SHA::7}"
+          encoded=$(python3 -c 'import sys, urllib.parse; print(urllib.parse.quote(sys.argv[1], safe=""))' "$image")
+          curl -fsS -X POST "${RENDER_DEPLOY_HOOK}&imgURL=${encoded}" > /dev/null
+          echo "Deploy triggered for $image"
 
       - name: Summary
         run: |

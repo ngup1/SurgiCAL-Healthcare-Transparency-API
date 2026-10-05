@@ -10,7 +10,15 @@ load_dotenv()
 
 
 def get_db_connection():
-    """Get a PostgreSQL connection (direct RDS connect)."""
+    """
+    Get a PostgreSQL connection.
+
+    DATABASE_URL (a full connection string, as hosted providers like Neon give
+    you) takes precedence; otherwise the separate DB_* variables are used.
+    """
+    database_url = os.getenv("DATABASE_URL")
+    if database_url:
+        return psycopg2.connect(database_url)
     return psycopg2.connect(
         host=os.getenv("DB_HOST", "localhost"),
         port=int(os.getenv("DB_PORT", "5432")),

@@ -3,7 +3,7 @@ VENV     := .venv
 PIP      := $(VENV)/bin/pip
 PYTHON_V := $(VENV)/bin/python
 
-.PHONY: venv install install-api install-dev test lint format run-api up down db-up db-reset seed-data playwright-install run-etl clean
+.PHONY: venv install install-api install-dev test lint format run-api up down db-up db-reset seed-data seed-db playwright-install run-etl clean
 
 ## Create virtual environment
 venv:
@@ -59,6 +59,12 @@ db-reset:
 ## Regenerate mock data (api/seed/data/*.json and api/seed/seed.sql)
 seed-data:
 	$(PYTHON) api/seed/generate.py
+
+## Apply migrations + mock data to a hosted Postgres (e.g. Neon). Use a direct (non-pooled) URL:
+##   read -rs DATABASE_URL && export DATABASE_URL && make seed-db
+seed-db:
+	@test -n "$$DATABASE_URL" || { echo "Set DATABASE_URL first (see Makefile comment)"; exit 1; }
+	$(PYTHON_V) api/db/seed_remote.py
 
 ## Re-install Playwright Chromium browser only
 playwright-install:

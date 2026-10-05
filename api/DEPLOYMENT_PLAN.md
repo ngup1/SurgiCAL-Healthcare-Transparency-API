@@ -261,12 +261,15 @@ push ──► GitHub Actions ──► ghcr.io (image registry) ──► Rende
 - [x] `publish` job in `api-ci.yml`: runs only on pushes to `main`, after `lint` and `test` pass. Logs in to `ghcr.io` with the built-in `GITHUB_TOKEN` (`packages: write`) and pushes `ghcr.io/<owner>/surgical-api` tagged `:sha-<commit>` (fixed, for deploys and rollbacks) and `:latest`. Builds for both `linux/amd64` (Render) and `linux/arm64` (Apple Silicon). Reuses cached layers between runs. Runs on `main` are never cancelled midway.
 - [x] Published from the public repo `ngup1/surgical-api`. The package is **public**, inheriting the repo's visibility: an anonymous `docker pull ghcr.io/ngup1/surgical-api:latest` works, with no credentials needed by Render. The pulled image passes the 25-check smoke test, and its `org.opencontainers.image.revision` label matches the commit.
 
-**Stage C: Deploy to Render**
-- [ ] Create a Render Postgres instance, then run `CREATE EXTENSION postgis; CREATE EXTENSION pg_trgm; CREATE EXTENSION "uuid-ossp";`. Add `make seed-db DATABASE_URL=...`, which runs `migrations/*.sql` and then `seed.sql` with `psql`. **The local `api/db/Dockerfile` isn't used here:** a managed database is set up once by hand rather than built from an image.
-- [ ] Create a Render web service from the GHCR image (or from the repo's `api/Dockerfile`). Set `DB_*` and `DB_SSL_MODE=require` as environment variables (secrets never go in the repo), listen on `$PORT`, and use `/health` as the health check path.
-- [ ] Auto-deploy: Render's deploy hook (a URL stored as the `RENDER_DEPLOY_HOOK` secret), called by the workflow after the image is pushed.
-- [ ] Before relying on Render's free tiers, check the current terms: free web services sleep when idle, and free databases expire.
-- **Done when:** merging to `main` updates a public `https://<name>.onrender.com/docs` with no manual steps.
+**Stage C: Deploy (Render runs the API, Neon hosts the database)**
+Neon instead of Render Postgres: Render's free databases expire after ~30 days and are then deleted. Neon's free tier doesn't expire (it sleeps when idle) and supports PostGIS and pg_trgm.
+- [x] The API accepts `DATABASE_URL` (a single connection string), which takes precedence over the `DB_*` variables.
+- [x] `make seed-db` (`api/db/seed_remote.py`): records applied migrations in `schema_migrations`, applies each new file in its own transaction, then loads `seed.sql`. Safe to re-run. Tested on an empty database: 11 migrations applied, then all 85 tests pass against it through `DATABASE_URL`.
+- [x] The `publish` job calls Render's deploy hook (the `RENDER_DEPLOY_HOOK` secret) with `imgURL=…:sha-<commit>`, so Render runs the exact image CI built. The step is skipped while the secret is unset.
+- [ ] Neon project (Postgres 16, AWS US West 2 / Oregon). Seed it with the **direct** connection string.
+- [ ] Render web service from the existing image `ghcr.io/ngup1/surgical-api:latest`, in the Oregon region, with `DATABASE_URL` set to Neon's **pooled** connection string and health check path `/health`.
+- [ ] Copy the service's deploy hook URL into the GitHub secret `RENDER_DEPLOY_HOOK`.
+- **Done when:** merging to `main` updates `https://<name>.onrender.com/docs` with no manual steps.
 
 **Demo fallback:** run `make up`, then `cloudflared tunnel --url http://localhost:8000` for a temporary public HTTPS URL from your laptop.
 
