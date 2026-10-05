@@ -1,4 +1,4 @@
-"""Exception handlers that give every error response the same shape."""
+"""Error types, response models, and the handlers that give every error the same shape."""
 
 from typing import Any
 
@@ -8,7 +8,7 @@ from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel
 
-from api.validation import PATTERN_MESSAGES
+from src.constants import PATTERN_MESSAGES
 
 
 class FieldError(BaseModel):
@@ -28,6 +28,17 @@ class ValidationErrorResponse(BaseModel):
 
 class NotFoundResponse(BaseModel):
     detail: str
+
+
+class NotFound(Exception):
+    """Base for domain "no such record" errors; each domain sets its own DETAIL."""
+
+    DETAIL = "Not found"
+
+
+def raise_validation_error(field: str, message: str, value: Any, location: str = "query") -> None:
+    """Raise a 422 for `field`, formatted like FastAPI's own validation errors."""
+    raise RequestValidationError([{"type": "value_error", "loc": (location, field), "msg": message, "input": value}])
 
 
 def _field_error(err: dict[str, Any]) -> dict[str, Any]:
@@ -67,3 +78,7 @@ async def validation_exception_handler(request: Request, exc: RequestValidationE
         status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
         content={"code": "validation_error", "detail": detail, "errors": errors},
     )
+
+
+async def not_found_handler(request: Request, exc: NotFound) -> JSONResponse:
+    return JSONResponse(status_code=status.HTTP_404_NOT_FOUND, content={"detail": exc.DETAIL})

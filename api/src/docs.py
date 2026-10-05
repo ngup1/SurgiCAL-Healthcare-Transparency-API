@@ -7,7 +7,7 @@ examples into the form, and a pre-filled optional filter would silently narrow r
 
 from typing import Any
 
-from api.exceptions import NotFoundResponse, ValidationErrorResponse
+from src.exceptions import NotFoundResponse, ValidationErrorResponse
 
 API_DESCRIPTION = """
 

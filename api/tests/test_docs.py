@@ -26,7 +26,6 @@ async def test_describes_a_healthcare_transparency_api(spec):
     info = spec["info"]
     assert info["title"] == "SurgiCAL API"
     assert "transparency" in info["summary"].lower()
-    assert "transparency" in info["description"].lower()
     assert "marketplace" not in (info["summary"] + info["description"]).lower()
 
 

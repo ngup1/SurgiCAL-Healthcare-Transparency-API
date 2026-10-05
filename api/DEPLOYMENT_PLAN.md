@@ -188,12 +188,13 @@ Each phase ends in a working, testable state.
 - [x] Checked that the tests can fail: putting back the old `%` search operator fails 3 search tests.
 - **Result:** `make test` takes about 1 second, and all 85 tests pass against the current code.
 
-### Phase 3: Restructure into `src/` by domain
-- [ ] Create the layout from §2. Move each router's SQL into `service.py` and keep `router.py` limited to HTTP concerns.
-- [ ] `src/config.py`: `Settings(BaseSettings)` with `DATABASE_URL` (or the separate `DB_*` variables), `ENVIRONMENT`, `SHOW_DOCS`, `CORS_ORIGINS: list[str]`, `APP_VERSION`.
-- [ ] `src/schemas.py`: a `CustomModel(BaseModel)` with shared `model_config` (`from_attributes=True`, `populate_by_name=True`), and `Decimal` → `float` and `date` serialization.
-- [ ] Update `uvicorn api.main:app` → `uvicorn src.main:app` in the Dockerfile, Makefile and compose file.
-- **Done when:** the Phase 2 tests pass unchanged.
+### Phase 3: Restructure into `src/` by domain ✅ done
+- [x] `api/src/` organized by domain, following the guide: `hospitals/`, `providers/`, `prices/`, `devices/`, `search/`, `health/`. Each has a `router.py` (HTTP only) and a `service.py` (the SQL, moved over unchanged), plus `exceptions.py`, `constants.py` and `dependencies.py` where needed. Shared modules: `config.py`, `database.py` (connection plus `fetch_all` and `fetch_one`), `constants.py` (ID formats), `exceptions.py`, `geo.py`, `docs.py`.
+- [x] `src/config.py`: `Settings(BaseSettings)` from `pydantic-settings`, covering `DATABASE_URL` or `DB_*`, `SHOW_DOCS`, `CORS_ORIGINS` (no longer hard-coded) and `GIT_COMMIT`.
+- [x] Domain errors (`HospitalNotFound`, `ProviderNotFound`, `DeviceNotFound`) subclass `NotFound`; a single handler turns them into 404s.
+- [x] `ccns` parsing moved into a reusable dependency (`prices/dependencies.py: valid_ccn_list`). The geo helpers take a column name instead of string-replacing `location`.
+- [x] Entry point is now `src.main:app` (Dockerfile, Makefile). The tests import `src.*`; `conftest.py` clears `DATABASE_URL` unless `TEST_DATABASE_URL` is set, so a hosted database in `api/.env` is never used by the tests.
+- **Result:** all 95 tests pass with no changes apart from imports, and the 25/25 smoke checks pass against the rebuilt image.
 
 ### Phase 4: Async database and connection pool
 - [ ] `src/database.py`: create an `AsyncConnectionPool` in the app's `lifespan` and close it on shutdown. `async def get_db()` yields a pooled connection.

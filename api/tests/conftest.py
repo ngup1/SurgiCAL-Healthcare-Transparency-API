@@ -14,8 +14,11 @@ from pathlib import Path
 
 import pytest
 
-# Point the app at the compose database before it is imported. Values already in
-# the environment win, so CI can target its own database.
+# Point the app at the compose database before it is imported. DB_* values already in
+# the environment win, so CI can target its own database. DATABASE_URL is cleared (it
+# would take precedence, and api/.env may point at a hosted database) unless
+# TEST_DATABASE_URL is set explicitly.
+os.environ["DATABASE_URL"] = os.environ.get("TEST_DATABASE_URL", "")
 for key, value in {
     "DB_HOST": "localhost",
     "DB_PORT": "5433",
@@ -29,8 +32,8 @@ for key, value in {
 import psycopg2  # noqa: E402
 from httpx import ASGITransport, AsyncClient  # noqa: E402
 
-from api.dependencies import get_db_connection  # noqa: E402
-from api.main import app  # noqa: E402
+from src.database import get_db_connection  # noqa: E402
+from src.main import app  # noqa: E402
 
 SEED_DATA_DIR = Path(__file__).resolve().parents[1] / "seed" / "data"
 

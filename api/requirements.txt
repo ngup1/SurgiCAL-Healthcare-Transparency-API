@@ -1,5 +1,6 @@
 # API framework
 fastapi==0.115.0
+pydantic-settings==2.15.0
 # Server + the two speedups uvicorn[standard] adds that production uses.
 # (The rest of [standard] is dev-only: watchfiles is in requirements-dev.txt.)
 uvicorn==0.30.0
