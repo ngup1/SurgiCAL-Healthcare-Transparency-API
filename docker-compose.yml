@@ -1,3 +1,6 @@
+# Fixed project name: container, network and volume names don't depend on the checkout folder.
+name: surgical-api
+
 services:
   db:
     build:

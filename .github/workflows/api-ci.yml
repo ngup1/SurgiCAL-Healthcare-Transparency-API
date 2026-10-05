@@ -91,7 +91,7 @@ jobs:
 
       - name: Image size
         if: success()
-        run: docker images --format '{{.Repository}}:{{.Tag}} {{.Size}}' | grep healthcare
+        run: docker compose images
 
   publish:
     name: Publish image to ghcr.io
