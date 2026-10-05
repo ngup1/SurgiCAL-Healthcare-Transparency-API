@@ -1,0 +1,41 @@
+services:
+  db:
+    build:
+      context: .
+      dockerfile: api/db/Dockerfile
+    environment:
+      POSTGRES_DB: surgical
+      POSTGRES_USER: surgical
+      POSTGRES_PASSWORD: surgical
+    ports:
+      - "5433:5432" # 5433 on the host so a local Postgres on 5432 doesn't clash
+    volumes:
+      - db-data:/var/lib/postgresql/data
+    healthcheck:
+      # TCP check: during first-time init Postgres only listens on a local socket,
+      # so this stays unhealthy until migrations and seed data have loaded.
+      test: ["CMD", "pg_isready", "-h", "127.0.0.1", "-U", "surgical", "-d", "surgical"]
+      interval: 5s
+      timeout: 3s
+      retries: 30
+      start_period: 10s
+
+  api:
+    build:
+      context: .
+      dockerfile: api/Dockerfile
+    ports:
+      - "8000:8000"
+    environment:
+      DB_HOST: db
+      DB_PORT: "5432"
+      DB_NAME: surgical
+      DB_USER: surgical
+      DB_PASSWORD: surgical
+      DB_SSL_MODE: disable
+    depends_on:
+      db:
+        condition: service_healthy
+
+volumes:
+  db-data:

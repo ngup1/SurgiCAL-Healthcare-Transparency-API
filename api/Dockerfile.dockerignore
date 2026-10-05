@@ -1,0 +1,15 @@
+# Used instead of the root .dockerignore when building api/Dockerfile (BuildKit
+# looks for <Dockerfile>.dockerignore). Sends api/ minus everything the running
+# API doesn't need, so new app modules are included automatically.
+*
+!api/
+api/tests
+api/seed
+api/db
+api/*.md
+api/.env*
+api/pytest.ini
+api/requirements-dev.txt
+api/Dockerfile*
+**/__pycache__
+**/*.py[cod]

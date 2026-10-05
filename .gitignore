@@ -1,0 +1,30 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+.venv/
+*.egg-info/
+dist/
+build/
+.eggs/
+
+# Environment & secrets
+.env
+*.share
+
+# Data files (can be regenerated)
+etl/data/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+
+.clade/

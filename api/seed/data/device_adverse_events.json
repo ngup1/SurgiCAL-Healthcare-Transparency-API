@@ -1,0 +1,1542 @@
+[
+  {
+    "device_id": "2246a405-6cfc-591e-be9f-647719bfacb0",
+    "mdr_report_key": "18402847",
+    "product_code": "JWH",
+    "brand_name": "Meridian Ascend Total Knee System",
+    "manufacturer": "Meridian Orthopedics",
+    "event_type": "malfunction",
+    "event_date": "2026-02-27",
+    "patient_outcomes": [
+      "No Known Impact Or Consequence To Patient"
+    ],
+    "device_problems": [
+      "Fracture",
+      "Migration"
+    ],
+    "event_narrative": "During the procedure the user observed fracture. A backup device was used and the procedure was completed without delay. No patient injury was reported."
+  },
+  {
+    "device_id": "2246a405-6cfc-591e-be9f-647719bfacb0",
+    "mdr_report_key": "18404987",
+    "product_code": "JWH",
+    "brand_name": "Meridian Ascend Total Knee System",
+    "manufacturer": "Meridian Orthopedics",
+    "event_type": "malfunction",
+    "event_date": "2022-09-16",
+    "patient_outcomes": [
+      "No Consequences Or Impact To Patient"
+    ],
+    "device_problems": [
+      "Material Deformation"
+    ],
+    "event_narrative": "During the procedure the user observed material deformation. A backup device was used and the procedure was completed without delay. No patient injury was reported."
+  },
+  {
+    "device_id": "a0f529f2-0a25-5f59-9d1d-4448eebcdedc",
+    "mdr_report_key": "18410037",
+    "product_code": "KRO",
+    "brand_name": "Meridian Ascend Revision Knee",
+    "manufacturer": "Meridian Orthopedics",
+    "event_type": "injury",
+    "event_date": "2024-04-12",
+    "patient_outcomes": [
+      "Other"
+    ],
+    "device_problems": [
+      "Migration"
+    ],
+    "event_narrative": "It was reported that the patient required revision surgery approximately 47 days post-procedure due to migration. The device was explanted and returned for evaluation."
+  },
+  {
+    "device_id": "a0f529f2-0a25-5f59-9d1d-4448eebcdedc",
+    "mdr_report_key": "18411389",
+    "product_code": "KRO",
+    "brand_name": "Meridian Ascend Revision Knee",
+    "manufacturer": "Meridian Orthopedics",
+    "event_type": "malfunction",
+    "event_date": "2022-12-05",
+    "patient_outcomes": [
+      "No Consequences Or Impact To Patient"
+    ],
+    "device_problems": [
+      "Loosening of Implant Not Related to Bone-Ingrowth"
+    ],
+    "event_narrative": "During the procedure the user observed loosening of implant not related to bone-ingrowth. A backup device was used and the procedure was completed without delay. No patient injury was reported."
+  },
+  {
+    "device_id": "a0f529f2-0a25-5f59-9d1d-4448eebcdedc",
+    "mdr_report_key": "18416122",
+    "product_code": "KRO",
+    "brand_name": "Meridian Ascend Revision Knee",
+    "manufacturer": "Meridian Orthopedics",
+    "event_type": "malfunction",
+    "event_date": "2025-10-18",
+    "patient_outcomes": [
+      "No Consequences Or Impact To Patient"
+    ],
+    "device_problems": [
+      "Loosening of Implant Not Related to Bone-Ingrowth",
+      "Wear"
+    ],
+    "event_narrative": "During the procedure the user observed loosening of implant not related to bone-ingrowth. A backup device was used and the procedure was completed without delay. No patient injury was reported."
+  },
+  {
+    "device_id": "c6604621-714b-52ee-9306-939c213833e6",
+    "mdr_report_key": "18423134",
+    "product_code": "MBH",
+    "brand_name": "Halcyon Kinetic Knee",
+    "manufacturer": "Halcyon Biomedical",
+    "event_type": "injury",
+    "event_date": "2025-11-01",
+    "patient_outcomes": [
+      "Required Intervention"
+    ],
+    "device_problems": [
+      "Fracture",
+      "Device Dislodged or Dislocated"
+    ],
+    "event_narrative": "It was reported that the patient required revision surgery approximately 311 days post-procedure due to fracture. The device was explanted and returned for evaluation."
+  },
+  {
+    "device_id": "c6604621-714b-52ee-9306-939c213833e6",
+    "mdr_report_key": "18430534",
+    "product_code": "MBH",
+    "brand_name": "Halcyon Kinetic Knee",
+    "manufacturer": "Halcyon Biomedical",
+    "event_type": "injury",
+    "event_date": "2022-06-03",
+    "patient_outcomes": [
+      "Other"
+    ],
+    "device_problems": [
+      "Fracture"
+    ],
+    "event_narrative": "It was reported that the patient required revision surgery approximately 69 days post-procedure due to fracture. The device was explanted and returned for evaluation."
+  },
+  {
+    "device_id": "a9eea377-0577-5809-9541-1b8439dca3de",
+    "mdr_report_key": "18433377",
+    "product_code": "LPH",
+    "brand_name": "Meridian Stride Hip Stem",
+    "manufacturer": "Meridian Orthopedics",
+    "event_type": "malfunction",
+    "event_date": "2025-10-22",
+    "patient_outcomes": [
+      "No Consequences Or Impact To Patient"
+    ],
+    "device_problems": [
+      "Migration"
+    ],
+    "event_narrative": "During the procedure the user observed migration. A backup device was used and the procedure was completed without delay. No patient injury was reported."
+  },
+  {
+    "device_id": "a9eea377-0577-5809-9541-1b8439dca3de",
+    "mdr_report_key": "18435358",
+    "product_code": "LPH",
+    "brand_name": "Meridian Stride Hip Stem",
+    "manufacturer": "Meridian Orthopedics",
+    "event_type": "malfunction",
+    "event_date": "2023-03-13",
+    "patient_outcomes": [
+      "No Consequences Or Impact To Patient"
+    ],
+    "device_problems": [
+      "Migration",
+      "Material Deformation"
+    ],
+    "event_narrative": "During the procedure the user observed migration. A backup device was used and the procedure was completed without delay. No patient injury was reported."
+  },
+  {
+    "device_id": "a9eea377-0577-5809-9541-1b8439dca3de",
+    "mdr_report_key": "18441857",
+    "product_code": "LPH",
+    "brand_name": "Meridian Stride Hip Stem",
+    "manufacturer": "Meridian Orthopedics",
+    "event_type": "malfunction",
+    "event_date": "2022-03-14",
+    "patient_outcomes": [
+      "No Known Impact Or Consequence To Patient"
+    ],
+    "device_problems": [
+      "Material Deformation",
+      "Device Dislodged or Dislocated"
+    ],
+    "event_narrative": "During the procedure the user observed material deformation. A backup device was used and the procedure was completed without delay. No patient injury was reported."
+  },
+  {
+    "device_id": "a9eea377-0577-5809-9541-1b8439dca3de",
+    "mdr_report_key": "18449906",
+    "product_code": "LPH",
+    "brand_name": "Meridian Stride Hip Stem",
+    "manufacturer": "Meridian Orthopedics",
+    "event_type": "malfunction",
+    "event_date": "2024-07-31",
+    "patient_outcomes": [
+      "No Known Impact Or Consequence To Patient"
+    ],
+    "device_problems": [
+      "Device Dislodged or Dislocated"
+    ],
+    "event_narrative": "During the procedure the user observed device dislodged or dislocated. A backup device was used and the procedure was completed without delay. No patient injury was reported."
+  },
+  {
+    "device_id": "a9eea377-0577-5809-9541-1b8439dca3de",
+    "mdr_report_key": "18455754",
+    "product_code": "LPH",
+    "brand_name": "Meridian Stride Hip Stem",
+    "manufacturer": "Meridian Orthopedics",
+    "event_type": "malfunction",
+    "event_date": "2024-04-03",
+    "patient_outcomes": [
+      "No Known Impact Or Consequence To Patient"
+    ],
+    "device_problems": [
+      "Material Deformation",
+      "Fracture"
+    ],
+    "event_narrative": "During the procedure the user observed material deformation. A backup device was used and the procedure was completed without delay. No patient injury was reported."
+  },
+  {
+    "device_id": "cd11d982-9bc4-5cea-85c6-e40a5121e916",
+    "mdr_report_key": "18464472",
+    "product_code": "LPH",
+    "brand_name": "Halcyon Arcus Acetabular Cup",
+    "manufacturer": "Halcyon Biomedical",
+    "event_type": "malfunction",
+    "event_date": "2022-09-11",
+    "patient_outcomes": [
+      "No Known Impact Or Consequence To Patient"
+    ],
+    "device_problems": [
+      "Wear"
+    ],
+    "event_narrative": "During the procedure the user observed wear. A backup device was used and the procedure was completed without delay. No patient injury was reported."
+  },
+  {
+    "device_id": "cd11d982-9bc4-5cea-85c6-e40a5121e916",
+    "mdr_report_key": "18467071",
+    "product_code": "LPH",
+    "brand_name": "Halcyon Arcus Acetabular Cup",
+    "manufacturer": "Halcyon Biomedical",
+    "event_type": "injury",
+    "event_date": "2024-03-20",
+    "patient_outcomes": [
+      "Other"
+    ],
+    "device_problems": [
+      "Fracture",
+      "Wear"
+    ],
+    "event_narrative": "It was reported that the patient required revision surgery approximately 154 days post-procedure due to fracture. The device was explanted and returned for evaluation."
+  },
+  {
+    "device_id": "9b8a217c-c813-504d-98dc-fd00f4aeaf6e",
+    "mdr_report_key": "18474231",
+    "product_code": "LZO",
+    "brand_name": "Halcyon Arcus Ceramic Head",
+    "manufacturer": "Halcyon Biomedical",
+    "event_type": "malfunction",
+    "event_date": "2023-01-24",
+    "patient_outcomes": [
+      "No Known Impact Or Consequence To Patient"
+    ],
+    "device_problems": [
+      "Loosening of Implant Not Related to Bone-Ingrowth"
+    ],
+    "event_narrative": "During the procedure the user observed loosening of implant not related to bone-ingrowth. A backup device was used and the procedure was completed without delay. No patient injury was reported."
+  },
+  {
+    "device_id": "9b8a217c-c813-504d-98dc-fd00f4aeaf6e",
+    "mdr_report_key": "18476471",
+    "product_code": "LZO",
+    "brand_name": "Halcyon Arcus Ceramic Head",
+    "manufacturer": "Halcyon Biomedical",
+    "event_type": "malfunction",
+    "event_date": "2025-09-26",
+    "patient_outcomes": [
+      "No Consequences Or Impact To Patient"
+    ],
+    "device_problems": [
+      "Loosening of Implant Not Related to Bone-Ingrowth",
+      "Fracture"
+    ],
+    "event_narrative": "During the procedure the user observed loosening of implant not related to bone-ingrowth. A backup device was used and the procedure was completed without delay. No patient injury was reported."
+  },
+  {
+    "device_id": "9b8a217c-c813-504d-98dc-fd00f4aeaf6e",
+    "mdr_report_key": "18480875",
+    "product_code": "LZO",
+    "brand_name": "Halcyon Arcus Ceramic Head",
+    "manufacturer": "Halcyon Biomedical",
+    "event_type": "malfunction",
+    "event_date": "2025-10-28",
+    "patient_outcomes": [
+      "No Consequences Or Impact To Patient"
+    ],
+    "device_problems": [
+      "Device Dislodged or Dislocated",
+      "Wear"
+    ],
+    "event_narrative": "During the procedure the user observed device dislodged or dislocated. A backup device was used and the procedure was completed without delay. No patient injury was reported."
+  },
+  {
+    "device_id": "9b8a217c-c813-504d-98dc-fd00f4aeaf6e",
+    "mdr_report_key": "18487476",
+    "product_code": "LZO",
+    "brand_name": "Halcyon Arcus Ceramic Head",
+    "manufacturer": "Halcyon Biomedical",
+    "event_type": "malfunction",
+    "event_date": "2022-08-09",
+    "patient_outcomes": [
+      "No Consequences Or Impact To Patient"
+    ],
+    "device_problems": [
+      "Fracture",
+      "Loosening of Implant Not Related to Bone-Ingrowth"
+    ],
+    "event_narrative": "During the procedure the user observed fracture. A backup device was used and the procedure was completed without delay. No patient injury was reported."
+  },
+  {
+    "device_id": "a4f9648c-8103-55a1-9c3b-6bd9c1b35dfb",
+    "mdr_report_key": "18488378",
+    "product_code": "KWS",
+    "brand_name": "Meridian Summit Shoulder",
+    "manufacturer": "Meridian Orthopedics",
+    "event_type": "injury",
+    "event_date": "2026-02-19",
+    "patient_outcomes": [
+      "Required Intervention"
+    ],
+    "device_problems": [
+      "Wear",
+      "Device Dislodged or Dislocated"
+    ],
+    "event_narrative": "It was reported that the patient required revision surgery approximately 223 days post-procedure due to wear. The device was explanted and returned for evaluation."
+  },
+  {
+    "device_id": "a4f9648c-8103-55a1-9c3b-6bd9c1b35dfb",
+    "mdr_report_key": "18496295",
+    "product_code": "KWS",
+    "brand_name": "Meridian Summit Shoulder",
+    "manufacturer": "Meridian Orthopedics",
+    "event_type": "malfunction",
+    "event_date": "2023-05-23",
+    "patient_outcomes": [
+      "No Consequences Or Impact To Patient"
+    ],
+    "device_problems": [
+      "Loosening of Implant Not Related to Bone-Ingrowth",
+      "Wear"
+    ],
+    "event_narrative": "During the procedure the user observed loosening of implant not related to bone-ingrowth. A backup device was used and the procedure was completed without delay. No patient injury was reported."
+  },
+  {
+    "device_id": "a4f9648c-8103-55a1-9c3b-6bd9c1b35dfb",
+    "mdr_report_key": "18504721",
+    "product_code": "KWS",
+    "brand_name": "Meridian Summit Shoulder",
+    "manufacturer": "Meridian Orthopedics",
+    "event_type": "malfunction",
+    "event_date": "2025-12-06",
+    "patient_outcomes": [
+      "No Consequences Or Impact To Patient"
+    ],
+    "device_problems": [
+      "Loosening of Implant Not Related to Bone-Ingrowth",
+      "Migration"
+    ],
+    "event_narrative": "During the procedure the user observed loosening of implant not related to bone-ingrowth. A backup device was used and the procedure was completed without delay. No patient injury was reported."
+  },
+  {
+    "device_id": "a91b4afa-5d56-565b-9d29-a7bcb838907c",
+    "mdr_report_key": "18508562",
+    "product_code": "NKB",
+    "brand_name": "Northstar Keel Pedicle Screw System",
+    "manufacturer": "Northstar Spine",
+    "event_type": "malfunction",
+    "event_date": "2024-11-10",
+    "patient_outcomes": [
+      "No Known Impact Or Consequence To Patient"
+    ],
+    "device_problems": [
+      "Wear",
+      "Loosening of Implant Not Related to Bone-Ingrowth"
+    ],
+    "event_narrative": "During the procedure the user observed wear. A backup device was used and the procedure was completed without delay. No patient injury was reported."
+  },
+  {
+    "device_id": "a91b4afa-5d56-565b-9d29-a7bcb838907c",
+    "mdr_report_key": "18509458",
+    "product_code": "NKB",
+    "brand_name": "Northstar Keel Pedicle Screw System",
+    "manufacturer": "Northstar Spine",
+    "event_type": "malfunction",
+    "event_date": "2023-12-20",
+    "patient_outcomes": [
+      "No Known Impact Or Consequence To Patient"
+    ],
+    "device_problems": [
+      "Migration",
+      "Material Deformation"
+    ],
+    "event_narrative": "During the procedure the user observed migration. A backup device was used and the procedure was completed without delay. No patient injury was reported."
+  },
+  {
+    "device_id": "a91b4afa-5d56-565b-9d29-a7bcb838907c",
+    "mdr_report_key": "18514748",
+    "product_code": "NKB",
+    "brand_name": "Northstar Keel Pedicle Screw System",
+    "manufacturer": "Northstar Spine",
+    "event_type": "injury",
+    "event_date": "2022-01-02",
+    "patient_outcomes": [
+      "Required Intervention"
+    ],
+    "device_problems": [
+      "Loosening of Implant Not Related to Bone-Ingrowth"
+    ],
+    "event_narrative": "It was reported that the patient required revision surgery approximately 339 days post-procedure due to loosening of implant not related to bone-ingrowth. The device was explanted and returned for evaluation."
+  },
+  {
+    "device_id": "a91b4afa-5d56-565b-9d29-a7bcb838907c",
+    "mdr_report_key": "18520067",
+    "product_code": "NKB",
+    "brand_name": "Northstar Keel Pedicle Screw System",
+    "manufacturer": "Northstar Spine",
+    "event_type": "malfunction",
+    "event_date": "2022-07-26",
+    "patient_outcomes": [
+      "No Known Impact Or Consequence To Patient"
+    ],
+    "device_problems": [
+      "Migration",
+      "Device Dislodged or Dislocated"
+    ],
+    "event_narrative": "During the procedure the user observed migration. A backup device was used and the procedure was completed without delay. No patient injury was reported."
+  },
+  {
+    "device_id": "2bdce6a0-fe23-5c97-8c1b-b10688307f92",
+    "mdr_report_key": "18521944",
+    "product_code": "ODP",
+    "brand_name": "Northstar Lattice Cervical Cage",
+    "manufacturer": "Northstar Spine",
+    "event_type": "malfunction",
+    "event_date": "2025-02-04",
+    "patient_outcomes": [
+      "No Consequences Or Impact To Patient"
+    ],
+    "device_problems": [
+      "Material Deformation"
+    ],
+    "event_narrative": "During the procedure the user observed material deformation. A backup device was used and the procedure was completed without delay. No patient injury was reported."
+  },
+  {
+    "device_id": "2bdce6a0-fe23-5c97-8c1b-b10688307f92",
+    "mdr_report_key": "18527901",
+    "product_code": "ODP",
+    "brand_name": "Northstar Lattice Cervical Cage",
+    "manufacturer": "Northstar Spine",
+    "event_type": "injury",
+    "event_date": "2024-12-19",
+    "patient_outcomes": [
+      "Other"
+    ],
+    "device_problems": [
+      "Material Deformation",
+      "Device Dislodged or Dislocated"
+    ],
+    "event_narrative": "It was reported that the patient required revision surgery approximately 122 days post-procedure due to material deformation. The device was explanted and returned for evaluation."
+  },
+  {
+    "device_id": "2bdce6a0-fe23-5c97-8c1b-b10688307f92",
+    "mdr_report_key": "18532472",
+    "product_code": "ODP",
+    "brand_name": "Northstar Lattice Cervical Cage",
+    "manufacturer": "Northstar Spine",
+    "event_type": "malfunction",
+    "event_date": "2022-09-25",
+    "patient_outcomes": [
+      "No Consequences Or Impact To Patient"
+    ],
+    "device_problems": [
+      "Loosening of Implant Not Related to Bone-Ingrowth",
+      "Material Deformation"
+    ],
+    "event_narrative": "During the procedure the user observed loosening of implant not related to bone-ingrowth. A backup device was used and the procedure was completed without delay. No patient injury was reported."
+  },
+  {
+    "device_id": "2bdce6a0-fe23-5c97-8c1b-b10688307f92",
+    "mdr_report_key": "18535642",
+    "product_code": "ODP",
+    "brand_name": "Northstar Lattice Cervical Cage",
+    "manufacturer": "Northstar Spine",
+    "event_type": "malfunction",
+    "event_date": "2025-01-24",
+    "patient_outcomes": [
+      "No Known Impact Or Consequence To Patient"
+    ],
+    "device_problems": [
+      "Loosening of Implant Not Related to Bone-Ingrowth",
+      "Material Deformation"
+    ],
+    "event_narrative": "During the procedure the user observed loosening of implant not related to bone-ingrowth. A backup device was used and the procedure was completed without delay. No patient injury was reported."
+  },
+  {
+    "device_id": "d97d75ba-b813-52ff-bc3a-84a701ecaf12",
+    "mdr_report_key": "18536409",
+    "product_code": "KWQ",
+    "brand_name": "Northstar Lattice Cervical Plate",
+    "manufacturer": "Northstar Spine",
+    "event_type": "malfunction",
+    "event_date": "2025-02-21",
+    "patient_outcomes": [
+      "No Known Impact Or Consequence To Patient"
+    ],
+    "device_problems": [
+      "Device Dislodged or Dislocated",
+      "Migration"
+    ],
+    "event_narrative": "During the procedure the user observed device dislodged or dislocated. A backup device was used and the procedure was completed without delay. No patient injury was reported."
+  },
+  {
+    "device_id": "d97d75ba-b813-52ff-bc3a-84a701ecaf12",
+    "mdr_report_key": "18543806",
+    "product_code": "KWQ",
+    "brand_name": "Northstar Lattice Cervical Plate",
+    "manufacturer": "Northstar Spine",
+    "event_type": "injury",
+    "event_date": "2022-05-19",
+    "patient_outcomes": [
+      "Disability"
+    ],
+    "device_problems": [
+      "Wear"
+    ],
+    "event_narrative": "It was reported that the patient required revision surgery approximately 215 days post-procedure due to wear. The device was explanted and returned for evaluation."
+  },
+  {
+    "device_id": "d97d75ba-b813-52ff-bc3a-84a701ecaf12",
+    "mdr_report_key": "18552437",
+    "product_code": "KWQ",
+    "brand_name": "Northstar Lattice Cervical Plate",
+    "manufacturer": "Northstar Spine",
+    "event_type": "injury",
+    "event_date": "2025-05-12",
+    "patient_outcomes": [
+      "Other"
+    ],
+    "device_problems": [
+      "Fracture"
+    ],
+    "event_narrative": "It was reported that the patient required revision surgery approximately 357 days post-procedure due to fracture. The device was explanted and returned for evaluation."
+  },
+  {
+    "device_id": "385893c6-cf36-59fc-b46f-342a506d9abd",
+    "mdr_report_key": "18556055",
+    "product_code": "FTL",
+    "brand_name": "Halcyon FlexWeave Hernia Mesh",
+    "manufacturer": "Halcyon Biomedical",
+    "event_type": "malfunction",
+    "event_date": "2024-07-21",
+    "patient_outcomes": [
+      "No Known Impact Or Consequence To Patient"
+    ],
+    "device_problems": [
+      "Device Dislodged or Dislocated"
+    ],
+    "event_narrative": "During the procedure the user observed device dislodged or dislocated. A backup device was used and the procedure was completed without delay. No patient injury was reported."
+  },
+  {
+    "device_id": "385893c6-cf36-59fc-b46f-342a506d9abd",
+    "mdr_report_key": "18559714",
+    "product_code": "FTL",
+    "brand_name": "Halcyon FlexWeave Hernia Mesh",
+    "manufacturer": "Halcyon Biomedical",
+    "event_type": "malfunction",
+    "event_date": "2022-12-17",
+    "patient_outcomes": [
+      "No Consequences Or Impact To Patient"
+    ],
+    "device_problems": [
+      "Device Dislodged or Dislocated",
+      "Loosening of Implant Not Related to Bone-Ingrowth"
+    ],
+    "event_narrative": "During the procedure the user observed device dislodged or dislocated. A backup device was used and the procedure was completed without delay. No patient injury was reported."
+  },
+  {
+    "device_id": "385893c6-cf36-59fc-b46f-342a506d9abd",
+    "mdr_report_key": "18568505",
+    "product_code": "FTL",
+    "brand_name": "Halcyon FlexWeave Hernia Mesh",
+    "manufacturer": "Halcyon Biomedical",
+    "event_type": "malfunction",
+    "event_date": "2022-10-31",
+    "patient_outcomes": [
+      "No Known Impact Or Consequence To Patient"
+    ],
+    "device_problems": [
+      "Material Deformation"
+    ],
+    "event_narrative": "During the procedure the user observed material deformation. A backup device was used and the procedure was completed without delay. No patient injury was reported."
+  },
+  {
+    "device_id": "2ab4e515-038b-5c96-9546-346a3cbb0b30",
+    "mdr_report_key": "18573872",
+    "product_code": "FTL",
+    "brand_name": "Halcyon FlexWeave Composite Mesh",
+    "manufacturer": "Halcyon Biomedical",
+    "event_type": "malfunction",
+    "event_date": "2024-04-16",
+    "patient_outcomes": [
+      "No Known Impact Or Consequence To Patient"
+    ],
+    "device_problems": [
+      "Material Deformation",
+      "Fracture"
+    ],
+    "event_narrative": "During the procedure the user observed material deformation. A backup device was used and the procedure was completed without delay. No patient injury was reported."
+  },
+  {
+    "device_id": "2ab4e515-038b-5c96-9546-346a3cbb0b30",
+    "mdr_report_key": "18574860",
+    "product_code": "FTL",
+    "brand_name": "Halcyon FlexWeave Composite Mesh",
+    "manufacturer": "Halcyon Biomedical",
+    "event_type": "injury",
+    "event_date": "2023-03-26",
+    "patient_outcomes": [
+      "Other"
+    ],
+    "device_problems": [
+      "Migration"
+    ],
+    "event_narrative": "It was reported that the patient required revision surgery approximately 91 days post-procedure due to migration. The device was explanted and returned for evaluation."
+  },
+  {
+    "device_id": "2ab4e515-038b-5c96-9546-346a3cbb0b30",
+    "mdr_report_key": "18579104",
+    "product_code": "FTL",
+    "brand_name": "Halcyon FlexWeave Composite Mesh",
+    "manufacturer": "Halcyon Biomedical",
+    "event_type": "death",
+    "event_date": "2026-03-08",
+    "patient_outcomes": [
+      "Death"
+    ],
+    "device_problems": [
+      "Material Deformation"
+    ],
+    "event_narrative": "It was reported that the patient expired 335 days after the procedure. The relationship between the device and the death has not been established. Investigation is ongoing."
+  },
+  {
+    "device_id": "2ab4e515-038b-5c96-9546-346a3cbb0b30",
+    "mdr_report_key": "18583370",
+    "product_code": "FTL",
+    "brand_name": "Halcyon FlexWeave Composite Mesh",
+    "manufacturer": "Halcyon Biomedical",
+    "event_type": "injury",
+    "event_date": "2023-03-28",
+    "patient_outcomes": [
+      "Other"
+    ],
+    "device_problems": [
+      "Wear"
+    ],
+    "event_narrative": "It was reported that the patient required revision surgery approximately 138 days post-procedure due to wear. The device was explanted and returned for evaluation."
+  },
+  {
+    "device_id": "9dc07231-6e8a-5fd4-bacd-34102aee26d0",
+    "mdr_report_key": "18591545",
+    "product_code": "NIQ",
+    "brand_name": "Cardiovance Lumina DES",
+    "manufacturer": "Cardiovance Medical",
+    "event_type": "malfunction",
+    "event_date": "2023-01-22",
+    "patient_outcomes": [
+      "No Known Impact Or Consequence To Patient"
+    ],
+    "device_problems": [
+      "Fracture"
+    ],
+    "event_narrative": "During the procedure the user observed fracture. A backup device was used and the procedure was completed without delay. No patient injury was reported."
+  },
+  {
+    "device_id": "9dc07231-6e8a-5fd4-bacd-34102aee26d0",
+    "mdr_report_key": "18594550",
+    "product_code": "NIQ",
+    "brand_name": "Cardiovance Lumina DES",
+    "manufacturer": "Cardiovance Medical",
+    "event_type": "injury",
+    "event_date": "2022-11-30",
+    "patient_outcomes": [
+      "Hospitalization",
+      "Required Intervention"
+    ],
+    "device_problems": [
+      "Migration"
+    ],
+    "event_narrative": "It was reported that the patient required revision surgery approximately 202 days post-procedure due to migration. The device was explanted and returned for evaluation."
+  },
+  {
+    "device_id": "9dc07231-6e8a-5fd4-bacd-34102aee26d0",
+    "mdr_report_key": "18597677",
+    "product_code": "NIQ",
+    "brand_name": "Cardiovance Lumina DES",
+    "manufacturer": "Cardiovance Medical",
+    "event_type": "malfunction",
+    "event_date": "2023-05-18",
+    "patient_outcomes": [
+      "No Known Impact Or Consequence To Patient"
+    ],
+    "device_problems": [
+      "Wear"
+    ],
+    "event_narrative": "During the procedure the user observed wear. A backup device was used and the procedure was completed without delay. No patient injury was reported."
+  },
+  {
+    "device_id": "9dc07231-6e8a-5fd4-bacd-34102aee26d0",
+    "mdr_report_key": "18604321",
+    "product_code": "NIQ",
+    "brand_name": "Cardiovance Lumina DES",
+    "manufacturer": "Cardiovance Medical",
+    "event_type": "malfunction",
+    "event_date": "2026-03-17",
+    "patient_outcomes": [
+      "No Consequences Or Impact To Patient"
+    ],
+    "device_problems": [
+      "Material Deformation"
+    ],
+    "event_narrative": "During the procedure the user observed material deformation. A backup device was used and the procedure was completed without delay. No patient injury was reported."
+  },
+  {
+    "device_id": "9dc07231-6e8a-5fd4-bacd-34102aee26d0",
+    "mdr_report_key": "18606004",
+    "product_code": "NIQ",
+    "brand_name": "Cardiovance Lumina DES",
+    "manufacturer": "Cardiovance Medical",
+    "event_type": "malfunction",
+    "event_date": "2022-01-28",
+    "patient_outcomes": [
+      "No Consequences Or Impact To Patient"
+    ],
+    "device_problems": [
+      "Loosening of Implant Not Related to Bone-Ingrowth"
+    ],
+    "event_narrative": "During the procedure the user observed loosening of implant not related to bone-ingrowth. A backup device was used and the procedure was completed without delay. No patient injury was reported."
+  },
+  {
+    "device_id": "9dc07231-6e8a-5fd4-bacd-34102aee26d0",
+    "mdr_report_key": "18610122",
+    "product_code": "NIQ",
+    "brand_name": "Cardiovance Lumina DES",
+    "manufacturer": "Cardiovance Medical",
+    "event_type": "injury",
+    "event_date": "2022-01-28",
+    "patient_outcomes": [
+      "Required Intervention"
+    ],
+    "device_problems": [
+      "Fracture",
+      "Device Dislodged or Dislocated"
+    ],
+    "event_narrative": "It was reported that the patient required revision surgery approximately 55 days post-procedure due to fracture. The device was explanted and returned for evaluation."
+  },
+  {
+    "device_id": "0e9f8c8a-c221-59eb-9c00-122b47f4dc9f",
+    "mdr_report_key": "18617451",
+    "product_code": "NIQ",
+    "brand_name": "Cardiovance Lumina Thin DES",
+    "manufacturer": "Cardiovance Medical",
+    "event_type": "injury",
+    "event_date": "2022-11-13",
+    "patient_outcomes": [
+      "Hospitalization",
+      "Required Intervention"
+    ],
+    "device_problems": [
+      "Migration",
+      "Wear"
+    ],
+    "event_narrative": "It was reported that the patient required revision surgery approximately 29 days post-procedure due to migration. The device was explanted and returned for evaluation."
+  },
+  {
+    "device_id": "0e9f8c8a-c221-59eb-9c00-122b47f4dc9f",
+    "mdr_report_key": "18626406",
+    "product_code": "NIQ",
+    "brand_name": "Cardiovance Lumina Thin DES",
+    "manufacturer": "Cardiovance Medical",
+    "event_type": "injury",
+    "event_date": "2022-04-02",
+    "patient_outcomes": [
+      "Required Intervention"
+    ],
+    "device_problems": [
+      "Loosening of Implant Not Related to Bone-Ingrowth"
+    ],
+    "event_narrative": "It was reported that the patient required revision surgery approximately 279 days post-procedure due to loosening of implant not related to bone-ingrowth. The device was explanted and returned for evaluation."
+  },
+  {
+    "device_id": "0e9f8c8a-c221-59eb-9c00-122b47f4dc9f",
+    "mdr_report_key": "18631317",
+    "product_code": "NIQ",
+    "brand_name": "Cardiovance Lumina Thin DES",
+    "manufacturer": "Cardiovance Medical",
+    "event_type": "malfunction",
+    "event_date": "2023-04-05",
+    "patient_outcomes": [
+      "No Consequences Or Impact To Patient"
+    ],
+    "device_problems": [
+      "Fracture",
+      "Loosening of Implant Not Related to Bone-Ingrowth"
+    ],
+    "event_narrative": "During the procedure the user observed fracture. A backup device was used and the procedure was completed without delay. No patient injury was reported."
+  },
+  {
+    "device_id": "0e9f8c8a-c221-59eb-9c00-122b47f4dc9f",
+    "mdr_report_key": "18638365",
+    "product_code": "NIQ",
+    "brand_name": "Cardiovance Lumina Thin DES",
+    "manufacturer": "Cardiovance Medical",
+    "event_type": "malfunction",
+    "event_date": "2023-04-08",
+    "patient_outcomes": [
+      "No Known Impact Or Consequence To Patient"
+    ],
+    "device_problems": [
+      "Material Deformation",
+      "Migration"
+    ],
+    "event_narrative": "During the procedure the user observed material deformation. A backup device was used and the procedure was completed without delay. No patient injury was reported."
+  },
+  {
+    "device_id": "0e9f8c8a-c221-59eb-9c00-122b47f4dc9f",
+    "mdr_report_key": "18640256",
+    "product_code": "NIQ",
+    "brand_name": "Cardiovance Lumina Thin DES",
+    "manufacturer": "Cardiovance Medical",
+    "event_type": "malfunction",
+    "event_date": "2022-07-28",
+    "patient_outcomes": [
+      "No Known Impact Or Consequence To Patient"
+    ],
+    "device_problems": [
+      "Fracture"
+    ],
+    "event_narrative": "During the procedure the user observed fracture. A backup device was used and the procedure was completed without delay. No patient injury was reported."
+  },
+  {
+    "device_id": "0e9f8c8a-c221-59eb-9c00-122b47f4dc9f",
+    "mdr_report_key": "18641555",
+    "product_code": "NIQ",
+    "brand_name": "Cardiovance Lumina Thin DES",
+    "manufacturer": "Cardiovance Medical",
+    "event_type": "injury",
+    "event_date": "2022-06-23",
+    "patient_outcomes": [
+      "Required Intervention"
+    ],
+    "device_problems": [
+      "Migration"
+    ],
+    "event_narrative": "It was reported that the patient required revision surgery approximately 310 days post-procedure due to migration. The device was explanted and returned for evaluation."
+  },
+  {
+    "device_id": "0e9f8c8a-c221-59eb-9c00-122b47f4dc9f",
+    "mdr_report_key": "18644080",
+    "product_code": "NIQ",
+    "brand_name": "Cardiovance Lumina Thin DES",
+    "manufacturer": "Cardiovance Medical",
+    "event_type": "malfunction",
+    "event_date": "2025-10-23",
+    "patient_outcomes": [
+      "No Known Impact Or Consequence To Patient"
+    ],
+    "device_problems": [
+      "Device Dislodged or Dislocated",
+      "Fracture"
+    ],
+    "event_narrative": "During the procedure the user observed device dislodged or dislocated. A backup device was used and the procedure was completed without delay. No patient injury was reported."
+  },
+  {
+    "device_id": "0e9f8c8a-c221-59eb-9c00-122b47f4dc9f",
+    "mdr_report_key": "18649070",
+    "product_code": "NIQ",
+    "brand_name": "Cardiovance Lumina Thin DES",
+    "manufacturer": "Cardiovance Medical",
+    "event_type": "injury",
+    "event_date": "2023-07-10",
+    "patient_outcomes": [
+      "Disability"
+    ],
+    "device_problems": [
+      "Migration",
+      "Loosening of Implant Not Related to Bone-Ingrowth"
+    ],
+    "event_narrative": "It was reported that the patient required revision surgery approximately 339 days post-procedure due to migration. The device was explanted and returned for evaluation."
+  },
+  {
+    "device_id": "0e9f8c8a-c221-59eb-9c00-122b47f4dc9f",
+    "mdr_report_key": "18655167",
+    "product_code": "NIQ",
+    "brand_name": "Cardiovance Lumina Thin DES",
+    "manufacturer": "Cardiovance Medical",
+    "event_type": "injury",
+    "event_date": "2022-11-01",
+    "patient_outcomes": [
+      "Hospitalization",
+      "Required Intervention"
+    ],
+    "device_problems": [
+      "Loosening of Implant Not Related to Bone-Ingrowth"
+    ],
+    "event_narrative": "It was reported that the patient required revision surgery approximately 164 days post-procedure due to loosening of implant not related to bone-ingrowth. The device was explanted and returned for evaluation."
+  },
+  {
+    "device_id": "68670191-dbe2-5dbd-a693-5f7118cab2c2",
+    "mdr_report_key": "18657587",
+    "product_code": "DXY",
+    "brand_name": "Cardiovance Pulse DR Pacemaker",
+    "manufacturer": "Cardiovance Medical",
+    "event_type": "malfunction",
+    "event_date": "2024-02-28",
+    "patient_outcomes": [
+      "No Known Impact Or Consequence To Patient"
+    ],
+    "device_problems": [
+      "Fracture"
+    ],
+    "event_narrative": "During the procedure the user observed fracture. A backup device was used and the procedure was completed without delay. No patient injury was reported."
+  },
+  {
+    "device_id": "68670191-dbe2-5dbd-a693-5f7118cab2c2",
+    "mdr_report_key": "18665734",
+    "product_code": "DXY",
+    "brand_name": "Cardiovance Pulse DR Pacemaker",
+    "manufacturer": "Cardiovance Medical",
+    "event_type": "malfunction",
+    "event_date": "2022-10-11",
+    "patient_outcomes": [
+      "No Consequences Or Impact To Patient"
+    ],
+    "device_problems": [
+      "Device Dislodged or Dislocated",
+      "Migration"
+    ],
+    "event_narrative": "During the procedure the user observed device dislodged or dislocated. A backup device was used and the procedure was completed without delay. No patient injury was reported."
+  },
+  {
+    "device_id": "68670191-dbe2-5dbd-a693-5f7118cab2c2",
+    "mdr_report_key": "18672643",
+    "product_code": "DXY",
+    "brand_name": "Cardiovance Pulse DR Pacemaker",
+    "manufacturer": "Cardiovance Medical",
+    "event_type": "malfunction",
+    "event_date": "2023-04-17",
+    "patient_outcomes": [
+      "No Known Impact Or Consequence To Patient"
+    ],
+    "device_problems": [
+      "Device Dislodged or Dislocated",
+      "Material Deformation"
+    ],
+    "event_narrative": "During the procedure the user observed device dislodged or dislocated. A backup device was used and the procedure was completed without delay. No patient injury was reported."
+  },
+  {
+    "device_id": "68670191-dbe2-5dbd-a693-5f7118cab2c2",
+    "mdr_report_key": "18679604",
+    "product_code": "DXY",
+    "brand_name": "Cardiovance Pulse DR Pacemaker",
+    "manufacturer": "Cardiovance Medical",
+    "event_type": "malfunction",
+    "event_date": "2022-06-28",
+    "patient_outcomes": [
+      "No Consequences Or Impact To Patient"
+    ],
+    "device_problems": [
+      "Material Deformation"
+    ],
+    "event_narrative": "During the procedure the user observed material deformation. A backup device was used and the procedure was completed without delay. No patient injury was reported."
+  },
+  {
+    "device_id": "68670191-dbe2-5dbd-a693-5f7118cab2c2",
+    "mdr_report_key": "18679700",
+    "product_code": "DXY",
+    "brand_name": "Cardiovance Pulse DR Pacemaker",
+    "manufacturer": "Cardiovance Medical",
+    "event_type": "malfunction",
+    "event_date": "2025-02-17",
+    "patient_outcomes": [
+      "No Known Impact Or Consequence To Patient"
+    ],
+    "device_problems": [
+      "Migration"
+    ],
+    "event_narrative": "During the procedure the user observed migration. A backup device was used and the procedure was completed without delay. No patient injury was reported."
+  },
+  {
+    "device_id": "68670191-dbe2-5dbd-a693-5f7118cab2c2",
+    "mdr_report_key": "18681554",
+    "product_code": "DXY",
+    "brand_name": "Cardiovance Pulse DR Pacemaker",
+    "manufacturer": "Cardiovance Medical",
+    "event_type": "malfunction",
+    "event_date": "2023-08-27",
+    "patient_outcomes": [
+      "No Known Impact Or Consequence To Patient"
+    ],
+    "device_problems": [
+      "Migration",
+      "Fracture"
+    ],
+    "event_narrative": "During the procedure the user observed migration. A backup device was used and the procedure was completed without delay. No patient injury was reported."
+  },
+  {
+    "device_id": "68670191-dbe2-5dbd-a693-5f7118cab2c2",
+    "mdr_report_key": "18688502",
+    "product_code": "DXY",
+    "brand_name": "Cardiovance Pulse DR Pacemaker",
+    "manufacturer": "Cardiovance Medical",
+    "event_type": "malfunction",
+    "event_date": "2026-03-10",
+    "patient_outcomes": [
+      "No Consequences Or Impact To Patient"
+    ],
+    "device_problems": [
+      "Loosening of Implant Not Related to Bone-Ingrowth"
+    ],
+    "event_narrative": "During the procedure the user observed loosening of implant not related to bone-ingrowth. A backup device was used and the procedure was completed without delay. No patient injury was reported."
+  },
+  {
+    "device_id": "68670191-dbe2-5dbd-a693-5f7118cab2c2",
+    "mdr_report_key": "18690896",
+    "product_code": "DXY",
+    "brand_name": "Cardiovance Pulse DR Pacemaker",
+    "manufacturer": "Cardiovance Medical",
+    "event_type": "malfunction",
+    "event_date": "2024-05-19",
+    "patient_outcomes": [
+      "No Known Impact Or Consequence To Patient"
+    ],
+    "device_problems": [
+      "Material Deformation"
+    ],
+    "event_narrative": "During the procedure the user observed material deformation. A backup device was used and the procedure was completed without delay. No patient injury was reported."
+  },
+  {
+    "device_id": "aba6875e-5077-59c9-96c1-0bd1bf7f083a",
+    "mdr_report_key": "18691440",
+    "product_code": "DTB",
+    "brand_name": "Cardiovance Pulse Pacing Lead",
+    "manufacturer": "Cardiovance Medical",
+    "event_type": "malfunction",
+    "event_date": "2023-05-17",
+    "patient_outcomes": [
+      "No Consequences Or Impact To Patient"
+    ],
+    "device_problems": [
+      "Loosening of Implant Not Related to Bone-Ingrowth"
+    ],
+    "event_narrative": "During the procedure the user observed loosening of implant not related to bone-ingrowth. A backup device was used and the procedure was completed without delay. No patient injury was reported."
+  },
+  {
+    "device_id": "aba6875e-5077-59c9-96c1-0bd1bf7f083a",
+    "mdr_report_key": "18698313",
+    "product_code": "DTB",
+    "brand_name": "Cardiovance Pulse Pacing Lead",
+    "manufacturer": "Cardiovance Medical",
+    "event_type": "malfunction",
+    "event_date": "2026-03-03",
+    "patient_outcomes": [
+      "No Consequences Or Impact To Patient"
+    ],
+    "device_problems": [
+      "Wear"
+    ],
+    "event_narrative": "During the procedure the user observed wear. A backup device was used and the procedure was completed without delay. No patient injury was reported."
+  },
+  {
+    "device_id": "aba6875e-5077-59c9-96c1-0bd1bf7f083a",
+    "mdr_report_key": "18707004",
+    "product_code": "DTB",
+    "brand_name": "Cardiovance Pulse Pacing Lead",
+    "manufacturer": "Cardiovance Medical",
+    "event_type": "injury",
+    "event_date": "2026-01-19",
+    "patient_outcomes": [
+      "Other"
+    ],
+    "device_problems": [
+      "Wear",
+      "Material Deformation"
+    ],
+    "event_narrative": "It was reported that the patient required revision surgery approximately 228 days post-procedure due to wear. The device was explanted and returned for evaluation."
+  },
+  {
+    "device_id": "aba6875e-5077-59c9-96c1-0bd1bf7f083a",
+    "mdr_report_key": "18707270",
+    "product_code": "DTB",
+    "brand_name": "Cardiovance Pulse Pacing Lead",
+    "manufacturer": "Cardiovance Medical",
+    "event_type": "malfunction",
+    "event_date": "2025-08-08",
+    "patient_outcomes": [
+      "No Consequences Or Impact To Patient"
+    ],
+    "device_problems": [
+      "Loosening of Implant Not Related to Bone-Ingrowth"
+    ],
+    "event_narrative": "During the procedure the user observed loosening of implant not related to bone-ingrowth. A backup device was used and the procedure was completed without delay. No patient injury was reported."
+  },
+  {
+    "device_id": "aba6875e-5077-59c9-96c1-0bd1bf7f083a",
+    "mdr_report_key": "18710163",
+    "product_code": "DTB",
+    "brand_name": "Cardiovance Pulse Pacing Lead",
+    "manufacturer": "Cardiovance Medical",
+    "event_type": "malfunction",
+    "event_date": "2024-05-17",
+    "patient_outcomes": [
+      "No Known Impact Or Consequence To Patient"
+    ],
+    "device_problems": [
+      "Wear"
+    ],
+    "event_narrative": "During the procedure the user observed wear. A backup device was used and the procedure was completed without delay. No patient injury was reported."
+  },
+  {
+    "device_id": "aba6875e-5077-59c9-96c1-0bd1bf7f083a",
+    "mdr_report_key": "18714440",
+    "product_code": "DTB",
+    "brand_name": "Cardiovance Pulse Pacing Lead",
+    "manufacturer": "Cardiovance Medical",
+    "event_type": "injury",
+    "event_date": "2024-05-17",
+    "patient_outcomes": [
+      "Hospitalization",
+      "Required Intervention"
+    ],
+    "device_problems": [
+      "Material Deformation",
+      "Fracture"
+    ],
+    "event_narrative": "It was reported that the patient required revision surgery approximately 140 days post-procedure due to material deformation. The device was explanted and returned for evaluation."
+  },
+  {
+    "device_id": "aba6875e-5077-59c9-96c1-0bd1bf7f083a",
+    "mdr_report_key": "18715996",
+    "product_code": "DTB",
+    "brand_name": "Cardiovance Pulse Pacing Lead",
+    "manufacturer": "Cardiovance Medical",
+    "event_type": "malfunction",
+    "event_date": "2023-03-10",
+    "patient_outcomes": [
+      "No Known Impact Or Consequence To Patient"
+    ],
+    "device_problems": [
+      "Material Deformation"
+    ],
+    "event_narrative": "During the procedure the user observed material deformation. A backup device was used and the procedure was completed without delay. No patient injury was reported."
+  },
+  {
+    "device_id": "21a004e2-775a-5bd8-b7b9-55dd3bab94fd",
+    "mdr_report_key": "18722279",
+    "product_code": "HQL",
+    "brand_name": "Lumen Vision ClearView IOL",
+    "manufacturer": "Lumen Vision Inc.",
+    "event_type": "malfunction",
+    "event_date": "2023-02-03",
+    "patient_outcomes": [
+      "No Known Impact Or Consequence To Patient"
+    ],
+    "device_problems": [
+      "Material Deformation",
+      "Wear"
+    ],
+    "event_narrative": "During the procedure the user observed material deformation. A backup device was used and the procedure was completed without delay. No patient injury was reported."
+  },
+  {
+    "device_id": "21a004e2-775a-5bd8-b7b9-55dd3bab94fd",
+    "mdr_report_key": "18724039",
+    "product_code": "HQL",
+    "brand_name": "Lumen Vision ClearView IOL",
+    "manufacturer": "Lumen Vision Inc.",
+    "event_type": "malfunction",
+    "event_date": "2023-08-01",
+    "patient_outcomes": [
+      "No Consequences Or Impact To Patient"
+    ],
+    "device_problems": [
+      "Loosening of Implant Not Related to Bone-Ingrowth",
+      "Fracture"
+    ],
+    "event_narrative": "During the procedure the user observed loosening of implant not related to bone-ingrowth. A backup device was used and the procedure was completed without delay. No patient injury was reported."
+  },
+  {
+    "device_id": "21a004e2-775a-5bd8-b7b9-55dd3bab94fd",
+    "mdr_report_key": "18725833",
+    "product_code": "HQL",
+    "brand_name": "Lumen Vision ClearView IOL",
+    "manufacturer": "Lumen Vision Inc.",
+    "event_type": "malfunction",
+    "event_date": "2023-01-20",
+    "patient_outcomes": [
+      "No Consequences Or Impact To Patient"
+    ],
+    "device_problems": [
+      "Migration"
+    ],
+    "event_narrative": "During the procedure the user observed migration. A backup device was used and the procedure was completed without delay. No patient injury was reported."
+  },
+  {
+    "device_id": "21a004e2-775a-5bd8-b7b9-55dd3bab94fd",
+    "mdr_report_key": "18726413",
+    "product_code": "HQL",
+    "brand_name": "Lumen Vision ClearView IOL",
+    "manufacturer": "Lumen Vision Inc.",
+    "event_type": "malfunction",
+    "event_date": "2025-03-02",
+    "patient_outcomes": [
+      "No Consequences Or Impact To Patient"
+    ],
+    "device_problems": [
+      "Device Dislodged or Dislocated"
+    ],
+    "event_narrative": "During the procedure the user observed device dislodged or dislocated. A backup device was used and the procedure was completed without delay. No patient injury was reported."
+  },
+  {
+    "device_id": "21a004e2-775a-5bd8-b7b9-55dd3bab94fd",
+    "mdr_report_key": "18734389",
+    "product_code": "HQL",
+    "brand_name": "Lumen Vision ClearView IOL",
+    "manufacturer": "Lumen Vision Inc.",
+    "event_type": "malfunction",
+    "event_date": "2022-01-18",
+    "patient_outcomes": [
+      "No Known Impact Or Consequence To Patient"
+    ],
+    "device_problems": [
+      "Loosening of Implant Not Related to Bone-Ingrowth",
+      "Migration"
+    ],
+    "event_narrative": "During the procedure the user observed loosening of implant not related to bone-ingrowth. A backup device was used and the procedure was completed without delay. No patient injury was reported."
+  },
+  {
+    "device_id": "21a004e2-775a-5bd8-b7b9-55dd3bab94fd",
+    "mdr_report_key": "18739065",
+    "product_code": "HQL",
+    "brand_name": "Lumen Vision ClearView IOL",
+    "manufacturer": "Lumen Vision Inc.",
+    "event_type": "injury",
+    "event_date": "2026-03-20",
+    "patient_outcomes": [
+      "Disability"
+    ],
+    "device_problems": [
+      "Migration"
+    ],
+    "event_narrative": "It was reported that the patient required revision surgery approximately 372 days post-procedure due to migration. The device was explanted and returned for evaluation."
+  },
+  {
+    "device_id": "21a004e2-775a-5bd8-b7b9-55dd3bab94fd",
+    "mdr_report_key": "18744945",
+    "product_code": "HQL",
+    "brand_name": "Lumen Vision ClearView IOL",
+    "manufacturer": "Lumen Vision Inc.",
+    "event_type": "death",
+    "event_date": "2024-04-14",
+    "patient_outcomes": [
+      "Death"
+    ],
+    "device_problems": [
+      "Migration"
+    ],
+    "event_narrative": "It was reported that the patient expired 258 days after the procedure. The relationship between the device and the death has not been established. Investigation is ongoing."
+  },
+  {
+    "device_id": "21a004e2-775a-5bd8-b7b9-55dd3bab94fd",
+    "mdr_report_key": "18747455",
+    "product_code": "HQL",
+    "brand_name": "Lumen Vision ClearView IOL",
+    "manufacturer": "Lumen Vision Inc.",
+    "event_type": "malfunction",
+    "event_date": "2022-03-18",
+    "patient_outcomes": [
+      "No Known Impact Or Consequence To Patient"
+    ],
+    "device_problems": [
+      "Wear",
+      "Device Dislodged or Dislocated"
+    ],
+    "event_narrative": "During the procedure the user observed wear. A backup device was used and the procedure was completed without delay. No patient injury was reported."
+  },
+  {
+    "device_id": "21a004e2-775a-5bd8-b7b9-55dd3bab94fd",
+    "mdr_report_key": "18749987",
+    "product_code": "HQL",
+    "brand_name": "Lumen Vision ClearView IOL",
+    "manufacturer": "Lumen Vision Inc.",
+    "event_type": "injury",
+    "event_date": "2022-07-11",
+    "patient_outcomes": [
+      "Hospitalization",
+      "Required Intervention"
+    ],
+    "device_problems": [
+      "Material Deformation"
+    ],
+    "event_narrative": "It was reported that the patient required revision surgery approximately 111 days post-procedure due to material deformation. The device was explanted and returned for evaluation."
+  },
+  {
+    "device_id": "8499edcd-7f07-5273-911d-af3cee15cc48",
+    "mdr_report_key": "18753458",
+    "product_code": "MJP",
+    "brand_name": "Lumen Vision ClearView Toric IOL",
+    "manufacturer": "Lumen Vision Inc.",
+    "event_type": "death",
+    "event_date": "2025-03-07",
+    "patient_outcomes": [
+      "Death"
+    ],
+    "device_problems": [
+      "Fracture"
+    ],
+    "event_narrative": "It was reported that the patient expired 50 days after the procedure. The relationship between the device and the death has not been established. Investigation is ongoing."
+  },
+  {
+    "device_id": "8499edcd-7f07-5273-911d-af3cee15cc48",
+    "mdr_report_key": "18753752",
+    "product_code": "MJP",
+    "brand_name": "Lumen Vision ClearView Toric IOL",
+    "manufacturer": "Lumen Vision Inc.",
+    "event_type": "malfunction",
+    "event_date": "2024-10-18",
+    "patient_outcomes": [
+      "No Consequences Or Impact To Patient"
+    ],
+    "device_problems": [
+      "Device Dislodged or Dislocated",
+      "Loosening of Implant Not Related to Bone-Ingrowth"
+    ],
+    "event_narrative": "During the procedure the user observed device dislodged or dislocated. A backup device was used and the procedure was completed without delay. No patient injury was reported."
+  },
+  {
+    "device_id": "8499edcd-7f07-5273-911d-af3cee15cc48",
+    "mdr_report_key": "18758941",
+    "product_code": "MJP",
+    "brand_name": "Lumen Vision ClearView Toric IOL",
+    "manufacturer": "Lumen Vision Inc.",
+    "event_type": "malfunction",
+    "event_date": "2023-07-28",
+    "patient_outcomes": [
+      "No Known Impact Or Consequence To Patient"
+    ],
+    "device_problems": [
+      "Fracture",
+      "Loosening of Implant Not Related to Bone-Ingrowth"
+    ],
+    "event_narrative": "During the procedure the user observed fracture. A backup device was used and the procedure was completed without delay. No patient injury was reported."
+  },
+  {
+    "device_id": "8499edcd-7f07-5273-911d-af3cee15cc48",
+    "mdr_report_key": "18760452",
+    "product_code": "MJP",
+    "brand_name": "Lumen Vision ClearView Toric IOL",
+    "manufacturer": "Lumen Vision Inc.",
+    "event_type": "malfunction",
+    "event_date": "2023-06-09",
+    "patient_outcomes": [
+      "No Known Impact Or Consequence To Patient"
+    ],
+    "device_problems": [
+      "Migration",
+      "Wear"
+    ],
+    "event_narrative": "During the procedure the user observed migration. A backup device was used and the procedure was completed without delay. No patient injury was reported."
+  },
+  {
+    "device_id": "8499edcd-7f07-5273-911d-af3cee15cc48",
+    "mdr_report_key": "18762803",
+    "product_code": "MJP",
+    "brand_name": "Lumen Vision ClearView Toric IOL",
+    "manufacturer": "Lumen Vision Inc.",
+    "event_type": "injury",
+    "event_date": "2023-08-11",
+    "patient_outcomes": [
+      "Disability"
+    ],
+    "device_problems": [
+      "Loosening of Implant Not Related to Bone-Ingrowth",
+      "Migration"
+    ],
+    "event_narrative": "It was reported that the patient required revision surgery approximately 210 days post-procedure due to loosening of implant not related to bone-ingrowth. The device was explanted and returned for evaluation."
+  },
+  {
+    "device_id": "8499edcd-7f07-5273-911d-af3cee15cc48",
+    "mdr_report_key": "18764966",
+    "product_code": "MJP",
+    "brand_name": "Lumen Vision ClearView Toric IOL",
+    "manufacturer": "Lumen Vision Inc.",
+    "event_type": "malfunction",
+    "event_date": "2025-10-29",
+    "patient_outcomes": [
+      "No Known Impact Or Consequence To Patient"
+    ],
+    "device_problems": [
+      "Migration",
+      "Loosening of Implant Not Related to Bone-Ingrowth"
+    ],
+    "event_narrative": "During the procedure the user observed migration. A backup device was used and the procedure was completed without delay. No patient injury was reported."
+  },
+  {
+    "device_id": "8499edcd-7f07-5273-911d-af3cee15cc48",
+    "mdr_report_key": "18772390",
+    "product_code": "MJP",
+    "brand_name": "Lumen Vision ClearView Toric IOL",
+    "manufacturer": "Lumen Vision Inc.",
+    "event_type": "malfunction",
+    "event_date": "2025-08-11",
+    "patient_outcomes": [
+      "No Consequences Or Impact To Patient"
+    ],
+    "device_problems": [
+      "Device Dislodged or Dislocated"
+    ],
+    "event_narrative": "During the procedure the user observed device dislodged or dislocated. A backup device was used and the procedure was completed without delay. No patient injury was reported."
+  },
+  {
+    "device_id": "802a40d8-80fc-5995-bae6-85cbc9f41a10",
+    "mdr_report_key": "18773635",
+    "product_code": "LKF",
+    "brand_name": "Apex UteraGuide Manipulator",
+    "manufacturer": "Apex Surgical Instruments",
+    "event_type": "malfunction",
+    "event_date": "2024-08-12",
+    "patient_outcomes": [
+      "No Known Impact Or Consequence To Patient"
+    ],
+    "device_problems": [
+      "Misfire",
+      "Device Operates Differently Than Expected"
+    ],
+    "event_narrative": "During the procedure the user observed misfire. A backup device was used and the procedure was completed without delay. No patient injury was reported."
+  },
+  {
+    "device_id": "802a40d8-80fc-5995-bae6-85cbc9f41a10",
+    "mdr_report_key": "18782452",
+    "product_code": "LKF",
+    "brand_name": "Apex UteraGuide Manipulator",
+    "manufacturer": "Apex Surgical Instruments",
+    "event_type": "injury",
+    "event_date": "2023-01-05",
+    "patient_outcomes": [
+      "Required Intervention"
+    ],
+    "device_problems": [
+      "Misfire",
+      "Electrical Issue"
+    ],
+    "event_narrative": "It was reported that the patient required revision surgery approximately 204 days post-procedure due to misfire. The device was explanted and returned for evaluation."
+  },
+  {
+    "device_id": "802a40d8-80fc-5995-bae6-85cbc9f41a10",
+    "mdr_report_key": "18789598",
+    "product_code": "LKF",
+    "brand_name": "Apex UteraGuide Manipulator",
+    "manufacturer": "Apex Surgical Instruments",
+    "event_type": "malfunction",
+    "event_date": "2023-12-03",
+    "patient_outcomes": [
+      "No Known Impact Or Consequence To Patient"
+    ],
+    "device_problems": [
+      "Misfire",
+      "Device Operates Differently Than Expected"
+    ],
+    "event_narrative": "During the procedure the user observed misfire. A backup device was used and the procedure was completed without delay. No patient injury was reported."
+  },
+  {
+    "device_id": "1e5874db-0afa-5f77-a509-ba3705c12075",
+    "mdr_report_key": "18794893",
+    "product_code": "LCJ",
+    "brand_name": "Halcyon ContourForm Tissue Expander",
+    "manufacturer": "Halcyon Biomedical",
+    "event_type": "malfunction",
+    "event_date": "2024-05-30",
+    "patient_outcomes": [
+      "No Known Impact Or Consequence To Patient"
+    ],
+    "device_problems": [
+      "Loosening of Implant Not Related to Bone-Ingrowth",
+      "Migration"
+    ],
+    "event_narrative": "During the procedure the user observed loosening of implant not related to bone-ingrowth. A backup device was used and the procedure was completed without delay. No patient injury was reported."
+  },
+  {
+    "device_id": "1e5874db-0afa-5f77-a509-ba3705c12075",
+    "mdr_report_key": "18795829",
+    "product_code": "LCJ",
+    "brand_name": "Halcyon ContourForm Tissue Expander",
+    "manufacturer": "Halcyon Biomedical",
+    "event_type": "malfunction",
+    "event_date": "2024-05-16",
+    "patient_outcomes": [
+      "No Known Impact Or Consequence To Patient"
+    ],
+    "device_problems": [
+      "Material Deformation"
+    ],
+    "event_narrative": "During the procedure the user observed material deformation. A backup device was used and the procedure was completed without delay. No patient injury was reported."
+  },
+  {
+    "device_id": "1e5874db-0afa-5f77-a509-ba3705c12075",
+    "mdr_report_key": "18798764",
+    "product_code": "LCJ",
+    "brand_name": "Halcyon ContourForm Tissue Expander",
+    "manufacturer": "Halcyon Biomedical",
+    "event_type": "malfunction",
+    "event_date": "2024-04-09",
+    "patient_outcomes": [
+      "No Consequences Or Impact To Patient"
+    ],
+    "device_problems": [
+      "Migration"
+    ],
+    "event_narrative": "During the procedure the user observed migration. A backup device was used and the procedure was completed without delay. No patient injury was reported."
+  },
+  {
+    "device_id": "a33351b1-d164-5d2c-9bd7-ed60834d4288",
+    "mdr_report_key": "18801829",
+    "product_code": "FPA",
+    "brand_name": "Keystone FlowSet IV Infusion Set",
+    "manufacturer": "Keystone Endoscopy",
+    "event_type": "injury",
+    "event_date": "2023-12-02",
+    "patient_outcomes": [
+      "Other"
+    ],
+    "device_problems": [
+      "Break"
+    ],
+    "event_narrative": "It was reported that the patient required revision surgery approximately 85 days post-procedure due to break. The device was explanted and returned for evaluation."
+  },
+  {
+    "device_id": "a33351b1-d164-5d2c-9bd7-ed60834d4288",
+    "mdr_report_key": "18805132",
+    "product_code": "FPA",
+    "brand_name": "Keystone FlowSet IV Infusion Set",
+    "manufacturer": "Keystone Endoscopy",
+    "event_type": "malfunction",
+    "event_date": "2025-01-01",
+    "patient_outcomes": [
+      "No Consequences Or Impact To Patient"
+    ],
+    "device_problems": [
+      "Break",
+      "Packaging Problem"
+    ],
+    "event_narrative": "During the procedure the user observed break. A backup device was used and the procedure was completed without delay. No patient injury was reported."
+  }
+]

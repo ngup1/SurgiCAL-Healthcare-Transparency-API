@@ -1,0 +1,1982 @@
+[
+  {
+    "npi": "1572628497",
+    "patient_rating": 3.9,
+    "num_reviews": 17,
+    "total_medicare_services": 282,
+    "total_medicare_beneficiaries": 168,
+    "total_medicare_payment": 97716.28,
+    "wrvu_estimate": 1768.8,
+    "volume_bucket": "MEDIUM",
+    "trilliant_specialty": "Orthopaedic Surgery",
+    "trilliant_active": true,
+    "patient_demographics": {
+      "avg_age": 59,
+      "pct_female": 0.59,
+      "pct_medicare": 0.4,
+      "pct_dual_eligible": 0.27
+    },
+    "has_sanctions": false,
+    "specialty_classification": "Physician"
+  },
+  {
+    "npi": "1678377700",
+    "patient_rating": 3.8,
+    "num_reviews": 121,
+    "total_medicare_services": 605,
+    "total_medicare_beneficiaries": 271,
+    "total_medicare_payment": 143941.07,
+    "wrvu_estimate": 3131.6,
+    "volume_bucket": "MEDIUM",
+    "trilliant_specialty": "General Surgery",
+    "trilliant_active": true,
+    "patient_demographics": {
+      "avg_age": 65,
+      "pct_female": 0.64,
+      "pct_medicare": 0.56,
+      "pct_dual_eligible": 0.1
+    },
+    "has_sanctions": false,
+    "specialty_classification": "Physician"
+  },
+  {
+    "npi": "1435240829",
+    "patient_rating": 4.0,
+    "num_reviews": 228,
+    "total_medicare_services": 493,
+    "total_medicare_beneficiaries": 264,
+    "total_medicare_payment": 429752.08,
+    "wrvu_estimate": 2967.1,
+    "volume_bucket": "MEDIUM",
+    "trilliant_specialty": "General Surgery",
+    "trilliant_active": true,
+    "patient_demographics": {
+      "avg_age": 75,
+      "pct_female": 0.49,
+      "pct_medicare": 0.62,
+      "pct_dual_eligible": 0.15
+    },
+    "has_sanctions": false,
+    "specialty_classification": "Physician"
+  },
+  {
+    "npi": "1131869996",
+    "patient_rating": 3.6,
+    "num_reviews": 111,
+    "total_medicare_services": 971,
+    "total_medicare_beneficiaries": 491,
+    "total_medicare_payment": 142323.08,
+    "wrvu_estimate": 8382.8,
+    "volume_bucket": "HIGH",
+    "trilliant_specialty": "Ophthalmology",
+    "trilliant_active": true,
+    "patient_demographics": {
+      "avg_age": 65,
+      "pct_female": 0.37,
+      "pct_medicare": 0.25,
+      "pct_dual_eligible": 0.16
+    },
+    "has_sanctions": false,
+    "specialty_classification": "Physician"
+  },
+  {
+    "npi": "1349361836",
+    "patient_rating": 3.7,
+    "num_reviews": 279,
+    "total_medicare_services": 511,
+    "total_medicare_beneficiaries": 305,
+    "total_medicare_payment": 74586.74,
+    "wrvu_estimate": 2461.8,
+    "volume_bucket": "MEDIUM",
+    "trilliant_specialty": "General Surgery",
+    "trilliant_active": true,
+    "patient_demographics": {
+      "avg_age": 61,
+      "pct_female": 0.57,
+      "pct_medicare": 0.52,
+      "pct_dual_eligible": 0.06
+    },
+    "has_sanctions": false,
+    "specialty_classification": "Physician"
+  },
+  {
+    "npi": "1027874290",
+    "patient_rating": 4.1,
+    "num_reviews": 342,
+    "total_medicare_services": 285,
+    "total_medicare_beneficiaries": 221,
+    "total_medicare_payment": 212930.38,
+    "wrvu_estimate": 1391.2,
+    "volume_bucket": "LOW",
+    "trilliant_specialty": "Ophthalmology",
+    "trilliant_active": true,
+    "patient_demographics": {
+      "avg_age": 62,
+      "pct_female": 0.38,
+      "pct_medicare": 0.36,
+      "pct_dual_eligible": 0.08
+    },
+    "has_sanctions": false,
+    "specialty_classification": "Physician"
+  },
+  {
+    "npi": "1086131715",
+    "patient_rating": 4.1,
+    "num_reviews": 72,
+    "total_medicare_services": 610,
+    "total_medicare_beneficiaries": 454,
+    "total_medicare_payment": 186978.95,
+    "wrvu_estimate": 5156.4,
+    "volume_bucket": "HIGH",
+    "trilliant_specialty": "Ophthalmology",
+    "trilliant_active": true,
+    "patient_demographics": {
+      "avg_age": 61,
+      "pct_female": 0.45,
+      "pct_medicare": 0.6,
+      "pct_dual_eligible": 0.12
+    },
+    "has_sanctions": true,
+    "specialty_classification": "Physician"
+  },
+  {
+    "npi": "1875588679",
+    "patient_rating": 5.0,
+    "num_reviews": 408,
+    "total_medicare_services": 354,
+    "total_medicare_beneficiaries": 257,
+    "total_medicare_payment": 313031.89,
+    "wrvu_estimate": 1652.7,
+    "volume_bucket": "MEDIUM",
+    "trilliant_specialty": "Obstetrics & Gynecology",
+    "trilliant_active": true,
+    "patient_demographics": {
+      "avg_age": 49,
+      "pct_female": 0.39,
+      "pct_medicare": 0.68,
+      "pct_dual_eligible": 0.13
+    },
+    "has_sanctions": false,
+    "specialty_classification": "Physician"
+  },
+  {
+    "npi": "1621745961",
+    "patient_rating": 4.5,
+    "num_reviews": 225,
+    "total_medicare_services": 5305,
+    "total_medicare_beneficiaries": 4198,
+    "total_medicare_payment": 3732084.2,
+    "wrvu_estimate": 47649.4,
+    "volume_bucket": "HIGH",
+    "trilliant_specialty": "Diagnostic Radiology",
+    "trilliant_active": true,
+    "patient_demographics": {
+      "avg_age": 51,
+      "pct_female": 0.48,
+      "pct_medicare": 0.56,
+      "pct_dual_eligible": 0.28
+    },
+    "has_sanctions": false,
+    "specialty_classification": "Physician"
+  },
+  {
+    "npi": "1386922219",
+    "patient_rating": 4.0,
+    "num_reviews": 150,
+    "total_medicare_services": 461,
+    "total_medicare_beneficiaries": 309,
+    "total_medicare_payment": 96597.94,
+    "wrvu_estimate": 3822.8,
+    "volume_bucket": "MEDIUM",
+    "trilliant_specialty": "Gastroenterology",
+    "trilliant_active": true,
+    "patient_demographics": {
+      "avg_age": 59,
+      "pct_female": 0.65,
+      "pct_medicare": 0.38,
+      "pct_dual_eligible": 0.29
+    },
+    "has_sanctions": false,
+    "specialty_classification": "Physician"
+  },
+  {
+    "npi": "1369594407",
+    "patient_rating": 4.6,
+    "num_reviews": 120,
+    "total_medicare_services": 4076,
+    "total_medicare_beneficiaries": 2620,
+    "total_medicare_payment": 1503649.38,
+    "wrvu_estimate": 33914.5,
+    "volume_bucket": "HIGH",
+    "trilliant_specialty": "Neurological Surgery",
+    "trilliant_active": true,
+    "patient_demographics": {
+      "avg_age": 67,
+      "pct_female": 0.43,
+      "pct_medicare": 0.59,
+      "pct_dual_eligible": 0.24
+    },
+    "has_sanctions": false,
+    "specialty_classification": "Physician"
+  },
+  {
+    "npi": "1095214569",
+    "patient_rating": 4.5,
+    "num_reviews": 176,
+    "total_medicare_services": 1286,
+    "total_medicare_beneficiaries": 928,
+    "total_medicare_payment": 596744.82,
+    "wrvu_estimate": 9832.0,
+    "volume_bucket": "HIGH",
+    "trilliant_specialty": "Orthopaedic Surgery",
+    "trilliant_active": true,
+    "patient_demographics": {
+      "avg_age": 72,
+      "pct_female": 0.64,
+      "pct_medicare": 0.64,
+      "pct_dual_eligible": 0.23
+    },
+    "has_sanctions": false,
+    "specialty_classification": "Physician"
+  },
+  {
+    "npi": "1048175495",
+    "patient_rating": 4.4,
+    "num_reviews": 328,
+    "total_medicare_services": 1346,
+    "total_medicare_beneficiaries": 981,
+    "total_medicare_payment": 1111389.32,
+    "wrvu_estimate": 8440.2,
+    "volume_bucket": "HIGH",
+    "trilliant_specialty": "Anesthesiology",
+    "trilliant_active": true,
+    "patient_demographics": {
+      "avg_age": 61,
+      "pct_female": 0.39,
+      "pct_medicare": 0.27,
+      "pct_dual_eligible": 0.06
+    },
+    "has_sanctions": false,
+    "specialty_classification": "Physician"
+  },
+  {
+    "npi": "1586926176",
+    "patient_rating": 3.9,
+    "num_reviews": 100,
+    "total_medicare_services": 8554,
+    "total_medicare_beneficiaries": 6734,
+    "total_medicare_payment": 7340947.39,
+    "wrvu_estimate": 38584.7,
+    "volume_bucket": "HIGH",
+    "trilliant_specialty": "Orthopaedic Surgery",
+    "trilliant_active": true,
+    "patient_demographics": {
+      "avg_age": 50,
+      "pct_female": 0.55,
+      "pct_medicare": 0.54,
+      "pct_dual_eligible": 0.2
+    },
+    "has_sanctions": true,
+    "specialty_classification": "Physician"
+  },
+  {
+    "npi": "1183933526",
+    "patient_rating": 3.5,
+    "num_reviews": 29,
+    "total_medicare_services": 918,
+    "total_medicare_beneficiaries": 413,
+    "total_medicare_payment": 390322.27,
+    "wrvu_estimate": 3916.6,
+    "volume_bucket": "MEDIUM",
+    "trilliant_specialty": "Gastroenterology",
+    "trilliant_active": true,
+    "patient_demographics": {
+      "avg_age": 50,
+      "pct_female": 0.49,
+      "pct_medicare": 0.6,
+      "pct_dual_eligible": 0.18
+    },
+    "has_sanctions": false,
+    "specialty_classification": "Physician"
+  },
+  {
+    "npi": "1700766177",
+    "patient_rating": 4.3,
+    "num_reviews": 153,
+    "total_medicare_services": 818,
+    "total_medicare_beneficiaries": 475,
+    "total_medicare_payment": 471536.07,
+    "wrvu_estimate": 3817.1,
+    "volume_bucket": "MEDIUM",
+    "trilliant_specialty": "Thoracic Surgery (Cardiothoracic Vascular Surgery)",
+    "trilliant_active": true,
+    "patient_demographics": {
+      "avg_age": 70,
+      "pct_female": 0.38,
+      "pct_medicare": 0.54,
+      "pct_dual_eligible": 0.27
+    },
+    "has_sanctions": false,
+    "specialty_classification": "Physician"
+  },
+  {
+    "npi": "1988516567",
+    "patient_rating": 3.9,
+    "num_reviews": 393,
+    "total_medicare_services": 356,
+    "total_medicare_beneficiaries": 182,
+    "total_medicare_payment": 94500.36,
+    "wrvu_estimate": 2818.7,
+    "volume_bucket": "MEDIUM",
+    "trilliant_specialty": "Orthopaedic Surgery",
+    "trilliant_active": true,
+    "patient_demographics": {
+      "avg_age": 65,
+      "pct_female": 0.64,
+      "pct_medicare": 0.62,
+      "pct_dual_eligible": 0.2
+    },
+    "has_sanctions": false,
+    "specialty_classification": "Physician"
+  },
+  {
+    "npi": "1445502291",
+    "patient_rating": 4.6,
+    "num_reviews": 293,
+    "total_medicare_services": 385,
+    "total_medicare_beneficiaries": 245,
+    "total_medicare_payment": 309671.13,
+    "wrvu_estimate": 2714.7,
+    "volume_bucket": "MEDIUM",
+    "trilliant_specialty": "Orthopaedic Surgery",
+    "trilliant_active": true,
+    "patient_demographics": {
+      "avg_age": 72,
+      "pct_female": 0.54,
+      "pct_medicare": 0.55,
+      "pct_dual_eligible": 0.12
+    },
+    "has_sanctions": false,
+    "specialty_classification": "Physician"
+  },
+  {
+    "npi": "1156149787",
+    "patient_rating": 3.8,
+    "num_reviews": 6,
+    "total_medicare_services": 344,
+    "total_medicare_beneficiaries": 206,
+    "total_medicare_payment": 148999.17,
+    "wrvu_estimate": 1303.3,
+    "volume_bucket": "LOW",
+    "trilliant_specialty": "Thoracic Surgery (Cardiothoracic Vascular Surgery)",
+    "trilliant_active": true,
+    "patient_demographics": {
+      "avg_age": 65,
+      "pct_female": 0.56,
+      "pct_medicare": 0.48,
+      "pct_dual_eligible": 0.26
+    },
+    "has_sanctions": false,
+    "specialty_classification": "Physician"
+  },
+  {
+    "npi": "1645352182",
+    "patient_rating": 4.6,
+    "num_reviews": 41,
+    "total_medicare_services": 363,
+    "total_medicare_beneficiaries": 170,
+    "total_medicare_payment": 259085.96,
+    "wrvu_estimate": 1114.4,
+    "volume_bucket": "LOW",
+    "trilliant_specialty": "Diagnostic Radiology",
+    "trilliant_active": true,
+    "patient_demographics": {
+      "avg_age": 72,
+      "pct_female": 0.52,
+      "pct_medicare": 0.51,
+      "pct_dual_eligible": 0.22
+    },
+    "has_sanctions": false,
+    "specialty_classification": "Physician"
+  },
+  {
+    "npi": "1807935972",
+    "patient_rating": 4.0,
+    "num_reviews": 270,
+    "total_medicare_services": 299,
+    "total_medicare_beneficiaries": 192,
+    "total_medicare_payment": 113140.5,
+    "wrvu_estimate": 1514.2,
+    "volume_bucket": "MEDIUM",
+    "trilliant_specialty": "Diagnostic Radiology",
+    "trilliant_active": true,
+    "patient_demographics": {
+      "avg_age": 60,
+      "pct_female": 0.47,
+      "pct_medicare": 0.4,
+      "pct_dual_eligible": 0.2
+    },
+    "has_sanctions": false,
+    "specialty_classification": "Physician"
+  },
+  {
+    "npi": "1644925194",
+    "patient_rating": 3.8,
+    "num_reviews": 68,
+    "total_medicare_services": 149,
+    "total_medicare_beneficiaries": 99,
+    "total_medicare_payment": 113202.21,
+    "wrvu_estimate": 969.2,
+    "volume_bucket": "LOW",
+    "trilliant_specialty": "Ophthalmology",
+    "trilliant_active": true,
+    "patient_demographics": {
+      "avg_age": 69,
+      "pct_female": 0.62,
+      "pct_medicare": 0.29,
+      "pct_dual_eligible": 0.22
+    },
+    "has_sanctions": false,
+    "specialty_classification": "Physician"
+  },
+  {
+    "npi": "1332214182",
+    "patient_rating": 4.0,
+    "num_reviews": 213,
+    "total_medicare_services": 3821,
+    "total_medicare_beneficiaries": 2085,
+    "total_medicare_payment": 2560300.22,
+    "wrvu_estimate": 12069.7,
+    "volume_bucket": "HIGH",
+    "trilliant_specialty": "Orthopaedic Surgery",
+    "trilliant_active": false,
+    "patient_demographics": {
+      "avg_age": 67,
+      "pct_female": 0.44,
+      "pct_medicare": 0.59,
+      "pct_dual_eligible": 0.16
+    },
+    "has_sanctions": false,
+    "specialty_classification": "Physician"
+  },
+  {
+    "npi": "1977468861",
+    "patient_rating": 3.7,
+    "num_reviews": 265,
+    "total_medicare_services": 1068,
+    "total_medicare_beneficiaries": 490,
+    "total_medicare_payment": 468560.97,
+    "wrvu_estimate": 7841.1,
+    "volume_bucket": "HIGH",
+    "trilliant_specialty": "General Surgery",
+    "trilliant_active": true,
+    "patient_demographics": {
+      "avg_age": 55,
+      "pct_female": 0.6,
+      "pct_medicare": 0.65,
+      "pct_dual_eligible": 0.28
+    },
+    "has_sanctions": false,
+    "specialty_classification": "Physician"
+  },
+  {
+    "npi": "1305152203",
+    "patient_rating": 4.5,
+    "num_reviews": 273,
+    "total_medicare_services": 71,
+    "total_medicare_beneficiaries": 40,
+    "total_medicare_payment": 50868.77,
+    "wrvu_estimate": 414.8,
+    "volume_bucket": "LOW",
+    "trilliant_specialty": "General Surgery",
+    "trilliant_active": true,
+    "patient_demographics": {
+      "avg_age": 51,
+      "pct_female": 0.36,
+      "pct_medicare": 0.44,
+      "pct_dual_eligible": 0.25
+    },
+    "has_sanctions": false,
+    "specialty_classification": "Physician"
+  },
+  {
+    "npi": "1324609530",
+    "patient_rating": 3.2,
+    "num_reviews": 243,
+    "total_medicare_services": 722,
+    "total_medicare_beneficiaries": 301,
+    "total_medicare_payment": 286809.22,
+    "wrvu_estimate": 4009.5,
+    "volume_bucket": "HIGH",
+    "trilliant_specialty": "Orthopaedic Surgery",
+    "trilliant_active": true,
+    "patient_demographics": {
+      "avg_age": 71,
+      "pct_female": 0.35,
+      "pct_medicare": 0.6,
+      "pct_dual_eligible": 0.14
+    },
+    "has_sanctions": false,
+    "specialty_classification": "Physician"
+  },
+  {
+    "npi": "1585277225",
+    "patient_rating": 4.1,
+    "num_reviews": 21,
+    "total_medicare_services": 353,
+    "total_medicare_beneficiaries": 247,
+    "total_medicare_payment": 83556.8,
+    "wrvu_estimate": 2720.9,
+    "volume_bucket": "MEDIUM",
+    "trilliant_specialty": "Ophthalmology",
+    "trilliant_active": true,
+    "patient_demographics": {
+      "avg_age": 72,
+      "pct_female": 0.36,
+      "pct_medicare": 0.55,
+      "pct_dual_eligible": 0.12
+    },
+    "has_sanctions": false,
+    "specialty_classification": "Physician"
+  },
+  {
+    "npi": "1277584169",
+    "patient_rating": 3.5,
+    "num_reviews": 230,
+    "total_medicare_services": 328,
+    "total_medicare_beneficiaries": 177,
+    "total_medicare_payment": 37631.84,
+    "wrvu_estimate": 2303.8,
+    "volume_bucket": "MEDIUM",
+    "trilliant_specialty": "Neurological Surgery",
+    "trilliant_active": true,
+    "patient_demographics": {
+      "avg_age": 59,
+      "pct_female": 0.53,
+      "pct_medicare": 0.45,
+      "pct_dual_eligible": 0.21
+    },
+    "has_sanctions": false,
+    "specialty_classification": "Physician"
+  },
+  {
+    "npi": "1202970210",
+    "patient_rating": 4.2,
+    "num_reviews": 206,
+    "total_medicare_services": 259,
+    "total_medicare_beneficiaries": 136,
+    "total_medicare_payment": 79908.13,
+    "wrvu_estimate": 1558.5,
+    "volume_bucket": "MEDIUM",
+    "trilliant_specialty": "Orthopaedic Surgery",
+    "trilliant_active": false,
+    "patient_demographics": {
+      "avg_age": 48,
+      "pct_female": 0.57,
+      "pct_medicare": 0.47,
+      "pct_dual_eligible": 0.15
+    },
+    "has_sanctions": false,
+    "specialty_classification": "Physician"
+  },
+  {
+    "npi": "1473121725",
+    "patient_rating": 4.5,
+    "num_reviews": 361,
+    "total_medicare_services": 361,
+    "total_medicare_beneficiaries": 236,
+    "total_medicare_payment": 263830.0,
+    "wrvu_estimate": 1120.0,
+    "volume_bucket": "LOW",
+    "trilliant_specialty": "General Surgery",
+    "trilliant_active": true,
+    "patient_demographics": {
+      "avg_age": 51,
+      "pct_female": 0.65,
+      "pct_medicare": 0.61,
+      "pct_dual_eligible": 0.11
+    },
+    "has_sanctions": false,
+    "specialty_classification": "Physician"
+  },
+  {
+    "npi": "1911467862",
+    "patient_rating": 4.6,
+    "num_reviews": 330,
+    "total_medicare_services": 794,
+    "total_medicare_beneficiaries": 504,
+    "total_medicare_payment": 563407.27,
+    "wrvu_estimate": 6467.7,
+    "volume_bucket": "HIGH",
+    "trilliant_specialty": "General Surgery",
+    "trilliant_active": true,
+    "patient_demographics": {
+      "avg_age": 64,
+      "pct_female": 0.62,
+      "pct_medicare": 0.27,
+      "pct_dual_eligible": 0.08
+    },
+    "has_sanctions": false,
+    "specialty_classification": "Physician"
+  },
+  {
+    "npi": "1414384242",
+    "patient_rating": 3.3,
+    "num_reviews": 331,
+    "total_medicare_services": 897,
+    "total_medicare_beneficiaries": 635,
+    "total_medicare_payment": 266425.01,
+    "wrvu_estimate": 1972.2,
+    "volume_bucket": "MEDIUM",
+    "trilliant_specialty": "Orthopaedic Surgery",
+    "trilliant_active": true,
+    "patient_demographics": {
+      "avg_age": 66,
+      "pct_female": 0.47,
+      "pct_medicare": 0.54,
+      "pct_dual_eligible": 0.17
+    },
+    "has_sanctions": false,
+    "specialty_classification": "Physician"
+  },
+  {
+    "npi": "1647102767",
+    "patient_rating": 3.8,
+    "num_reviews": 241,
+    "total_medicare_services": 243,
+    "total_medicare_beneficiaries": 109,
+    "total_medicare_payment": 109026.5,
+    "wrvu_estimate": 1441.4,
+    "volume_bucket": "LOW",
+    "trilliant_specialty": "General Surgery",
+    "trilliant_active": true,
+    "patient_demographics": {
+      "avg_age": 49,
+      "pct_female": 0.44,
+      "pct_medicare": 0.42,
+      "pct_dual_eligible": 0.2
+    },
+    "has_sanctions": false,
+    "specialty_classification": "Physician"
+  },
+  {
+    "npi": "1327877472",
+    "patient_rating": 4.4,
+    "num_reviews": 243,
+    "total_medicare_services": 160,
+    "total_medicare_beneficiaries": 82,
+    "total_medicare_payment": 13872.88,
+    "wrvu_estimate": 1308.2,
+    "volume_bucket": "LOW",
+    "trilliant_specialty": "Diagnostic Radiology",
+    "trilliant_active": true,
+    "patient_demographics": {
+      "avg_age": 52,
+      "pct_female": 0.61,
+      "pct_medicare": 0.58,
+      "pct_dual_eligible": 0.24
+    },
+    "has_sanctions": false,
+    "specialty_classification": "Physician"
+  },
+  {
+    "npi": "1416878498",
+    "patient_rating": 4.1,
+    "num_reviews": 26,
+    "total_medicare_services": 842,
+    "total_medicare_beneficiaries": 349,
+    "total_medicare_payment": 560052.35,
+    "wrvu_estimate": 4684.8,
+    "volume_bucket": "HIGH",
+    "trilliant_specialty": "Neurological Surgery",
+    "trilliant_active": true,
+    "patient_demographics": {
+      "avg_age": 64,
+      "pct_female": 0.49,
+      "pct_medicare": 0.52,
+      "pct_dual_eligible": 0.18
+    },
+    "has_sanctions": false,
+    "specialty_classification": "Physician"
+  },
+  {
+    "npi": "1888794702",
+    "patient_rating": 4.2,
+    "num_reviews": 119,
+    "total_medicare_services": 213,
+    "total_medicare_beneficiaries": 146,
+    "total_medicare_payment": 118958.18,
+    "wrvu_estimate": 1875.3,
+    "volume_bucket": "MEDIUM",
+    "trilliant_specialty": "Ophthalmology",
+    "trilliant_active": true,
+    "patient_demographics": {
+      "avg_age": 68,
+      "pct_female": 0.57,
+      "pct_medicare": 0.6,
+      "pct_dual_eligible": 0.15
+    },
+    "has_sanctions": false,
+    "specialty_classification": "Physician"
+  },
+  {
+    "npi": "1756263681",
+    "patient_rating": 3.5,
+    "num_reviews": 275,
+    "total_medicare_services": 870,
+    "total_medicare_beneficiaries": 467,
+    "total_medicare_payment": 322348.34,
+    "wrvu_estimate": 3650.8,
+    "volume_bucket": "MEDIUM",
+    "trilliant_specialty": "General Surgery",
+    "trilliant_active": true,
+    "patient_demographics": {
+      "avg_age": 71,
+      "pct_female": 0.55,
+      "pct_medicare": 0.61,
+      "pct_dual_eligible": 0.12
+    },
+    "has_sanctions": false,
+    "specialty_classification": "Physician"
+  },
+  {
+    "npi": "1437575842",
+    "patient_rating": 4.5,
+    "num_reviews": 180,
+    "total_medicare_services": 981,
+    "total_medicare_beneficiaries": 754,
+    "total_medicare_payment": 606157.04,
+    "wrvu_estimate": 3937.2,
+    "volume_bucket": "MEDIUM",
+    "trilliant_specialty": "Anesthesiology",
+    "trilliant_active": true,
+    "patient_demographics": {
+      "avg_age": 54,
+      "pct_female": 0.41,
+      "pct_medicare": 0.49,
+      "pct_dual_eligible": 0.28
+    },
+    "has_sanctions": false,
+    "specialty_classification": "Physician"
+  },
+  {
+    "npi": "1833016573",
+    "patient_rating": 4.6,
+    "num_reviews": 150,
+    "total_medicare_services": 1474,
+    "total_medicare_beneficiaries": 778,
+    "total_medicare_payment": 898603.9,
+    "wrvu_estimate": 9660.3,
+    "volume_bucket": "HIGH",
+    "trilliant_specialty": "Orthopaedic Surgery",
+    "trilliant_active": true,
+    "patient_demographics": {
+      "avg_age": 50,
+      "pct_female": 0.55,
+      "pct_medicare": 0.35,
+      "pct_dual_eligible": 0.23
+    },
+    "has_sanctions": false,
+    "specialty_classification": "Physician"
+  },
+  {
+    "npi": "1672400490",
+    "patient_rating": 3.5,
+    "num_reviews": 237,
+    "total_medicare_services": 515,
+    "total_medicare_beneficiaries": 339,
+    "total_medicare_payment": 344664.01,
+    "wrvu_estimate": 1436.1,
+    "volume_bucket": "LOW",
+    "trilliant_specialty": "Orthopaedic Surgery",
+    "trilliant_active": true,
+    "patient_demographics": {
+      "avg_age": 58,
+      "pct_female": 0.59,
+      "pct_medicare": 0.51,
+      "pct_dual_eligible": 0.24
+    },
+    "has_sanctions": false,
+    "specialty_classification": "Physician"
+  },
+  {
+    "npi": "1161227537",
+    "patient_rating": 3.6,
+    "num_reviews": 344,
+    "total_medicare_services": 623,
+    "total_medicare_beneficiaries": 278,
+    "total_medicare_payment": 206575.09,
+    "wrvu_estimate": 2814.0,
+    "volume_bucket": "MEDIUM",
+    "trilliant_specialty": "Diagnostic Radiology",
+    "trilliant_active": true,
+    "patient_demographics": {
+      "avg_age": 64,
+      "pct_female": 0.63,
+      "pct_medicare": 0.65,
+      "pct_dual_eligible": 0.24
+    },
+    "has_sanctions": false,
+    "specialty_classification": "Physician"
+  },
+  {
+    "npi": "1327279562",
+    "patient_rating": 3.4,
+    "num_reviews": 283,
+    "total_medicare_services": 578,
+    "total_medicare_beneficiaries": 439,
+    "total_medicare_payment": 142054.23,
+    "wrvu_estimate": 4867.2,
+    "volume_bucket": "HIGH",
+    "trilliant_specialty": "Ophthalmology",
+    "trilliant_active": true,
+    "patient_demographics": {
+      "avg_age": 53,
+      "pct_female": 0.45,
+      "pct_medicare": 0.48,
+      "pct_dual_eligible": 0.08
+    },
+    "has_sanctions": false,
+    "specialty_classification": "Physician"
+  },
+  {
+    "npi": "1046226563",
+    "patient_rating": 4.7,
+    "num_reviews": 390,
+    "total_medicare_services": 460,
+    "total_medicare_beneficiaries": 188,
+    "total_medicare_payment": 149342.52,
+    "wrvu_estimate": 4071.5,
+    "volume_bucket": "HIGH",
+    "trilliant_specialty": "Neurological Surgery",
+    "trilliant_active": true,
+    "patient_demographics": {
+      "avg_age": 65,
+      "pct_female": 0.48,
+      "pct_medicare": 0.42,
+      "pct_dual_eligible": 0.11
+    },
+    "has_sanctions": false,
+    "specialty_classification": "Physician"
+  },
+  {
+    "npi": "1690331198",
+    "patient_rating": 3.3,
+    "num_reviews": 260,
+    "total_medicare_services": 341,
+    "total_medicare_beneficiaries": 271,
+    "total_medicare_payment": 92756.24,
+    "wrvu_estimate": 2743.7,
+    "volume_bucket": "MEDIUM",
+    "trilliant_specialty": "Orthopaedic Surgery",
+    "trilliant_active": true,
+    "patient_demographics": {
+      "avg_age": 66,
+      "pct_female": 0.45,
+      "pct_medicare": 0.52,
+      "pct_dual_eligible": 0.22
+    },
+    "has_sanctions": false,
+    "specialty_classification": "Physician"
+  },
+  {
+    "npi": "1408926875",
+    "patient_rating": 3.6,
+    "num_reviews": 118,
+    "total_medicare_services": 388,
+    "total_medicare_beneficiaries": 201,
+    "total_medicare_payment": 256162.63,
+    "wrvu_estimate": 2237.0,
+    "volume_bucket": "MEDIUM",
+    "trilliant_specialty": "General Surgery",
+    "trilliant_active": true,
+    "patient_demographics": {
+      "avg_age": 49,
+      "pct_female": 0.52,
+      "pct_medicare": 0.69,
+      "pct_dual_eligible": 0.19
+    },
+    "has_sanctions": false,
+    "specialty_classification": "Physician"
+  },
+  {
+    "npi": "1183046998",
+    "patient_rating": 3.6,
+    "num_reviews": 100,
+    "total_medicare_services": 1214,
+    "total_medicare_beneficiaries": 952,
+    "total_medicare_payment": 213905.93,
+    "wrvu_estimate": 10152.6,
+    "volume_bucket": "HIGH",
+    "trilliant_specialty": "General Surgery",
+    "trilliant_active": false,
+    "patient_demographics": {
+      "avg_age": 63,
+      "pct_female": 0.62,
+      "pct_medicare": 0.56,
+      "pct_dual_eligible": 0.23
+    },
+    "has_sanctions": false,
+    "specialty_classification": "Physician"
+  },
+  {
+    "npi": "1854458779",
+    "patient_rating": 3.7,
+    "num_reviews": 103,
+    "total_medicare_services": 649,
+    "total_medicare_beneficiaries": 345,
+    "total_medicare_payment": 254063.13,
+    "wrvu_estimate": 4569.0,
+    "volume_bucket": "HIGH",
+    "trilliant_specialty": "General Surgery",
+    "trilliant_active": true,
+    "patient_demographics": {
+      "avg_age": 63,
+      "pct_female": 0.52,
+      "pct_medicare": 0.67,
+      "pct_dual_eligible": 0.13
+    },
+    "has_sanctions": false,
+    "specialty_classification": "Physician"
+  },
+  {
+    "npi": "1522872807",
+    "patient_rating": 3.2,
+    "num_reviews": 261,
+    "total_medicare_services": 1003,
+    "total_medicare_beneficiaries": 584,
+    "total_medicare_payment": 129957.8,
+    "wrvu_estimate": 6971.0,
+    "volume_bucket": "HIGH",
+    "trilliant_specialty": "Thoracic Surgery (Cardiothoracic Vascular Surgery)",
+    "trilliant_active": true,
+    "patient_demographics": {
+      "avg_age": 67,
+      "pct_female": 0.62,
+      "pct_medicare": 0.55,
+      "pct_dual_eligible": 0.05
+    },
+    "has_sanctions": false,
+    "specialty_classification": "Physician"
+  },
+  {
+    "npi": "1086211822",
+    "patient_rating": 3.7,
+    "num_reviews": 44,
+    "total_medicare_services": 505,
+    "total_medicare_beneficiaries": 334,
+    "total_medicare_payment": 395788.55,
+    "wrvu_estimate": 3474.7,
+    "volume_bucket": "MEDIUM",
+    "trilliant_specialty": "Neurological Surgery",
+    "trilliant_active": true,
+    "patient_demographics": {
+      "avg_age": 50,
+      "pct_female": 0.47,
+      "pct_medicare": 0.42,
+      "pct_dual_eligible": 0.17
+    },
+    "has_sanctions": false,
+    "specialty_classification": "Physician"
+  },
+  {
+    "npi": "1180339743",
+    "patient_rating": 4.7,
+    "num_reviews": 42,
+    "total_medicare_services": 340,
+    "total_medicare_beneficiaries": 176,
+    "total_medicare_payment": 184431.55,
+    "wrvu_estimate": 2633.2,
+    "volume_bucket": "MEDIUM",
+    "trilliant_specialty": "Obstetrics & Gynecology",
+    "trilliant_active": true,
+    "patient_demographics": {
+      "avg_age": 75,
+      "pct_female": 0.47,
+      "pct_medicare": 0.65,
+      "pct_dual_eligible": 0.13
+    },
+    "has_sanctions": false,
+    "specialty_classification": "Physician"
+  },
+  {
+    "npi": "1016315990",
+    "patient_rating": 3.4,
+    "num_reviews": 319,
+    "total_medicare_services": 406,
+    "total_medicare_beneficiaries": 210,
+    "total_medicare_payment": 114528.06,
+    "wrvu_estimate": 2689.6,
+    "volume_bucket": "MEDIUM",
+    "trilliant_specialty": "Orthopaedic Surgery",
+    "trilliant_active": true,
+    "patient_demographics": {
+      "avg_age": 56,
+      "pct_female": 0.4,
+      "pct_medicare": 0.57,
+      "pct_dual_eligible": 0.21
+    },
+    "has_sanctions": false,
+    "specialty_classification": "Physician"
+  },
+  {
+    "npi": "1262244472",
+    "patient_rating": 3.4,
+    "num_reviews": 6,
+    "total_medicare_services": 536,
+    "total_medicare_beneficiaries": 417,
+    "total_medicare_payment": 188896.11,
+    "wrvu_estimate": 2789.9,
+    "volume_bucket": "MEDIUM",
+    "trilliant_specialty": "Neurological Surgery",
+    "trilliant_active": true,
+    "patient_demographics": {
+      "avg_age": 73,
+      "pct_female": 0.61,
+      "pct_medicare": 0.45,
+      "pct_dual_eligible": 0.16
+    },
+    "has_sanctions": false,
+    "specialty_classification": "Physician"
+  },
+  {
+    "npi": "1375265471",
+    "patient_rating": 4.5,
+    "num_reviews": 365,
+    "total_medicare_services": 82,
+    "total_medicare_beneficiaries": 39,
+    "total_medicare_payment": 60196.37,
+    "wrvu_estimate": 179.4,
+    "volume_bucket": "LOW",
+    "trilliant_specialty": "Ophthalmology",
+    "trilliant_active": true,
+    "patient_demographics": {
+      "avg_age": 50,
+      "pct_female": 0.6,
+      "pct_medicare": 0.61,
+      "pct_dual_eligible": 0.15
+    },
+    "has_sanctions": false,
+    "specialty_classification": "Physician"
+  },
+  {
+    "npi": "1179796887",
+    "patient_rating": 4.3,
+    "num_reviews": 291,
+    "total_medicare_services": 194,
+    "total_medicare_beneficiaries": 153,
+    "total_medicare_payment": 123292.23,
+    "wrvu_estimate": 613.9,
+    "volume_bucket": "LOW",
+    "trilliant_specialty": "Ophthalmology",
+    "trilliant_active": true,
+    "patient_demographics": {
+      "avg_age": 72,
+      "pct_female": 0.45,
+      "pct_medicare": 0.61,
+      "pct_dual_eligible": 0.08
+    },
+    "has_sanctions": false,
+    "specialty_classification": "Physician"
+  },
+  {
+    "npi": "1250714619",
+    "patient_rating": 3.8,
+    "num_reviews": 156,
+    "total_medicare_services": 513,
+    "total_medicare_beneficiaries": 214,
+    "total_medicare_payment": 340036.29,
+    "wrvu_estimate": 3528.1,
+    "volume_bucket": "MEDIUM",
+    "trilliant_specialty": "General Surgery",
+    "trilliant_active": true,
+    "patient_demographics": {
+      "avg_age": 58,
+      "pct_female": 0.54,
+      "pct_medicare": 0.55,
+      "pct_dual_eligible": 0.09
+    },
+    "has_sanctions": false,
+    "specialty_classification": "Physician"
+  },
+  {
+    "npi": "1673622662",
+    "patient_rating": 3.3,
+    "num_reviews": 55,
+    "total_medicare_services": 106,
+    "total_medicare_beneficiaries": 76,
+    "total_medicare_payment": 55146.39,
+    "wrvu_estimate": 812.1,
+    "volume_bucket": "LOW",
+    "trilliant_specialty": "General Surgery",
+    "trilliant_active": true,
+    "patient_demographics": {
+      "avg_age": 54,
+      "pct_female": 0.49,
+      "pct_medicare": 0.37,
+      "pct_dual_eligible": 0.27
+    },
+    "has_sanctions": false,
+    "specialty_classification": "Physician"
+  },
+  {
+    "npi": "1557924994",
+    "patient_rating": 3.9,
+    "num_reviews": 98,
+    "total_medicare_services": 558,
+    "total_medicare_beneficiaries": 331,
+    "total_medicare_payment": 290523.26,
+    "wrvu_estimate": 1654.5,
+    "volume_bucket": "MEDIUM",
+    "trilliant_specialty": "Ophthalmology",
+    "trilliant_active": true,
+    "patient_demographics": {
+      "avg_age": 53,
+      "pct_female": 0.52,
+      "pct_medicare": 0.47,
+      "pct_dual_eligible": 0.09
+    },
+    "has_sanctions": false,
+    "specialty_classification": "Physician"
+  },
+  {
+    "npi": "1236887679",
+    "patient_rating": 4.2,
+    "num_reviews": 398,
+    "total_medicare_services": 320,
+    "total_medicare_beneficiaries": 226,
+    "total_medicare_payment": 169848.15,
+    "wrvu_estimate": 2388.9,
+    "volume_bucket": "MEDIUM",
+    "trilliant_specialty": "Neurological Surgery",
+    "trilliant_active": true,
+    "patient_demographics": {
+      "avg_age": 51,
+      "pct_female": 0.43,
+      "pct_medicare": 0.49,
+      "pct_dual_eligible": 0.3
+    },
+    "has_sanctions": false,
+    "specialty_classification": "Physician"
+  },
+  {
+    "npi": "1613407455",
+    "patient_rating": 4.7,
+    "num_reviews": 415,
+    "total_medicare_services": 421,
+    "total_medicare_beneficiaries": 178,
+    "total_medicare_payment": 154788.52,
+    "wrvu_estimate": 3155.0,
+    "volume_bucket": "MEDIUM",
+    "trilliant_specialty": "Obstetrics & Gynecology",
+    "trilliant_active": true,
+    "patient_demographics": {
+      "avg_age": 65,
+      "pct_female": 0.4,
+      "pct_medicare": 0.69,
+      "pct_dual_eligible": 0.12
+    },
+    "has_sanctions": false,
+    "specialty_classification": "Physician"
+  },
+  {
+    "npi": "1042232532",
+    "patient_rating": 3.9,
+    "num_reviews": 252,
+    "total_medicare_services": 560,
+    "total_medicare_beneficiaries": 297,
+    "total_medicare_payment": 45935.64,
+    "wrvu_estimate": 4790.4,
+    "volume_bucket": "HIGH",
+    "trilliant_specialty": "Anesthesiology",
+    "trilliant_active": true,
+    "patient_demographics": {
+      "avg_age": 71,
+      "pct_female": 0.38,
+      "pct_medicare": 0.69,
+      "pct_dual_eligible": 0.21
+    },
+    "has_sanctions": false,
+    "specialty_classification": "Physician"
+  },
+  {
+    "npi": "1770632424",
+    "patient_rating": 4.4,
+    "num_reviews": 363,
+    "total_medicare_services": 224,
+    "total_medicare_beneficiaries": 98,
+    "total_medicare_payment": 57121.2,
+    "wrvu_estimate": 815.1,
+    "volume_bucket": "LOW",
+    "trilliant_specialty": "Ophthalmology",
+    "trilliant_active": true,
+    "patient_demographics": {
+      "avg_age": 66,
+      "pct_female": 0.42,
+      "pct_medicare": 0.56,
+      "pct_dual_eligible": 0.05
+    },
+    "has_sanctions": false,
+    "specialty_classification": "Physician"
+  },
+  {
+    "npi": "1136111550",
+    "patient_rating": 3.5,
+    "num_reviews": 213,
+    "total_medicare_services": 404,
+    "total_medicare_beneficiaries": 261,
+    "total_medicare_payment": 178872.93,
+    "wrvu_estimate": 2584.2,
+    "volume_bucket": "MEDIUM",
+    "trilliant_specialty": "Gastroenterology",
+    "trilliant_active": true,
+    "patient_demographics": {
+      "avg_age": 76,
+      "pct_female": 0.38,
+      "pct_medicare": 0.59,
+      "pct_dual_eligible": 0.2
+    },
+    "has_sanctions": false,
+    "specialty_classification": "Physician"
+  },
+  {
+    "npi": "1138999408",
+    "patient_rating": 3.6,
+    "num_reviews": 329,
+    "total_medicare_services": 925,
+    "total_medicare_beneficiaries": 589,
+    "total_medicare_payment": 474705.31,
+    "wrvu_estimate": 4348.6,
+    "volume_bucket": "HIGH",
+    "trilliant_specialty": "Anesthesiology",
+    "trilliant_active": false,
+    "patient_demographics": {
+      "avg_age": 59,
+      "pct_female": 0.63,
+      "pct_medicare": 0.31,
+      "pct_dual_eligible": 0.27
+    },
+    "has_sanctions": false,
+    "specialty_classification": "Physician"
+  },
+  {
+    "npi": "1910430069",
+    "patient_rating": 4.1,
+    "num_reviews": 107,
+    "total_medicare_services": 678,
+    "total_medicare_beneficiaries": 535,
+    "total_medicare_payment": 140623.47,
+    "wrvu_estimate": 2826.8,
+    "volume_bucket": "MEDIUM",
+    "trilliant_specialty": "General Surgery",
+    "trilliant_active": true,
+    "patient_demographics": {
+      "avg_age": 66,
+      "pct_female": 0.54,
+      "pct_medicare": 0.63,
+      "pct_dual_eligible": 0.22
+    },
+    "has_sanctions": false,
+    "specialty_classification": "Physician"
+  },
+  {
+    "npi": "1161799048",
+    "patient_rating": 4.5,
+    "num_reviews": 140,
+    "total_medicare_services": 989,
+    "total_medicare_beneficiaries": 685,
+    "total_medicare_payment": 174861.64,
+    "wrvu_estimate": 4552.5,
+    "volume_bucket": "HIGH",
+    "trilliant_specialty": "Obstetrics & Gynecology",
+    "trilliant_active": true,
+    "patient_demographics": {
+      "avg_age": 58,
+      "pct_female": 0.59,
+      "pct_medicare": 0.37,
+      "pct_dual_eligible": 0.07
+    },
+    "has_sanctions": false,
+    "specialty_classification": "Physician"
+  },
+  {
+    "npi": "1079252411",
+    "patient_rating": 4.9,
+    "num_reviews": 21,
+    "total_medicare_services": 511,
+    "total_medicare_beneficiaries": 317,
+    "total_medicare_payment": 423842.35,
+    "wrvu_estimate": 1558.9,
+    "volume_bucket": "MEDIUM",
+    "trilliant_specialty": "Interventional Cardiology",
+    "trilliant_active": true,
+    "patient_demographics": {
+      "avg_age": 61,
+      "pct_female": 0.42,
+      "pct_medicare": 0.36,
+      "pct_dual_eligible": 0.28
+    },
+    "has_sanctions": false,
+    "specialty_classification": "Physician"
+  },
+  {
+    "npi": "1023806171",
+    "patient_rating": 3.6,
+    "num_reviews": 191,
+    "total_medicare_services": 144,
+    "total_medicare_beneficiaries": 91,
+    "total_medicare_payment": 69776.03,
+    "wrvu_estimate": 1033.5,
+    "volume_bucket": "LOW",
+    "trilliant_specialty": "Gastroenterology",
+    "trilliant_active": true,
+    "patient_demographics": {
+      "avg_age": 54,
+      "pct_female": 0.57,
+      "pct_medicare": 0.5,
+      "pct_dual_eligible": 0.25
+    },
+    "has_sanctions": false,
+    "specialty_classification": "Physician"
+  },
+  {
+    "npi": "1064138369",
+    "patient_rating": 4.9,
+    "num_reviews": 124,
+    "total_medicare_services": 141,
+    "total_medicare_beneficiaries": 72,
+    "total_medicare_payment": 109662.64,
+    "wrvu_estimate": 711.3,
+    "volume_bucket": "LOW",
+    "trilliant_specialty": "Plastic Surgery",
+    "trilliant_active": true,
+    "patient_demographics": {
+      "avg_age": 60,
+      "pct_female": 0.56,
+      "pct_medicare": 0.58,
+      "pct_dual_eligible": 0.13
+    },
+    "has_sanctions": false,
+    "specialty_classification": "Physician"
+  },
+  {
+    "npi": "1277561852",
+    "patient_rating": 3.8,
+    "num_reviews": 49,
+    "total_medicare_services": 721,
+    "total_medicare_beneficiaries": 493,
+    "total_medicare_payment": 630217.45,
+    "wrvu_estimate": 5660.9,
+    "volume_bucket": "HIGH",
+    "trilliant_specialty": "Orthopaedic Surgery",
+    "trilliant_active": true,
+    "patient_demographics": {
+      "avg_age": 49,
+      "pct_female": 0.55,
+      "pct_medicare": 0.37,
+      "pct_dual_eligible": 0.3
+    },
+    "has_sanctions": false,
+    "specialty_classification": "Physician"
+  },
+  {
+    "npi": "1121003234",
+    "patient_rating": 3.4,
+    "num_reviews": 417,
+    "total_medicare_services": 168,
+    "total_medicare_beneficiaries": 89,
+    "total_medicare_payment": 19321.84,
+    "wrvu_estimate": 1287.7,
+    "volume_bucket": "LOW",
+    "trilliant_specialty": "Neurological Surgery",
+    "trilliant_active": true,
+    "patient_demographics": {
+      "avg_age": 53,
+      "pct_female": 0.63,
+      "pct_medicare": 0.44,
+      "pct_dual_eligible": 0.23
+    },
+    "has_sanctions": false,
+    "specialty_classification": "Physician"
+  },
+  {
+    "npi": "1657875989",
+    "patient_rating": 4.9,
+    "num_reviews": 31,
+    "total_medicare_services": 730,
+    "total_medicare_beneficiaries": 515,
+    "total_medicare_payment": 625754.56,
+    "wrvu_estimate": 5631.2,
+    "volume_bucket": "HIGH",
+    "trilliant_specialty": "General Surgery",
+    "trilliant_active": true,
+    "patient_demographics": {
+      "avg_age": 73,
+      "pct_female": 0.47,
+      "pct_medicare": 0.67,
+      "pct_dual_eligible": 0.3
+    },
+    "has_sanctions": false,
+    "specialty_classification": "Physician"
+  },
+  {
+    "npi": "1599293788",
+    "patient_rating": 4.9,
+    "num_reviews": 168,
+    "total_medicare_services": 339,
+    "total_medicare_beneficiaries": 143,
+    "total_medicare_payment": 68180.99,
+    "wrvu_estimate": 2379.3,
+    "volume_bucket": "MEDIUM",
+    "trilliant_specialty": "General Surgery",
+    "trilliant_active": true,
+    "patient_demographics": {
+      "avg_age": 52,
+      "pct_female": 0.58,
+      "pct_medicare": 0.63,
+      "pct_dual_eligible": 0.27
+    },
+    "has_sanctions": false,
+    "specialty_classification": "Physician"
+  },
+  {
+    "npi": "1545226759",
+    "patient_rating": 4.4,
+    "num_reviews": 68,
+    "total_medicare_services": 631,
+    "total_medicare_beneficiaries": 297,
+    "total_medicare_payment": 51410.27,
+    "wrvu_estimate": 2617.2,
+    "volume_bucket": "MEDIUM",
+    "trilliant_specialty": "General Surgery",
+    "trilliant_active": true,
+    "patient_demographics": {
+      "avg_age": 66,
+      "pct_female": 0.47,
+      "pct_medicare": 0.7,
+      "pct_dual_eligible": 0.29
+    },
+    "has_sanctions": false,
+    "specialty_classification": "Physician"
+  },
+  {
+    "npi": "1725135523",
+    "patient_rating": 3.4,
+    "num_reviews": 3,
+    "total_medicare_services": 376,
+    "total_medicare_beneficiaries": 157,
+    "total_medicare_payment": 165192.03,
+    "wrvu_estimate": 1427.5,
+    "volume_bucket": "LOW",
+    "trilliant_specialty": "Interventional Cardiology",
+    "trilliant_active": true,
+    "patient_demographics": {
+      "avg_age": 53,
+      "pct_female": 0.62,
+      "pct_medicare": 0.47,
+      "pct_dual_eligible": 0.14
+    },
+    "has_sanctions": false,
+    "specialty_classification": "Physician"
+  },
+  {
+    "npi": "1104054113",
+    "patient_rating": 4.3,
+    "num_reviews": 225,
+    "total_medicare_services": 892,
+    "total_medicare_beneficiaries": 412,
+    "total_medicare_payment": 145424.01,
+    "wrvu_estimate": 5865.3,
+    "volume_bucket": "HIGH",
+    "trilliant_specialty": "Orthopaedic Surgery",
+    "trilliant_active": true,
+    "patient_demographics": {
+      "avg_age": 54,
+      "pct_female": 0.47,
+      "pct_medicare": 0.5,
+      "pct_dual_eligible": 0.28
+    },
+    "has_sanctions": false,
+    "specialty_classification": "Physician"
+  },
+  {
+    "npi": "1467741868",
+    "patient_rating": 4.6,
+    "num_reviews": 344,
+    "total_medicare_services": 325,
+    "total_medicare_beneficiaries": 142,
+    "total_medicare_payment": 204059.62,
+    "wrvu_estimate": 790.2,
+    "volume_bucket": "LOW",
+    "trilliant_specialty": "Orthopaedic Surgery",
+    "trilliant_active": true,
+    "patient_demographics": {
+      "avg_age": 61,
+      "pct_female": 0.64,
+      "pct_medicare": 0.52,
+      "pct_dual_eligible": 0.19
+    },
+    "has_sanctions": false,
+    "specialty_classification": "Physician"
+  },
+  {
+    "npi": "1741608982",
+    "patient_rating": 4.0,
+    "num_reviews": 324,
+    "total_medicare_services": 223,
+    "total_medicare_beneficiaries": 102,
+    "total_medicare_payment": 126650.41,
+    "wrvu_estimate": 1988.7,
+    "volume_bucket": "MEDIUM",
+    "trilliant_specialty": "Gastroenterology",
+    "trilliant_active": true,
+    "patient_demographics": {
+      "avg_age": 71,
+      "pct_female": 0.62,
+      "pct_medicare": 0.28,
+      "pct_dual_eligible": 0.15
+    },
+    "has_sanctions": false,
+    "specialty_classification": "Physician"
+  },
+  {
+    "npi": "1986162299",
+    "patient_rating": 3.5,
+    "num_reviews": 209,
+    "total_medicare_services": 894,
+    "total_medicare_beneficiaries": 409,
+    "total_medicare_payment": 517713.0,
+    "wrvu_estimate": 4748.3,
+    "volume_bucket": "HIGH",
+    "trilliant_specialty": "General Surgery",
+    "trilliant_active": true,
+    "patient_demographics": {
+      "avg_age": 49,
+      "pct_female": 0.47,
+      "pct_medicare": 0.65,
+      "pct_dual_eligible": 0.22
+    },
+    "has_sanctions": false,
+    "specialty_classification": "Physician"
+  },
+  {
+    "npi": "1471324750",
+    "patient_rating": 3.8,
+    "num_reviews": 262,
+    "total_medicare_services": 1351,
+    "total_medicare_beneficiaries": 758,
+    "total_medicare_payment": 972751.71,
+    "wrvu_estimate": 4205.4,
+    "volume_bucket": "HIGH",
+    "trilliant_specialty": "Neurological Surgery",
+    "trilliant_active": true,
+    "patient_demographics": {
+      "avg_age": 66,
+      "pct_female": 0.36,
+      "pct_medicare": 0.34,
+      "pct_dual_eligible": 0.26
+    },
+    "has_sanctions": false,
+    "specialty_classification": "Physician"
+  },
+  {
+    "npi": "1578610358",
+    "patient_rating": 3.5,
+    "num_reviews": 295,
+    "total_medicare_services": 782,
+    "total_medicare_beneficiaries": 556,
+    "total_medicare_payment": 199989.65,
+    "wrvu_estimate": 3680.1,
+    "volume_bucket": "MEDIUM",
+    "trilliant_specialty": "General Surgery",
+    "trilliant_active": true,
+    "patient_demographics": {
+      "avg_age": 55,
+      "pct_female": 0.55,
+      "pct_medicare": 0.37,
+      "pct_dual_eligible": 0.15
+    },
+    "has_sanctions": true,
+    "specialty_classification": "Physician"
+  },
+  {
+    "npi": "1290349442",
+    "patient_rating": 4.4,
+    "num_reviews": 249,
+    "total_medicare_services": 670,
+    "total_medicare_beneficiaries": 285,
+    "total_medicare_payment": 596605.51,
+    "wrvu_estimate": 2665.8,
+    "volume_bucket": "MEDIUM",
+    "trilliant_specialty": "Gastroenterology",
+    "trilliant_active": true,
+    "patient_demographics": {
+      "avg_age": 75,
+      "pct_female": 0.43,
+      "pct_medicare": 0.55,
+      "pct_dual_eligible": 0.29
+    },
+    "has_sanctions": false,
+    "specialty_classification": "Physician"
+  },
+  {
+    "npi": "1652074463",
+    "patient_rating": 4.8,
+    "num_reviews": 346,
+    "total_medicare_services": 240,
+    "total_medicare_beneficiaries": 130,
+    "total_medicare_payment": 78278.34,
+    "wrvu_estimate": 1798.6,
+    "volume_bucket": "MEDIUM",
+    "trilliant_specialty": "Orthopaedic Surgery",
+    "trilliant_active": true,
+    "patient_demographics": {
+      "avg_age": 69,
+      "pct_female": 0.61,
+      "pct_medicare": 0.33,
+      "pct_dual_eligible": 0.07
+    },
+    "has_sanctions": false,
+    "specialty_classification": "Physician"
+  },
+  {
+    "npi": "1135346553",
+    "patient_rating": 4.2,
+    "num_reviews": 214,
+    "total_medicare_services": 338,
+    "total_medicare_beneficiaries": 142,
+    "total_medicare_payment": 263801.09,
+    "wrvu_estimate": 2286.5,
+    "volume_bucket": "MEDIUM",
+    "trilliant_specialty": "General Surgery",
+    "trilliant_active": true,
+    "patient_demographics": {
+      "avg_age": 54,
+      "pct_female": 0.45,
+      "pct_medicare": 0.69,
+      "pct_dual_eligible": 0.27
+    },
+    "has_sanctions": false,
+    "specialty_classification": "Physician"
+  },
+  {
+    "npi": "1525007435",
+    "patient_rating": 4.1,
+    "num_reviews": 5,
+    "total_medicare_services": 464,
+    "total_medicare_beneficiaries": 192,
+    "total_medicare_payment": 112993.13,
+    "wrvu_estimate": 2321.5,
+    "volume_bucket": "MEDIUM",
+    "trilliant_specialty": "Orthopaedic Surgery",
+    "trilliant_active": true,
+    "patient_demographics": {
+      "avg_age": 48,
+      "pct_female": 0.62,
+      "pct_medicare": 0.59,
+      "pct_dual_eligible": 0.18
+    },
+    "has_sanctions": true,
+    "specialty_classification": "Physician"
+  },
+  {
+    "npi": "1216894216",
+    "patient_rating": 3.8,
+    "num_reviews": 99,
+    "total_medicare_services": 1532,
+    "total_medicare_beneficiaries": 713,
+    "total_medicare_payment": 1261836.82,
+    "wrvu_estimate": 12730.4,
+    "volume_bucket": "HIGH",
+    "trilliant_specialty": "Orthopaedic Surgery",
+    "trilliant_active": true,
+    "patient_demographics": {
+      "avg_age": 48,
+      "pct_female": 0.42,
+      "pct_medicare": 0.58,
+      "pct_dual_eligible": 0.08
+    },
+    "has_sanctions": false,
+    "specialty_classification": "Physician"
+  },
+  {
+    "npi": "1489090104",
+    "patient_rating": 4.0,
+    "num_reviews": 54,
+    "total_medicare_services": 150,
+    "total_medicare_beneficiaries": 99,
+    "total_medicare_payment": 45207.19,
+    "wrvu_estimate": 309.8,
+    "volume_bucket": "LOW",
+    "trilliant_specialty": "Interventional Cardiology",
+    "trilliant_active": true,
+    "patient_demographics": {
+      "avg_age": 52,
+      "pct_female": 0.48,
+      "pct_medicare": 0.65,
+      "pct_dual_eligible": 0.18
+    },
+    "has_sanctions": false,
+    "specialty_classification": "Physician"
+  },
+  {
+    "npi": "1811437445",
+    "patient_rating": 4.8,
+    "num_reviews": 321,
+    "total_medicare_services": 133,
+    "total_medicare_beneficiaries": 67,
+    "total_medicare_payment": 90588.39,
+    "wrvu_estimate": 572.0,
+    "volume_bucket": "LOW",
+    "trilliant_specialty": "Orthopaedic Surgery",
+    "trilliant_active": true,
+    "patient_demographics": {
+      "avg_age": 58,
+      "pct_female": 0.4,
+      "pct_medicare": 0.43,
+      "pct_dual_eligible": 0.29
+    },
+    "has_sanctions": false,
+    "specialty_classification": "Physician"
+  },
+  {
+    "npi": "1202169797",
+    "patient_rating": 3.7,
+    "num_reviews": 163,
+    "total_medicare_services": 220,
+    "total_medicare_beneficiaries": 89,
+    "total_medicare_payment": 174247.14,
+    "wrvu_estimate": 510.8,
+    "volume_bucket": "LOW",
+    "trilliant_specialty": "General Surgery",
+    "trilliant_active": true,
+    "patient_demographics": {
+      "avg_age": 71,
+      "pct_female": 0.52,
+      "pct_medicare": 0.5,
+      "pct_dual_eligible": 0.29
+    },
+    "has_sanctions": false,
+    "specialty_classification": "Physician"
+  },
+  {
+    "npi": "1375628900",
+    "patient_rating": 4.1,
+    "num_reviews": 284,
+    "total_medicare_services": 376,
+    "total_medicare_beneficiaries": 247,
+    "total_medicare_payment": 154418.36,
+    "wrvu_estimate": 1484.1,
+    "volume_bucket": "LOW",
+    "trilliant_specialty": "General Surgery",
+    "trilliant_active": true,
+    "patient_demographics": {
+      "avg_age": 62,
+      "pct_female": 0.48,
+      "pct_medicare": 0.51,
+      "pct_dual_eligible": 0.07
+    },
+    "has_sanctions": false,
+    "specialty_classification": "Physician"
+  },
+  {
+    "npi": "1608801993",
+    "patient_rating": 4.5,
+    "num_reviews": 189,
+    "total_medicare_services": 202,
+    "total_medicare_beneficiaries": 138,
+    "total_medicare_payment": 35046.83,
+    "wrvu_estimate": 1252.3,
+    "volume_bucket": "LOW",
+    "trilliant_specialty": "General Surgery",
+    "trilliant_active": true,
+    "patient_demographics": {
+      "avg_age": 55,
+      "pct_female": 0.35,
+      "pct_medicare": 0.41,
+      "pct_dual_eligible": 0.21
+    },
+    "has_sanctions": false,
+    "specialty_classification": "Physician"
+  },
+  {
+    "npi": "1726149333",
+    "patient_rating": 4.7,
+    "num_reviews": 304,
+    "total_medicare_services": 217,
+    "total_medicare_beneficiaries": 97,
+    "total_medicare_payment": 176038.77,
+    "wrvu_estimate": 1841.5,
+    "volume_bucket": "MEDIUM",
+    "trilliant_specialty": "Interventional Cardiology",
+    "trilliant_active": true,
+    "patient_demographics": {
+      "avg_age": 66,
+      "pct_female": 0.64,
+      "pct_medicare": 0.31,
+      "pct_dual_eligible": 0.17
+    },
+    "has_sanctions": false,
+    "specialty_classification": "Physician"
+  },
+  {
+    "npi": "1922169952",
+    "patient_rating": 3.9,
+    "num_reviews": 361,
+    "total_medicare_services": 1772,
+    "total_medicare_beneficiaries": 1337,
+    "total_medicare_payment": 886144.58,
+    "wrvu_estimate": 5198.3,
+    "volume_bucket": "HIGH",
+    "trilliant_specialty": "Orthopaedic Surgery",
+    "trilliant_active": true,
+    "patient_demographics": {
+      "avg_age": 65,
+      "pct_female": 0.61,
+      "pct_medicare": 0.57,
+      "pct_dual_eligible": 0.28
+    },
+    "has_sanctions": false,
+    "specialty_classification": "Physician"
+  },
+  {
+    "npi": "1228851584",
+    "patient_rating": 3.7,
+    "num_reviews": 405,
+    "total_medicare_services": 458,
+    "total_medicare_beneficiaries": 212,
+    "total_medicare_payment": 144281.34,
+    "wrvu_estimate": 1097.5,
+    "volume_bucket": "LOW",
+    "trilliant_specialty": "Orthopaedic Surgery",
+    "trilliant_active": true,
+    "patient_demographics": {
+      "avg_age": 74,
+      "pct_female": 0.37,
+      "pct_medicare": 0.6,
+      "pct_dual_eligible": 0.1
+    },
+    "has_sanctions": false,
+    "specialty_classification": "Physician"
+  },
+  {
+    "npi": "1384066654",
+    "patient_rating": 4.3,
+    "num_reviews": 400,
+    "total_medicare_services": 1245,
+    "total_medicare_beneficiaries": 859,
+    "total_medicare_payment": 297141.81,
+    "wrvu_estimate": 7253.8,
+    "volume_bucket": "HIGH",
+    "trilliant_specialty": "General Surgery",
+    "trilliant_active": true,
+    "patient_demographics": {
+      "avg_age": 69,
+      "pct_female": 0.37,
+      "pct_medicare": 0.68,
+      "pct_dual_eligible": 0.23
+    },
+    "has_sanctions": false,
+    "specialty_classification": "Physician"
+  },
+  {
+    "npi": "1826886156",
+    "patient_rating": 4.3,
+    "num_reviews": 321,
+    "total_medicare_services": 827,
+    "total_medicare_beneficiaries": 411,
+    "total_medicare_payment": 93202.36,
+    "wrvu_estimate": 6890.1,
+    "volume_bucket": "HIGH",
+    "trilliant_specialty": "Obstetrics & Gynecology",
+    "trilliant_active": true,
+    "patient_demographics": {
+      "avg_age": 60,
+      "pct_female": 0.62,
+      "pct_medicare": 0.68,
+      "pct_dual_eligible": 0.15
+    },
+    "has_sanctions": false,
+    "specialty_classification": "Physician"
+  },
+  {
+    "npi": "1770435810",
+    "patient_rating": 4.5,
+    "num_reviews": 382,
+    "total_medicare_services": 484,
+    "total_medicare_beneficiaries": 343,
+    "total_medicare_payment": 295327.19,
+    "wrvu_estimate": 2789.9,
+    "volume_bucket": "MEDIUM",
+    "trilliant_specialty": "General Surgery",
+    "trilliant_active": true,
+    "patient_demographics": {
+      "avg_age": 71,
+      "pct_female": 0.56,
+      "pct_medicare": 0.26,
+      "pct_dual_eligible": 0.23
+    },
+    "has_sanctions": false,
+    "specialty_classification": "Physician"
+  },
+  {
+    "npi": "1934667662",
+    "patient_rating": 4.9,
+    "num_reviews": 57,
+    "total_medicare_services": 806,
+    "total_medicare_beneficiaries": 415,
+    "total_medicare_payment": 517790.92,
+    "wrvu_estimate": 2021.5,
+    "volume_bucket": "MEDIUM",
+    "trilliant_specialty": "Orthopaedic Surgery",
+    "trilliant_active": true,
+    "patient_demographics": {
+      "avg_age": 57,
+      "pct_female": 0.58,
+      "pct_medicare": 0.45,
+      "pct_dual_eligible": 0.15
+    },
+    "has_sanctions": false,
+    "specialty_classification": "Physician"
+  },
+  {
+    "npi": "1424508822",
+    "patient_rating": 4.1,
+    "num_reviews": 85,
+    "total_medicare_services": 378,
+    "total_medicare_beneficiaries": 179,
+    "total_medicare_payment": 221449.65,
+    "wrvu_estimate": 2465.1,
+    "volume_bucket": "MEDIUM",
+    "trilliant_specialty": "Neurological Surgery",
+    "trilliant_active": true,
+    "patient_demographics": {
+      "avg_age": 51,
+      "pct_female": 0.4,
+      "pct_medicare": 0.61,
+      "pct_dual_eligible": 0.26
+    },
+    "has_sanctions": false,
+    "specialty_classification": "Physician"
+  },
+  {
+    "npi": "1141397558",
+    "patient_rating": 4.3,
+    "num_reviews": 292,
+    "total_medicare_services": 456,
+    "total_medicare_beneficiaries": 285,
+    "total_medicare_payment": 338495.1,
+    "wrvu_estimate": 1887.7,
+    "volume_bucket": "MEDIUM",
+    "trilliant_specialty": "Plastic Surgery",
+    "trilliant_active": false,
+    "patient_demographics": {
+      "avg_age": 53,
+      "pct_female": 0.35,
+      "pct_medicare": 0.36,
+      "pct_dual_eligible": 0.11
+    },
+    "has_sanctions": false,
+    "specialty_classification": "Physician"
+  }
+]

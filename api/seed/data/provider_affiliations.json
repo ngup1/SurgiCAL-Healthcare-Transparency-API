@@ -1,0 +1,952 @@
+[
+  {
+    "npi": "1572628497",
+    "ccn": "050810",
+    "is_primary": true
+  },
+  {
+    "npi": "1678377700",
+    "ccn": "050801",
+    "is_primary": true
+  },
+  {
+    "npi": "1678377700",
+    "ccn": "050805",
+    "is_primary": false
+  },
+  {
+    "npi": "1435240829",
+    "ccn": "050815",
+    "is_primary": true
+  },
+  {
+    "npi": "1435240829",
+    "ccn": "050818",
+    "is_primary": false
+  },
+  {
+    "npi": "1131869996",
+    "ccn": "050802",
+    "is_primary": true
+  },
+  {
+    "npi": "1131869996",
+    "ccn": "050804",
+    "is_primary": false
+  },
+  {
+    "npi": "1131869996",
+    "ccn": "050805",
+    "is_primary": false
+  },
+  {
+    "npi": "1349361836",
+    "ccn": "050806",
+    "is_primary": true
+  },
+  {
+    "npi": "1349361836",
+    "ccn": "050805",
+    "is_primary": false
+  },
+  {
+    "npi": "1027874290",
+    "ccn": "050822",
+    "is_primary": true
+  },
+  {
+    "npi": "1027874290",
+    "ccn": "050823",
+    "is_primary": false
+  },
+  {
+    "npi": "1603859772",
+    "ccn": "050821",
+    "is_primary": true
+  },
+  {
+    "npi": "1603859772",
+    "ccn": "050820",
+    "is_primary": false
+  },
+  {
+    "npi": "1086131715",
+    "ccn": "050820",
+    "is_primary": true
+  },
+  {
+    "npi": "1086131715",
+    "ccn": "050819",
+    "is_primary": false
+  },
+  {
+    "npi": "1086131715",
+    "ccn": "050821",
+    "is_primary": false
+  },
+  {
+    "npi": "1875588679",
+    "ccn": "050821",
+    "is_primary": true
+  },
+  {
+    "npi": "1875588679",
+    "ccn": "050820",
+    "is_primary": false
+  },
+  {
+    "npi": "1621745961",
+    "ccn": "050803",
+    "is_primary": true
+  },
+  {
+    "npi": "1621745961",
+    "ccn": "050805",
+    "is_primary": false
+  },
+  {
+    "npi": "1386922219",
+    "ccn": "050807",
+    "is_primary": true
+  },
+  {
+    "npi": "1386922219",
+    "ccn": "050808",
+    "is_primary": false
+  },
+  {
+    "npi": "1369594407",
+    "ccn": "050807",
+    "is_primary": true
+  },
+  {
+    "npi": "1095214569",
+    "ccn": "050803",
+    "is_primary": true
+  },
+  {
+    "npi": "1095214569",
+    "ccn": "050802",
+    "is_primary": false
+  },
+  {
+    "npi": "1048175495",
+    "ccn": "050821",
+    "is_primary": true
+  },
+  {
+    "npi": "1586926176",
+    "ccn": "050806",
+    "is_primary": true
+  },
+  {
+    "npi": "1586926176",
+    "ccn": "050805",
+    "is_primary": false
+  },
+  {
+    "npi": "1586926176",
+    "ccn": "050803",
+    "is_primary": false
+  },
+  {
+    "npi": "1183933526",
+    "ccn": "050806",
+    "is_primary": true
+  },
+  {
+    "npi": "1183933526",
+    "ccn": "050803",
+    "is_primary": false
+  },
+  {
+    "npi": "1700766177",
+    "ccn": "050823",
+    "is_primary": true
+  },
+  {
+    "npi": "1700766177",
+    "ccn": "050822",
+    "is_primary": false
+  },
+  {
+    "npi": "1766156545",
+    "ccn": "050811",
+    "is_primary": true
+  },
+  {
+    "npi": "1988516567",
+    "ccn": "050818",
+    "is_primary": true
+  },
+  {
+    "npi": "1988516567",
+    "ccn": "050814",
+    "is_primary": false
+  },
+  {
+    "npi": "1445502291",
+    "ccn": "050823",
+    "is_primary": true
+  },
+  {
+    "npi": "1445502291",
+    "ccn": "050822",
+    "is_primary": false
+  },
+  {
+    "npi": "1156149787",
+    "ccn": "050809",
+    "is_primary": true
+  },
+  {
+    "npi": "1715969667",
+    "ccn": "050822",
+    "is_primary": true
+  },
+  {
+    "npi": "1715969667",
+    "ccn": "050823",
+    "is_primary": false
+  },
+  {
+    "npi": "1645352182",
+    "ccn": "050806",
+    "is_primary": true
+  },
+  {
+    "npi": "1645352182",
+    "ccn": "050803",
+    "is_primary": false
+  },
+  {
+    "npi": "1717744902",
+    "ccn": "051382",
+    "is_primary": true
+  },
+  {
+    "npi": "1717744902",
+    "ccn": "051383",
+    "is_primary": false
+  },
+  {
+    "npi": "1807935972",
+    "ccn": "050822",
+    "is_primary": true
+  },
+  {
+    "npi": "1807935972",
+    "ccn": "050823",
+    "is_primary": false
+  },
+  {
+    "npi": "1644925194",
+    "ccn": "050802",
+    "is_primary": true
+  },
+  {
+    "npi": "1644925194",
+    "ccn": "050803",
+    "is_primary": false
+  },
+  {
+    "npi": "1644925194",
+    "ccn": "050804",
+    "is_primary": false
+  },
+  {
+    "npi": "1332214182",
+    "ccn": "050807",
+    "is_primary": true
+  },
+  {
+    "npi": "1332214182",
+    "ccn": "050808",
+    "is_primary": false
+  },
+  {
+    "npi": "1977468861",
+    "ccn": "050821",
+    "is_primary": true
+  },
+  {
+    "npi": "1977468861",
+    "ccn": "050820",
+    "is_primary": false
+  },
+  {
+    "npi": "1305152203",
+    "ccn": "050809",
+    "is_primary": true
+  },
+  {
+    "npi": "1324609530",
+    "ccn": "050822",
+    "is_primary": true
+  },
+  {
+    "npi": "1585277225",
+    "ccn": "050820",
+    "is_primary": true
+  },
+  {
+    "npi": "1585277225",
+    "ccn": "050818",
+    "is_primary": false
+  },
+  {
+    "npi": "1277584169",
+    "ccn": "050809",
+    "is_primary": true
+  },
+  {
+    "npi": "1202970210",
+    "ccn": "050816",
+    "is_primary": true
+  },
+  {
+    "npi": "1473121725",
+    "ccn": "050807",
+    "is_primary": true
+  },
+  {
+    "npi": "1473121725",
+    "ccn": "050808",
+    "is_primary": false
+  },
+  {
+    "npi": "1911467862",
+    "ccn": "050814",
+    "is_primary": true
+  },
+  {
+    "npi": "1414384242",
+    "ccn": "050808",
+    "is_primary": true
+  },
+  {
+    "npi": "1414384242",
+    "ccn": "050807",
+    "is_primary": false
+  },
+  {
+    "npi": "1647102767",
+    "ccn": "050824",
+    "is_primary": true
+  },
+  {
+    "npi": "1327877472",
+    "ccn": "050805",
+    "is_primary": true
+  },
+  {
+    "npi": "1327877472",
+    "ccn": "050806",
+    "is_primary": false
+  },
+  {
+    "npi": "1416878498",
+    "ccn": "050814",
+    "is_primary": true
+  },
+  {
+    "npi": "1416878498",
+    "ccn": "050817",
+    "is_primary": false
+  },
+  {
+    "npi": "1888794702",
+    "ccn": "050805",
+    "is_primary": true
+  },
+  {
+    "npi": "1756263681",
+    "ccn": "050814",
+    "is_primary": true
+  },
+  {
+    "npi": "1756263681",
+    "ccn": "050817",
+    "is_primary": false
+  },
+  {
+    "npi": "1437575842",
+    "ccn": "050807",
+    "is_primary": true
+  },
+  {
+    "npi": "1437575842",
+    "ccn": "050808",
+    "is_primary": false
+  },
+  {
+    "npi": "1833016573",
+    "ccn": "050815",
+    "is_primary": true
+  },
+  {
+    "npi": "1833016573",
+    "ccn": "050816",
+    "is_primary": false
+  },
+  {
+    "npi": "1672400490",
+    "ccn": "050823",
+    "is_primary": true
+  },
+  {
+    "npi": "1672400490",
+    "ccn": "050822",
+    "is_primary": false
+  },
+  {
+    "npi": "1161227537",
+    "ccn": "050823",
+    "is_primary": true
+  },
+  {
+    "npi": "1161227537",
+    "ccn": "050822",
+    "is_primary": false
+  },
+  {
+    "npi": "1327279562",
+    "ccn": "050824",
+    "is_primary": true
+  },
+  {
+    "npi": "1286790872",
+    "ccn": "050803",
+    "is_primary": true
+  },
+  {
+    "npi": "1286790872",
+    "ccn": "050806",
+    "is_primary": false
+  },
+  {
+    "npi": "1046226563",
+    "ccn": "050817",
+    "is_primary": true
+  },
+  {
+    "npi": "1046226563",
+    "ccn": "050818",
+    "is_primary": false
+  },
+  {
+    "npi": "1690331198",
+    "ccn": "050805",
+    "is_primary": true
+  },
+  {
+    "npi": "1408926875",
+    "ccn": "050804",
+    "is_primary": true
+  },
+  {
+    "npi": "1408926875",
+    "ccn": "050805",
+    "is_primary": false
+  },
+  {
+    "npi": "1183046998",
+    "ccn": "050806",
+    "is_primary": true
+  },
+  {
+    "npi": "1183046998",
+    "ccn": "050805",
+    "is_primary": false
+  },
+  {
+    "npi": "1854458779",
+    "ccn": "050808",
+    "is_primary": true
+  },
+  {
+    "npi": "1854458779",
+    "ccn": "050807",
+    "is_primary": false
+  },
+  {
+    "npi": "1522872807",
+    "ccn": "050818",
+    "is_primary": true
+  },
+  {
+    "npi": "1086211822",
+    "ccn": "050801",
+    "is_primary": true
+  },
+  {
+    "npi": "1086211822",
+    "ccn": "050802",
+    "is_primary": false
+  },
+  {
+    "npi": "1086211822",
+    "ccn": "050803",
+    "is_primary": false
+  },
+  {
+    "npi": "1180339743",
+    "ccn": "050802",
+    "is_primary": true
+  },
+  {
+    "npi": "1016315990",
+    "ccn": "050824",
+    "is_primary": true
+  },
+  {
+    "npi": "1121267888",
+    "ccn": "050803",
+    "is_primary": true
+  },
+  {
+    "npi": "1121267888",
+    "ccn": "050805",
+    "is_primary": false
+  },
+  {
+    "npi": "1262244472",
+    "ccn": "050819",
+    "is_primary": true
+  },
+  {
+    "npi": "1375265471",
+    "ccn": "050815",
+    "is_primary": true
+  },
+  {
+    "npi": "1179796887",
+    "ccn": "050806",
+    "is_primary": true
+  },
+  {
+    "npi": "1250714619",
+    "ccn": "050819",
+    "is_primary": true
+  },
+  {
+    "npi": "1250714619",
+    "ccn": "050815",
+    "is_primary": false
+  },
+  {
+    "npi": "1250714619",
+    "ccn": "050816",
+    "is_primary": false
+  },
+  {
+    "npi": "1673622662",
+    "ccn": "050805",
+    "is_primary": true
+  },
+  {
+    "npi": "1557924994",
+    "ccn": "050815",
+    "is_primary": true
+  },
+  {
+    "npi": "1557924994",
+    "ccn": "050814",
+    "is_primary": false
+  },
+  {
+    "npi": "1236887679",
+    "ccn": "050801",
+    "is_primary": true
+  },
+  {
+    "npi": "1613407455",
+    "ccn": "050818",
+    "is_primary": true
+  },
+  {
+    "npi": "1613407455",
+    "ccn": "050820",
+    "is_primary": false
+  },
+  {
+    "npi": "1042232532",
+    "ccn": "050813",
+    "is_primary": true
+  },
+  {
+    "npi": "1042232532",
+    "ccn": "050816",
+    "is_primary": false
+  },
+  {
+    "npi": "1042232532",
+    "ccn": "050812",
+    "is_primary": false
+  },
+  {
+    "npi": "1374545899",
+    "ccn": "050820",
+    "is_primary": true
+  },
+  {
+    "npi": "1770632424",
+    "ccn": "050822",
+    "is_primary": true
+  },
+  {
+    "npi": "1770632424",
+    "ccn": "050823",
+    "is_primary": false
+  },
+  {
+    "npi": "1136111550",
+    "ccn": "051382",
+    "is_primary": true
+  },
+  {
+    "npi": "1138999408",
+    "ccn": "050808",
+    "is_primary": true
+  },
+  {
+    "npi": "1138999408",
+    "ccn": "050807",
+    "is_primary": false
+  },
+  {
+    "npi": "1910430069",
+    "ccn": "050817",
+    "is_primary": true
+  },
+  {
+    "npi": "1910430069",
+    "ccn": "050812",
+    "is_primary": false
+  },
+  {
+    "npi": "1910430069",
+    "ccn": "050818",
+    "is_primary": false
+  },
+  {
+    "npi": "1161799048",
+    "ccn": "050818",
+    "is_primary": true
+  },
+  {
+    "npi": "1161799048",
+    "ccn": "050815",
+    "is_primary": false
+  },
+  {
+    "npi": "1161799048",
+    "ccn": "050819",
+    "is_primary": false
+  },
+  {
+    "npi": "1079252411",
+    "ccn": "050802",
+    "is_primary": true
+  },
+  {
+    "npi": "1023806171",
+    "ccn": "050814",
+    "is_primary": true
+  },
+  {
+    "npi": "1064138369",
+    "ccn": "050801",
+    "is_primary": true
+  },
+  {
+    "npi": "1064138369",
+    "ccn": "050805",
+    "is_primary": false
+  },
+  {
+    "npi": "1277561852",
+    "ccn": "050805",
+    "is_primary": true
+  },
+  {
+    "npi": "1277561852",
+    "ccn": "050803",
+    "is_primary": false
+  },
+  {
+    "npi": "1121003234",
+    "ccn": "050811",
+    "is_primary": true
+  },
+  {
+    "npi": "1447209994",
+    "ccn": "050811",
+    "is_primary": true
+  },
+  {
+    "npi": "1657875989",
+    "ccn": "050810",
+    "is_primary": true
+  },
+  {
+    "npi": "1599293788",
+    "ccn": "050808",
+    "is_primary": true
+  },
+  {
+    "npi": "1599293788",
+    "ccn": "050807",
+    "is_primary": false
+  },
+  {
+    "npi": "1545226759",
+    "ccn": "050824",
+    "is_primary": true
+  },
+  {
+    "npi": "1725135523",
+    "ccn": "050823",
+    "is_primary": true
+  },
+  {
+    "npi": "1725135523",
+    "ccn": "050822",
+    "is_primary": false
+  },
+  {
+    "npi": "1104054113",
+    "ccn": "050812",
+    "is_primary": true
+  },
+  {
+    "npi": "1987205063",
+    "ccn": "050807",
+    "is_primary": true
+  },
+  {
+    "npi": "1467741868",
+    "ccn": "050807",
+    "is_primary": true
+  },
+  {
+    "npi": "1467741868",
+    "ccn": "050808",
+    "is_primary": false
+  },
+  {
+    "npi": "1741608982",
+    "ccn": "050810",
+    "is_primary": true
+  },
+  {
+    "npi": "1986162299",
+    "ccn": "050807",
+    "is_primary": true
+  },
+  {
+    "npi": "1986162299",
+    "ccn": "050808",
+    "is_primary": false
+  },
+  {
+    "npi": "1471324750",
+    "ccn": "050807",
+    "is_primary": true
+  },
+  {
+    "npi": "1471324750",
+    "ccn": "050808",
+    "is_primary": false
+  },
+  {
+    "npi": "1578610358",
+    "ccn": "050812",
+    "is_primary": true
+  },
+  {
+    "npi": "1578610358",
+    "ccn": "050815",
+    "is_primary": false
+  },
+  {
+    "npi": "1290349442",
+    "ccn": "050819",
+    "is_primary": true
+  },
+  {
+    "npi": "1290349442",
+    "ccn": "050818",
+    "is_primary": false
+  },
+  {
+    "npi": "1652074463",
+    "ccn": "050812",
+    "is_primary": true
+  },
+  {
+    "npi": "1652074463",
+    "ccn": "050815",
+    "is_primary": false
+  },
+  {
+    "npi": "1135346553",
+    "ccn": "050821",
+    "is_primary": true
+  },
+  {
+    "npi": "1525007435",
+    "ccn": "050822",
+    "is_primary": true
+  },
+  {
+    "npi": "1216894216",
+    "ccn": "050818",
+    "is_primary": true
+  },
+  {
+    "npi": "1216894216",
+    "ccn": "050817",
+    "is_primary": false
+  },
+  {
+    "npi": "1489090104",
+    "ccn": "050805",
+    "is_primary": true
+  },
+  {
+    "npi": "1489090104",
+    "ccn": "050804",
+    "is_primary": false
+  },
+  {
+    "npi": "1348356423",
+    "ccn": "050820",
+    "is_primary": true
+  },
+  {
+    "npi": "1348356423",
+    "ccn": "050818",
+    "is_primary": false
+  },
+  {
+    "npi": "1811437445",
+    "ccn": "050803",
+    "is_primary": true
+  },
+  {
+    "npi": "1811437445",
+    "ccn": "050804",
+    "is_primary": false
+  },
+  {
+    "npi": "1202169797",
+    "ccn": "050822",
+    "is_primary": true
+  },
+  {
+    "npi": "1202169797",
+    "ccn": "050823",
+    "is_primary": false
+  },
+  {
+    "npi": "1375628900",
+    "ccn": "050813",
+    "is_primary": true
+  },
+  {
+    "npi": "1375628900",
+    "ccn": "050814",
+    "is_primary": false
+  },
+  {
+    "npi": "1375628900",
+    "ccn": "050812",
+    "is_primary": false
+  },
+  {
+    "npi": "1608801993",
+    "ccn": "051382",
+    "is_primary": true
+  },
+  {
+    "npi": "1608801993",
+    "ccn": "051383",
+    "is_primary": false
+  },
+  {
+    "npi": "1726149333",
+    "ccn": "050809",
+    "is_primary": true
+  },
+  {
+    "npi": "1922169952",
+    "ccn": "050823",
+    "is_primary": true
+  },
+  {
+    "npi": "1922169952",
+    "ccn": "050822",
+    "is_primary": false
+  },
+  {
+    "npi": "1228851584",
+    "ccn": "050815",
+    "is_primary": true
+  },
+  {
+    "npi": "1228851584",
+    "ccn": "050819",
+    "is_primary": false
+  },
+  {
+    "npi": "1384066654",
+    "ccn": "050811",
+    "is_primary": true
+  },
+  {
+    "npi": "1940572021",
+    "ccn": "050807",
+    "is_primary": true
+  },
+  {
+    "npi": "1940572021",
+    "ccn": "050808",
+    "is_primary": false
+  },
+  {
+    "npi": "1826886156",
+    "ccn": "050813",
+    "is_primary": true
+  },
+  {
+    "npi": "1826886156",
+    "ccn": "050817",
+    "is_primary": false
+  },
+  {
+    "npi": "1770435810",
+    "ccn": "050823",
+    "is_primary": true
+  },
+  {
+    "npi": "1770435810",
+    "ccn": "050822",
+    "is_primary": false
+  },
+  {
+    "npi": "1934667662",
+    "ccn": "050805",
+    "is_primary": true
+  },
+  {
+    "npi": "1424508822",
+    "ccn": "050813",
+    "is_primary": true
+  },
+  {
+    "npi": "1141397558",
+    "ccn": "050824",
+    "is_primary": true
+  }
+]

@@ -1,0 +1,625 @@
+[
+  {
+    "place_type": "county",
+    "name": "Alameda",
+    "county": "Alameda",
+    "lat": 37.648,
+    "lng": -121.913
+  },
+  {
+    "place_type": "county",
+    "name": "Butte",
+    "county": "Butte",
+    "lat": 39.667,
+    "lng": -121.601
+  },
+  {
+    "place_type": "county",
+    "name": "Contra Costa",
+    "county": "Contra Costa",
+    "lat": 37.919,
+    "lng": -121.951
+  },
+  {
+    "place_type": "county",
+    "name": "El Dorado",
+    "county": "El Dorado",
+    "lat": 38.779,
+    "lng": -120.525
+  },
+  {
+    "place_type": "county",
+    "name": "Fresno",
+    "county": "Fresno",
+    "lat": 36.758,
+    "lng": -119.649
+  },
+  {
+    "place_type": "county",
+    "name": "Humboldt",
+    "county": "Humboldt",
+    "lat": 40.706,
+    "lng": -123.926
+  },
+  {
+    "place_type": "county",
+    "name": "Kern",
+    "county": "Kern",
+    "lat": 35.343,
+    "lng": -118.729
+  },
+  {
+    "place_type": "county",
+    "name": "Los Angeles",
+    "county": "Los Angeles",
+    "lat": 34.321,
+    "lng": -118.225
+  },
+  {
+    "place_type": "county",
+    "name": "Monterey",
+    "county": "Monterey",
+    "lat": 36.217,
+    "lng": -121.239
+  },
+  {
+    "place_type": "county",
+    "name": "Nevada",
+    "county": "Nevada",
+    "lat": 39.301,
+    "lng": -120.769
+  },
+  {
+    "place_type": "county",
+    "name": "Orange",
+    "county": "Orange",
+    "lat": 33.703,
+    "lng": -117.761
+  },
+  {
+    "place_type": "county",
+    "name": "Placer",
+    "county": "Placer",
+    "lat": 39.063,
+    "lng": -120.718
+  },
+  {
+    "place_type": "county",
+    "name": "Riverside",
+    "county": "Riverside",
+    "lat": 33.743,
+    "lng": -115.994
+  },
+  {
+    "place_type": "county",
+    "name": "Sacramento",
+    "county": "Sacramento",
+    "lat": 38.45,
+    "lng": -121.34
+  },
+  {
+    "place_type": "county",
+    "name": "San Bernardino",
+    "county": "San Bernardino",
+    "lat": 34.841,
+    "lng": -116.178
+  },
+  {
+    "place_type": "county",
+    "name": "San Diego",
+    "county": "San Diego",
+    "lat": 33.034,
+    "lng": -116.736
+  },
+  {
+    "place_type": "county",
+    "name": "San Francisco",
+    "county": "San Francisco",
+    "lat": 37.7599,
+    "lng": -122.437
+  },
+  {
+    "place_type": "county",
+    "name": "San Joaquin",
+    "county": "San Joaquin",
+    "lat": 37.935,
+    "lng": -121.272
+  },
+  {
+    "place_type": "county",
+    "name": "San Luis Obispo",
+    "county": "San Luis Obispo",
+    "lat": 35.387,
+    "lng": -120.404
+  },
+  {
+    "place_type": "county",
+    "name": "Santa Barbara",
+    "county": "Santa Barbara",
+    "lat": 34.67,
+    "lng": -120.017
+  },
+  {
+    "place_type": "county",
+    "name": "Santa Clara",
+    "county": "Santa Clara",
+    "lat": 37.233,
+    "lng": -121.695
+  },
+  {
+    "place_type": "county",
+    "name": "Shasta",
+    "county": "Shasta",
+    "lat": 40.763,
+    "lng": -122.041
+  },
+  {
+    "place_type": "county",
+    "name": "Sonoma",
+    "county": "Sonoma",
+    "lat": 38.525,
+    "lng": -122.926
+  },
+  {
+    "place_type": "county",
+    "name": "Stanislaus",
+    "county": "Stanislaus",
+    "lat": 37.559,
+    "lng": -120.998
+  },
+  {
+    "place_type": "county",
+    "name": "Ventura",
+    "county": "Ventura",
+    "lat": 34.457,
+    "lng": -119.083
+  },
+  {
+    "place_type": "city",
+    "name": "Anaheim",
+    "county": "Orange",
+    "lat": 33.847,
+    "lng": -117.931
+  },
+  {
+    "place_type": "city",
+    "name": "Bakersfield",
+    "county": "Kern",
+    "lat": 35.388,
+    "lng": -119.012
+  },
+  {
+    "place_type": "city",
+    "name": "Eureka",
+    "county": "Humboldt",
+    "lat": 40.784,
+    "lng": -124.145
+  },
+  {
+    "place_type": "city",
+    "name": "Fresno",
+    "county": "Fresno",
+    "lat": 36.748,
+    "lng": -119.782
+  },
+  {
+    "place_type": "city",
+    "name": "Irvine",
+    "county": "Orange",
+    "lat": 33.656,
+    "lng": -117.775
+  },
+  {
+    "place_type": "city",
+    "name": "La Jolla",
+    "county": "San Diego",
+    "lat": 32.884,
+    "lng": -117.225
+  },
+  {
+    "place_type": "city",
+    "name": "Long Beach",
+    "county": "Los Angeles",
+    "lat": 33.808,
+    "lng": -118.186
+  },
+  {
+    "place_type": "city",
+    "name": "Los Angeles",
+    "county": "Los Angeles",
+    "lat": 34.0725,
+    "lng": -118.241
+  },
+  {
+    "place_type": "city",
+    "name": "Oakland",
+    "county": "Alameda",
+    "lat": 37.81,
+    "lng": -122.258
+  },
+  {
+    "place_type": "city",
+    "name": "Palo Alto",
+    "county": "Santa Clara",
+    "lat": 37.436,
+    "lng": -122.17
+  },
+  {
+    "place_type": "city",
+    "name": "Pasadena",
+    "county": "Los Angeles",
+    "lat": 34.136,
+    "lng": -118.152
+  },
+  {
+    "place_type": "city",
+    "name": "Redding",
+    "county": "Shasta",
+    "lat": 40.585,
+    "lng": -122.396
+  },
+  {
+    "place_type": "city",
+    "name": "Riverside",
+    "county": "Riverside",
+    "lat": 33.976,
+    "lng": -117.388
+  },
+  {
+    "place_type": "city",
+    "name": "Roseville",
+    "county": "Placer",
+    "lat": 38.758,
+    "lng": -121.256
+  },
+  {
+    "place_type": "city",
+    "name": "Sacramento",
+    "county": "Sacramento",
+    "lat": 38.554,
+    "lng": -121.456
+  },
+  {
+    "place_type": "city",
+    "name": "San Bernardino",
+    "county": "San Bernardino",
+    "lat": 34.135,
+    "lng": -117.322
+  },
+  {
+    "place_type": "city",
+    "name": "San Diego",
+    "county": "San Diego",
+    "lat": 32.798,
+    "lng": -117.155
+  },
+  {
+    "place_type": "city",
+    "name": "San Francisco",
+    "county": "San Francisco",
+    "lat": 37.7668,
+    "lng": -122.4305
+  },
+  {
+    "place_type": "city",
+    "name": "San Jose",
+    "county": "Santa Clara",
+    "lat": 37.315,
+    "lng": -121.933
+  },
+  {
+    "place_type": "city",
+    "name": "Santa Barbara",
+    "county": "Santa Barbara",
+    "lat": 34.43,
+    "lng": -119.72
+  },
+  {
+    "place_type": "city",
+    "name": "Santa Monica",
+    "county": "Los Angeles",
+    "lat": 34.028,
+    "lng": -118.486
+  },
+  {
+    "place_type": "city",
+    "name": "South Lake Tahoe",
+    "county": "El Dorado",
+    "lat": 38.92,
+    "lng": -119.999
+  },
+  {
+    "place_type": "city",
+    "name": "Torrance",
+    "county": "Los Angeles",
+    "lat": 33.809,
+    "lng": -118.342
+  },
+  {
+    "place_type": "city",
+    "name": "Truckee",
+    "county": "Nevada",
+    "lat": 39.329,
+    "lng": -120.195
+  },
+  {
+    "place_type": "city",
+    "name": "Walnut Creek",
+    "county": "Contra Costa",
+    "lat": 37.915,
+    "lng": -122.04
+  },
+  {
+    "place_type": "city",
+    "name": "Berkeley",
+    "county": "Alameda",
+    "lat": 37.8715,
+    "lng": -122.273
+  },
+  {
+    "place_type": "city",
+    "name": "Glendale",
+    "county": "Los Angeles",
+    "lat": 34.1425,
+    "lng": -118.2551
+  },
+  {
+    "place_type": "city",
+    "name": "Burbank",
+    "county": "Los Angeles",
+    "lat": 34.1808,
+    "lng": -118.309
+  },
+  {
+    "place_type": "city",
+    "name": "Santa Ana",
+    "county": "Orange",
+    "lat": 33.7455,
+    "lng": -117.8677
+  },
+  {
+    "place_type": "city",
+    "name": "Chula Vista",
+    "county": "San Diego",
+    "lat": 32.6401,
+    "lng": -117.0842
+  },
+  {
+    "place_type": "city",
+    "name": "Modesto",
+    "county": "Stanislaus",
+    "lat": 37.6391,
+    "lng": -120.9969
+  },
+  {
+    "place_type": "city",
+    "name": "Stockton",
+    "county": "San Joaquin",
+    "lat": 37.9577,
+    "lng": -121.2908
+  },
+  {
+    "place_type": "city",
+    "name": "Santa Rosa",
+    "county": "Sonoma",
+    "lat": 38.4404,
+    "lng": -122.7141
+  },
+  {
+    "place_type": "city",
+    "name": "Ventura",
+    "county": "Ventura",
+    "lat": 34.2746,
+    "lng": -119.229
+  },
+  {
+    "place_type": "city",
+    "name": "Salinas",
+    "county": "Monterey",
+    "lat": 36.6777,
+    "lng": -121.6555
+  },
+  {
+    "place_type": "city",
+    "name": "San Luis Obispo",
+    "county": "San Luis Obispo",
+    "lat": 35.2828,
+    "lng": -120.6596
+  },
+  {
+    "place_type": "city",
+    "name": "Chico",
+    "county": "Butte",
+    "lat": 39.7285,
+    "lng": -121.8375
+  },
+  {
+    "place_type": "zip",
+    "name": "94107",
+    "county": "San Francisco",
+    "lat": 37.7765,
+    "lng": -122.392
+  },
+  {
+    "place_type": "zip",
+    "name": "94122",
+    "county": "San Francisco",
+    "lat": 37.757,
+    "lng": -122.469
+  },
+  {
+    "place_type": "zip",
+    "name": "94610",
+    "county": "Alameda",
+    "lat": 37.81,
+    "lng": -122.258
+  },
+  {
+    "place_type": "zip",
+    "name": "94598",
+    "county": "Contra Costa",
+    "lat": 37.915,
+    "lng": -122.04
+  },
+  {
+    "place_type": "zip",
+    "name": "94304",
+    "county": "Santa Clara",
+    "lat": 37.436,
+    "lng": -122.17
+  },
+  {
+    "place_type": "zip",
+    "name": "95128",
+    "county": "Santa Clara",
+    "lat": 37.315,
+    "lng": -121.933
+  },
+  {
+    "place_type": "zip",
+    "name": "95817",
+    "county": "Sacramento",
+    "lat": 38.554,
+    "lng": -121.456
+  },
+  {
+    "place_type": "zip",
+    "name": "95661",
+    "county": "Placer",
+    "lat": 38.758,
+    "lng": -121.256
+  },
+  {
+    "place_type": "zip",
+    "name": "93721",
+    "county": "Fresno",
+    "lat": 36.748,
+    "lng": -119.782
+  },
+  {
+    "place_type": "zip",
+    "name": "93301",
+    "county": "Kern",
+    "lat": 35.388,
+    "lng": -119.012
+  },
+  {
+    "place_type": "zip",
+    "name": "93105",
+    "county": "Santa Barbara",
+    "lat": 34.43,
+    "lng": -119.72
+  },
+  {
+    "place_type": "zip",
+    "name": "90033",
+    "county": "Los Angeles",
+    "lat": 34.059,
+    "lng": -118.209
+  },
+  {
+    "place_type": "zip",
+    "name": "90026",
+    "county": "Los Angeles",
+    "lat": 34.086,
+    "lng": -118.273
+  },
+  {
+    "place_type": "zip",
+    "name": "91105",
+    "county": "Los Angeles",
+    "lat": 34.136,
+    "lng": -118.152
+  },
+  {
+    "place_type": "zip",
+    "name": "90806",
+    "county": "Los Angeles",
+    "lat": 33.808,
+    "lng": -118.186
+  },
+  {
+    "place_type": "zip",
+    "name": "90404",
+    "county": "Los Angeles",
+    "lat": 34.028,
+    "lng": -118.486
+  },
+  {
+    "place_type": "zip",
+    "name": "90505",
+    "county": "Los Angeles",
+    "lat": 33.809,
+    "lng": -118.342
+  },
+  {
+    "place_type": "zip",
+    "name": "92618",
+    "county": "Orange",
+    "lat": 33.656,
+    "lng": -117.775
+  },
+  {
+    "place_type": "zip",
+    "name": "92801",
+    "county": "Orange",
+    "lat": 33.847,
+    "lng": -117.931
+  },
+  {
+    "place_type": "zip",
+    "name": "92501",
+    "county": "Riverside",
+    "lat": 33.976,
+    "lng": -117.388
+  },
+  {
+    "place_type": "zip",
+    "name": "92411",
+    "county": "San Bernardino",
+    "lat": 34.135,
+    "lng": -117.322
+  },
+  {
+    "place_type": "zip",
+    "name": "92123",
+    "county": "San Diego",
+    "lat": 32.798,
+    "lng": -117.155
+  },
+  {
+    "place_type": "zip",
+    "name": "92037",
+    "county": "San Diego",
+    "lat": 32.884,
+    "lng": -117.225
+  },
+  {
+    "place_type": "zip",
+    "name": "96001",
+    "county": "Shasta",
+    "lat": 40.585,
+    "lng": -122.396
+  },
+  {
+    "place_type": "zip",
+    "name": "95501",
+    "county": "Humboldt",
+    "lat": 40.784,
+    "lng": -124.145
+  },
+  {
+    "place_type": "zip",
+    "name": "96161",
+    "county": "Nevada",
+    "lat": 39.329,
+    "lng": -120.195
+  },
+  {
+    "place_type": "zip",
+    "name": "96150",
+    "county": "El Dorado",
+    "lat": 38.92,
+    "lng": -119.999
+  }
+]

@@ -1,0 +1,170 @@
+[
+  {
+    "code": "27447",
+    "description": "Total knee replacement (arthroplasty)",
+    "category": "surgery",
+    "body_system": "musculoskeletal",
+    "avg_work_rvu": 19.6,
+    "is_surgical": true
+  },
+  {
+    "code": "27130",
+    "description": "Total hip replacement (arthroplasty)",
+    "category": "surgery",
+    "body_system": "musculoskeletal",
+    "avg_work_rvu": 19.6,
+    "is_surgical": true
+  },
+  {
+    "code": "23472",
+    "description": "Total shoulder replacement (arthroplasty)",
+    "category": "surgery",
+    "body_system": "musculoskeletal",
+    "avg_work_rvu": 22.13,
+    "is_surgical": true
+  },
+  {
+    "code": "29881",
+    "description": "Knee arthroscopy with partial meniscus removal",
+    "category": "surgery",
+    "body_system": "musculoskeletal",
+    "avg_work_rvu": 7.03,
+    "is_surgical": true
+  },
+  {
+    "code": "63030",
+    "description": "Lumbar laminotomy with disc removal, single level",
+    "category": "surgery",
+    "body_system": "nervous",
+    "avg_work_rvu": 11.08,
+    "is_surgical": true
+  },
+  {
+    "code": "22551",
+    "description": "Anterior cervical discectomy and fusion, single level",
+    "category": "surgery",
+    "body_system": "musculoskeletal",
+    "avg_work_rvu": 25.0,
+    "is_surgical": true
+  },
+  {
+    "code": "47562",
+    "description": "Laparoscopic gallbladder removal (cholecystectomy)",
+    "category": "surgery",
+    "body_system": "digestive",
+    "avg_work_rvu": 10.47,
+    "is_surgical": true
+  },
+  {
+    "code": "49650",
+    "description": "Laparoscopic inguinal hernia repair",
+    "category": "surgery",
+    "body_system": "digestive",
+    "avg_work_rvu": 6.27,
+    "is_surgical": true
+  },
+  {
+    "code": "44970",
+    "description": "Laparoscopic appendix removal (appendectomy)",
+    "category": "surgery",
+    "body_system": "digestive",
+    "avg_work_rvu": 9.45,
+    "is_surgical": true
+  },
+  {
+    "code": "43644",
+    "description": "Laparoscopic gastric bypass (Roux-en-Y)",
+    "category": "surgery",
+    "body_system": "digestive",
+    "avg_work_rvu": 29.4,
+    "is_surgical": true
+  },
+  {
+    "code": "33533",
+    "description": "Coronary artery bypass graft, single arterial graft",
+    "category": "surgery",
+    "body_system": "cardiovascular",
+    "avg_work_rvu": 33.75,
+    "is_surgical": true
+  },
+  {
+    "code": "92928",
+    "description": "Coronary artery stent placement, single vessel",
+    "category": "surgery",
+    "body_system": "cardiovascular",
+    "avg_work_rvu": 10.96,
+    "is_surgical": true
+  },
+  {
+    "code": "33208",
+    "description": "Dual-chamber permanent pacemaker insertion",
+    "category": "device",
+    "body_system": "cardiovascular",
+    "avg_work_rvu": 7.8,
+    "is_surgical": true
+  },
+  {
+    "code": "66984",
+    "description": "Cataract removal with intraocular lens implant",
+    "category": "surgery",
+    "body_system": "eye",
+    "avg_work_rvu": 8.52,
+    "is_surgical": true
+  },
+  {
+    "code": "58571",
+    "description": "Laparoscopic hysterectomy",
+    "category": "surgery",
+    "body_system": "female_genital",
+    "avg_work_rvu": 15.1,
+    "is_surgical": true
+  },
+  {
+    "code": "19303",
+    "description": "Simple complete mastectomy",
+    "category": "surgery",
+    "body_system": "integumentary",
+    "avg_work_rvu": 15.73,
+    "is_surgical": true
+  },
+  {
+    "code": "15823",
+    "description": "Upper eyelid lift (blepharoplasty)",
+    "category": "plastics",
+    "body_system": "integumentary",
+    "avg_work_rvu": 6.81,
+    "is_surgical": true
+  },
+  {
+    "code": "45378",
+    "description": "Diagnostic colonoscopy",
+    "category": "surgery",
+    "body_system": "digestive",
+    "avg_work_rvu": 3.26,
+    "is_surgical": false
+  },
+  {
+    "code": "70553",
+    "description": "MRI of the brain without and with contrast",
+    "category": "scans",
+    "body_system": "radiology",
+    "avg_work_rvu": 2.29,
+    "is_surgical": false
+  },
+  {
+    "code": "73721",
+    "description": "MRI of a lower-extremity joint without contrast",
+    "category": "scans",
+    "body_system": "radiology",
+    "avg_work_rvu": 1.35,
+    "is_surgical": false
+  },
+  {
+    "code": "96365",
+    "description": "IV infusion, initial hour",
+    "category": "iv",
+    "body_system": "medicine",
+    "avg_work_rvu": 0.21,
+    "is_surgical": false
+  }
+]

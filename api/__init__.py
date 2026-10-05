@@ -1,0 +1,1 @@
+"""SurgiCAL FastAPI application."""

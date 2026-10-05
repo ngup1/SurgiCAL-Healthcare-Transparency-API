@@ -1,0 +1,18 @@
+# Lint + format config for the API (fastapi-best-practices: ruff for both).
+line-length = 120
+target-version = "py312"
+
+[lint]
+# pycodestyle, pyflakes, isort, bugbear, pyupgrade, simplify
+select = ["E", "W", "F", "I", "B", "UP", "SIM"]
+
+[lint.per-file-ignores]
+# FastAPI's Query()/Depends() defaults are the framework's intended pattern.
+"routers/*.py" = ["B008"]
+# Tests import their shared constants from conftest by module name.
+"tests/*.py" = ["I001"]
+# The generator's data tables are one row per line on purpose.
+"seed/generate.py" = ["E501"]
+
+[format]
+exclude = ["seed/generate.py"]

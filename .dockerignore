@@ -1,0 +1,10 @@
+# Build context is the repo root; send only what the images need.
+.git
+.venv
+**/__pycache__
+**/*.py[cod]
+.env
+**/.env
+etl
+api/seed/data
+*.md
