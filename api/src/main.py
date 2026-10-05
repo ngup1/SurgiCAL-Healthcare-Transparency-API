@@ -7,6 +7,7 @@ from fastapi import FastAPI
 from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import RedirectResponse
+from psycopg import OperationalError
 
 from src.config import settings
 from src.database import create_pool
@@ -15,6 +16,7 @@ from src.docs import API_DESCRIPTION, TAGS_METADATA, VALIDATION_RESPONSES
 from src.exceptions import (
     NotFound,
     RequestError,
+    database_unavailable_handler,
     not_found_handler,
     request_error_handler,
     validation_exception_handler,
@@ -22,10 +24,13 @@ from src.exceptions import (
 from src.health.router import router as health_router
 from src.hospitals.router import router as hospitals_router
 from src.locations.router import router as places_router
+from src.observability import REQUEST_ID_HEADER, RequestContextMiddleware, configure_logging
 from src.pagination import TOTAL_COUNT_HEADER
 from src.prices.router import router as prices_router
 from src.providers.router import router as providers_router
 from src.search.router import router as search_router
+
+configure_logging(settings.log_level, settings.log_json)
 
 
 @asynccontextmanager
@@ -64,12 +69,15 @@ app.add_middleware(
     allow_credentials=True,
     allow_methods=["GET"],
     allow_headers=["*"],
-    expose_headers=[TOTAL_COUNT_HEADER],  # let browser clients read the page total
+    expose_headers=[TOTAL_COUNT_HEADER, REQUEST_ID_HEADER],  # readable by browser clients
 )
+# Added last, so it's outermost: it sees every request and response, including CORS.
+app.add_middleware(RequestContextMiddleware)
 
 app.add_exception_handler(RequestValidationError, validation_exception_handler)
 app.add_exception_handler(NotFound, not_found_handler)
 app.add_exception_handler(RequestError, request_error_handler)
+app.add_exception_handler(OperationalError, database_unavailable_handler)
 
 for router, prefix in [
     (search_router, "/search"),

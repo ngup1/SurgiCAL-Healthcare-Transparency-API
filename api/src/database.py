@@ -19,6 +19,8 @@ def create_pool() -> AsyncConnectionPool:
         conninfo=settings.db_conninfo,
         min_size=settings.db_pool_min_size,
         max_size=settings.db_pool_max_size,
+        # Fail fast with a 503 instead of holding requests for 30 s when the database is down.
+        timeout=settings.db_pool_timeout,
         open=False,
         kwargs={
             "row_factory": dict_row,

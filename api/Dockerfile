@@ -40,10 +40,13 @@ ENV GIT_COMMIT=$GIT_COMMIT
 USER app
 EXPOSE 8000
 
-# Python's stdlib does the request, since slim images don't include curl.
+# Readiness (API + database). Python's stdlib does the request, since slim images don't
+# include curl. Render uses its own check on /health (liveness) instead, so a database
+# blip never makes it restart the API.
 HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 \
-    CMD python -c "import os, urllib.request; urllib.request.urlopen(f'http://127.0.0.1:{os.environ[\"PORT\"]}/health', timeout=4)"
+    CMD python -c "import os, urllib.request; urllib.request.urlopen(f'http://127.0.0.1:{os.environ[\"PORT\"]}/health/ready', timeout=4)"
 
 # Hosts like Render set $PORT; locally it defaults to 8000. --proxy-headers makes the
 # app see the original https scheme and client IP behind the host's load balancer.
-CMD ["sh", "-c", "exec uvicorn src.main:app --host 0.0.0.0 --port $PORT --workers 2 --proxy-headers --forwarded-allow-ips='*'"]
+# --no-access-log: the app writes its own JSON access log (src/observability.py).
+CMD ["sh", "-c", "exec uvicorn src.main:app --host 0.0.0.0 --port $PORT --workers 2 --proxy-headers --forwarded-allow-ips='*' --no-access-log"]
