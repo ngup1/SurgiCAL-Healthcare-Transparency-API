@@ -4,12 +4,13 @@ from fastapi import APIRouter, Depends, HTTPException, Path, Query
 from psycopg2.extras import RealDictCursor
 
 from api.dependencies import distance_select, get_db, spatial_where
+from api.docs import CCN_EXAMPLES, not_found
 from api.validation import CCN_PATTERN, STATE_PATTERN, require_lat_lng_pair
 
 router = APIRouter()
 
 
-@router.get("")
+@router.get("", summary="List hospitals")
 def list_hospitals(
     state: str = Query("CA", pattern=STATE_PATTERN, description="Two-letter state code"),
     lat: float | None = Query(None, ge=-90, le=90),
@@ -19,7 +20,12 @@ def list_hospitals(
     offset: int = Query(0, ge=0),
     conn=Depends(get_db),
 ):
-    """List hospitals, optionally filtered by location."""
+    """
+    List hospitals, sorted by name.
+
+    To search near a point, pass `lat` and `lng` together (e.g. `34.0522`, `-118.2437` for
+    downtown Los Angeles): results are then limited to `radius_miles` and sorted nearest first.
+    """
     require_lat_lng_pair(lat, lng)
     dist_sql, dist_params = distance_select(lat, lng)
     geo_clause, geo_params = spatial_where(lat, lng, radius_miles)
@@ -52,9 +58,12 @@ def list_hospitals(
         return cur.fetchall()
 
 
-@router.get("/{ccn}")
-def get_hospital(ccn: str = Path(..., pattern=CCN_PATTERN), conn=Depends(get_db)):
-    """Get hospital detail including quality metrics."""
+@router.get("/{ccn}", summary="Get a hospital with quality measures", responses=not_found("No hospital has this CCN"))
+def get_hospital(
+    ccn: str = Path(..., pattern=CCN_PATTERN, description="CMS Certification Number", openapi_examples=CCN_EXAMPLES),
+    conn=Depends(get_db),
+):
+    """Hospital details and CMS quality measures: star rating, comparison groups, and procedure-specific rates."""
     sql = """
         SELECT h.ccn, h.name, h.address, h.city, h.state, h.zip, h.phone,
                h.hospital_type, h.ownership, h.emergency_services,
@@ -76,14 +85,14 @@ def get_hospital(ccn: str = Path(..., pattern=CCN_PATTERN), conn=Depends(get_db)
         return dict(row)
 
 
-@router.get("/{ccn}/providers")
+@router.get("/{ccn}/providers", summary="List providers at a hospital")
 def list_hospital_providers(
-    ccn: str = Path(..., pattern=CCN_PATTERN),
+    ccn: str = Path(..., pattern=CCN_PATTERN, description="CMS Certification Number", openapi_examples=CCN_EXAMPLES),
     limit: int = Query(50, ge=1, le=200),
     offset: int = Query(0, ge=0),
     conn=Depends(get_db),
 ):
-    """List providers affiliated with a hospital."""
+    """Providers affiliated with the hospital, highest-volume first."""
     sql = """
         SELECT p.npi, p.first_name, p.last_name, p.credential, p.specialty,
                pm.patient_rating, pm.num_reviews, pm.volume_bucket, pm.wrvu_estimate,

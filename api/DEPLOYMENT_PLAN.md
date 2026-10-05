@@ -217,13 +217,14 @@ Each phase ends in a working, testable state.
 - [ ] Structured JSON logging, a request-ID middleware, and access logs from uvicorn.
 - [ ] Read CORS origins from `CORS_ORIGINS`, with no hard-coded `localhost:5173`.
 
-### Phase 7: Swagger UI for public testing
-- [ ] Set `openapi_tags` with a description for each domain, and write an app `description` that says plainly that **all data is fictional**.
-- [ ] Add `summary`, `description` and `responses={404: ...}` on every route, and `openapi_examples` on parameters that use real mock IDs (table in §6), so "Try it out" works on the first click.
-- [ ] Redirect `GET /` → `/docs`.
-- [ ] Use `SHOW_DOCS` to decide whether to pass `openapi_url=None` (the guide's "hide by default"). The public demo sets `SHOW_DOCS=true`.
-- [ ] Optional: `swagger_ui_parameters={"tryItOutEnabled": True, "displayRequestDuration": True}`.
-- **Done when:** a first-time visitor can open `/`, expand any endpoint, click Execute with the pre-filled example, and get data back.
+### Phase 7: Swagger UI for public testing ✅ done
+- [x] Header reads "SurgiCAL API · Healthcare transparency API", with a short description of how to try the API and its error behavior. There's no note about fictional data in Swagger; the README covers that.
+- [x] `openapi_tags` describe each area, ordered search → prices → hospitals → providers → devices → health. Every route has a `summary` and a plain-language description; optional filters describe their format with examples, e.g. "`aetna`, `medicare`, `cash`".
+- [x] **Required and path parameters are pre-filled** with seed-data values (`openapi_examples`, in `api/docs.py`), several with dropdown alternatives. Optional filters are deliberately left empty, since a pre-filled filter would silently narrow the results.
+- [x] `tryItOutEnabled`: every endpoint opens ready to Execute. `displayRequestDuration` is on, and the schema list at the bottom is hidden.
+- [x] The 422 response documents the real error format (`ValidationErrorResponse`) instead of FastAPI's default. Detail endpoints document their 404.
+- [x] `GET /` redirects to `/docs`. `SHOW_DOCS=false` hides `/docs`, `/redoc` and `/openapi.json` (on by default, so the deployed demo needs no settings).
+- [x] `tests/test_docs.py` (10 tests) checks: every tag is described, every operation has a summary, only required parameters are pre-filled, and **every example value (including dropdown alternatives) returns data**, so "Try it out → Execute" works on the first click.
 
 ### Phase 8: Production Docker image ✅ done (moved ahead of Phase 9)
 - [x] Two-stage `api/Dockerfile` on `python:3.12-slim`. Removed `gcc` and `libpq-dev` (187 MB), since `psycopg2-binary` bundles libpq. The virtualenv is created `--without-pip` and filled by the build stage's pip, so pip never ships.

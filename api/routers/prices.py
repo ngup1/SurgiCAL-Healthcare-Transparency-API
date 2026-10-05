@@ -6,6 +6,7 @@ from fastapi import APIRouter, Depends, Query
 from psycopg2.extras import RealDictCursor
 
 from api.dependencies import distance_select, get_db, spatial_where
+from api.docs import CCNS_EXAMPLES, CPT_EXAMPLES
 from api.validation import (
     CCN_PATTERN,
     CPT_PATTERN,
@@ -17,18 +18,23 @@ from api.validation import (
 router = APIRouter()
 
 
-@router.get("")
+@router.get("", summary="Prices for a procedure")
 def search_prices(
-    cpt: str = Query(..., pattern=CPT_PATTERN, description="CPT code to search for"),
+    cpt: str = Query(..., pattern=CPT_PATTERN, description="CPT procedure code", openapi_examples=CPT_EXAMPLES),
     lat: float | None = Query(None, ge=-90, le=90),
     lng: float | None = Query(None, ge=-180, le=180),
     radius_miles: float = Query(50, gt=0, le=250),
-    payer: str | None = Query(None, description="Filter by payer name"),
+    payer: str | None = Query(None, description="Partial match on insurer, e.g. `aetna`, `medicare`, `cash`"),
     limit: int = Query(50, ge=1, le=200),
     offset: int = Query(0, ge=0),
     conn=Depends(get_db),
 ):
-    """Search procedure prices by CPT code, location, and payer."""
+    """
+    Every price for a procedure, cheapest negotiated rate first: one row per hospital, insurer,
+    and plan, with the hospital's cash price, rate range, and quality rating.
+
+    Pass `lat` and `lng` together to limit to hospitals within `radius_miles`.
+    """
     require_lat_lng_pair(lat, lng)
     dist_sql, dist_params = distance_select(lat, lng)
     # Replace generic 'location' with table-qualified column
@@ -72,13 +78,13 @@ def search_prices(
         return cur.fetchall()
 
 
-@router.get("/compare")
+@router.get("/compare", summary="Compare a procedure across hospitals")
 def compare_prices(
-    cpt: str = Query(..., pattern=CPT_PATTERN, description="CPT code"),
-    ccns: str = Query(..., description="Comma-separated hospital CCNs"),
+    cpt: str = Query(..., pattern=CPT_PATTERN, description="CPT procedure code", openapi_examples=CPT_EXAMPLES),
+    ccns: str = Query(..., description="Comma-separated hospital CCNs (up to 10)", openapi_examples=CCNS_EXAMPLES),
     conn=Depends(get_db),
 ):
-    """Compare prices for a procedure across specific hospitals."""
+    """Side-by-side prices for one procedure at the hospitals you choose, grouped by hospital and insurer."""
     ccn_list = [c.strip() for c in ccns.split(",") if c.strip()]
     if not ccn_list:
         raise_validation_error("ccns", "At least one hospital CCN is required", ccns)

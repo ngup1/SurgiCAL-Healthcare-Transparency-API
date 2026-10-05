@@ -4,14 +4,15 @@ from fastapi import APIRouter, Depends, Query
 from psycopg2.extras import RealDictCursor
 
 from api.dependencies import get_db
+from api.docs import SEARCH_EXAMPLES
 
 router = APIRouter()
 
 
-@router.get("")
+@router.get("", summary="Search everything")
 def unified_search(
-    q: str = Query(..., min_length=2, max_length=100, description="Search query"),
-    limit: int = Query(10, ge=1, le=50),
+    q: str = Query(..., min_length=2, max_length=100, description="Search text", openapi_examples=SEARCH_EXAMPLES),
+    limit: int = Query(10, ge=1, le=50, description="Maximum results per group"),
     conn=Depends(get_db),
 ):
     """

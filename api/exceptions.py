@@ -6,8 +6,28 @@ from fastapi import Request, status
 from fastapi.encoders import jsonable_encoder
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
+from pydantic import BaseModel
 
 from api.validation import PATTERN_MESSAGES
+
+
+class FieldError(BaseModel):
+    field: str
+    location: str
+    message: str
+    input: Any = None
+
+
+class ValidationErrorResponse(BaseModel):
+    """Body of every 422 response (documented in OpenAPI)."""
+
+    code: str = "validation_error"
+    detail: str
+    errors: list[FieldError]
+
+
+class NotFoundResponse(BaseModel):
+    detail: str
 
 
 def _field_error(err: dict[str, Any]) -> dict[str, Any]:

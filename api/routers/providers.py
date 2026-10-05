@@ -4,16 +4,17 @@ from fastapi import APIRouter, Depends, HTTPException, Path, Query
 from psycopg2.extras import RealDictCursor
 
 from api.dependencies import distance_select, get_db, spatial_where
+from api.docs import NPI_EXAMPLES, not_found
 from api.validation import NPI_PATTERN, STATE_PATTERN, require_lat_lng_pair
 
 router = APIRouter()
 
 
-@router.get("")
+@router.get("", summary="List providers")
 def list_providers(
-    specialty: str | None = Query(None),
+    specialty: str | None = Query(None, description="Partial match, e.g. `ortho` or `cardio`"),
     state: str = Query("CA", pattern=STATE_PATTERN, description="Two-letter state code"),
-    city: str | None = Query(None),
+    city: str | None = Query(None, description="Partial match, e.g. `san` or `los angeles`"),
     lat: float | None = Query(None, ge=-90, le=90),
     lng: float | None = Query(None, ge=-180, le=180),
     radius_miles: float = Query(25, gt=0, le=250),
@@ -21,7 +22,10 @@ def list_providers(
     offset: int = Query(0, ge=0),
     conn=Depends(get_db),
 ):
-    """List providers, optionally filtered by specialty and location."""
+    """
+    List providers, sorted by last name. Filter by specialty and city, or pass `lat` and
+    `lng` together to search within `radius_miles` (nearest first).
+    """
     require_lat_lng_pair(lat, lng)
     dist_sql, dist_params = distance_select(lat, lng)
     # Replace generic 'location' with table-qualified column
@@ -65,9 +69,14 @@ def list_providers(
         return cur.fetchall()
 
 
-@router.get("/{npi}")
-def get_provider(npi: str = Path(..., pattern=NPI_PATTERN), conn=Depends(get_db)):
-    """Get provider detail including metrics and hospital affiliations."""
+@router.get("/{npi}", summary="Get a provider", responses=not_found("No provider has this NPI"))
+def get_provider(
+    npi: str = Path(
+        ..., pattern=NPI_PATTERN, description="National Provider Identifier", openapi_examples=NPI_EXAMPLES
+    ),
+    conn=Depends(get_db),
+):
+    """Provider details, volume and rating metrics, and hospital affiliations (primary first)."""
     sql = """
         SELECT p.npi, p.first_name, p.last_name, p.credential, p.specialty,
                p.taxonomy_code, p.gender, p.medical_school, p.graduation_year,

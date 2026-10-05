@@ -7,22 +7,25 @@ from fastapi import APIRouter, Depends, HTTPException, Path, Query
 from psycopg2.extras import RealDictCursor
 
 from api.dependencies import get_db
+from api.docs import CPT_EXAMPLES, DEVICE_ID_EXAMPLES, not_found
 from api.validation import CPT_PATTERN, PRODUCT_CODE_PATTERN
 
 router = APIRouter()
 
 
-@router.get("")
+@router.get("", summary="List devices")
 def list_devices(
     product_code: str | None = Query(None, pattern=PRODUCT_CODE_PATTERN, description="3-letter FDA product code"),
-    manufacturer: str | None = Query(None),
-    medical_specialty: str | None = Query(None),
-    q: str | None = Query(None, min_length=2, max_length=100, description="Fuzzy search by brand name"),
+    manufacturer: str | None = Query(None, description="Partial match, e.g. `meridian`"),
+    medical_specialty: str | None = Query(None, description="Partial match, e.g. `ortho`, `cardio`"),
+    q: str | None = Query(
+        None, min_length=2, max_length=100, description="Fuzzy brand-name search, e.g. `knee` or `pacemaker`"
+    ),
     limit: int = Query(50, ge=1, le=200),
     offset: int = Query(0, ge=0),
     conn=Depends(get_db),
 ):
-    """List medical devices with optional filters."""
+    """Medical devices, sorted by brand (or by relevance when `q` is given)."""
     where_parts = []
     params: list = []
 
@@ -59,9 +62,12 @@ def list_devices(
         return cur.fetchall()
 
 
-@router.get("/by-procedure/{cpt}")
-def devices_by_procedure(cpt: str = Path(..., pattern=CPT_PATTERN), conn=Depends(get_db)):
-    """Get devices associated with a specific CPT procedure code."""
+@router.get("/by-procedure/{cpt}", summary="Devices used in a procedure")
+def devices_by_procedure(
+    cpt: str = Path(..., pattern=CPT_PATTERN, description="CPT procedure code", openapi_examples=CPT_EXAMPLES),
+    conn=Depends(get_db),
+):
+    """Implants, instruments, and consumables used in a procedure."""
     sql = """
         SELECT d.id, d.fda_product_code, d.brand_name, d.generic_name,
                d.manufacturer, d.device_class, d.medical_specialty,
@@ -76,9 +82,12 @@ def devices_by_procedure(cpt: str = Path(..., pattern=CPT_PATTERN), conn=Depends
         return cur.fetchall()
 
 
-@router.get("/{device_id}")
-def get_device(device_id: UUID, conn=Depends(get_db)):
-    """Get device detail including recent recalls and adverse event summary."""
+@router.get("/{device_id}", summary="Get a device with its safety record", responses=not_found("No device has this ID"))
+def get_device(
+    device_id: UUID = Path(..., openapi_examples=DEVICE_ID_EXAMPLES),
+    conn=Depends(get_db),
+):
+    """Device details, its 10 most recent recalls, and adverse-event counts by type."""
     with conn.cursor(cursor_factory=RealDictCursor) as cur:
         # Device info
         cur.execute(
@@ -127,14 +136,14 @@ def get_device(device_id: UUID, conn=Depends(get_db)):
     return result
 
 
-@router.get("/{device_id}/recalls")
+@router.get("/{device_id}/recalls", summary="List recalls for a device")
 def device_recalls(
-    device_id: UUID,
+    device_id: UUID = Path(..., openapi_examples=DEVICE_ID_EXAMPLES),
     limit: int = Query(50, ge=1, le=200),
     offset: int = Query(0, ge=0),
     conn=Depends(get_db),
 ):
-    """List recalls for a specific device."""
+    """FDA recalls for the device, newest first."""
     sql = """
         SELECT recall_number, product_code, brand_name, manufacturer,
                recall_class, reason, status, recall_date, termination_date,
@@ -149,15 +158,15 @@ def device_recalls(
         return cur.fetchall()
 
 
-@router.get("/{device_id}/adverse-events")
+@router.get("/{device_id}/adverse-events", summary="List adverse events for a device")
 def device_adverse_events(
-    device_id: UUID,
+    device_id: UUID = Path(..., openapi_examples=DEVICE_ID_EXAMPLES),
     event_type: Literal["death", "injury", "malfunction"] | None = Query(None),
     limit: int = Query(50, ge=1, le=200),
     offset: int = Query(0, ge=0),
     conn=Depends(get_db),
 ):
-    """List adverse events for a specific device."""
+    """FDA MAUDE adverse-event reports for the device, newest first."""
     where_parts = ["device_id = %s"]
     params: list = [str(device_id)]
 
