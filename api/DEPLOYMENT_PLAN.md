@@ -221,11 +221,14 @@ Each phase ends in a working, testable state.
 - [x] Dependencies are plain functions with individual `Query` parameters, not Pydantic query models: wrapped in a dependency, a query model shows up in Swagger as one opaque parameter.
 - **Result:** 121 tests (new: `test_locations.py`, plus response-schema and header checks in `test_docs.py`). 30/30 container smoke checks pass. Throughput is unchanged at ~369 req/s despite the extra count query and response validation.
 
-### Phase 6: Errors, health, observability
-- [ ] `src/exceptions.py`: domain exceptions (`HospitalNotFound`, ...) inherit from a `NotFound` base that the app turns into a 404. A `psycopg.OperationalError` becomes **503** `{"detail": "Database unavailable"}`, and any other unexpected error becomes 500 with the details logged only on the server.
-- [ ] `/health` stays a liveness check. `/health/ready` runs `SELECT 1` and is used by Docker's `HEALTHCHECK` and the host's health check.
-- [ ] Structured JSON logging, a request-ID middleware, and access logs from uvicorn.
-- [ ] Read CORS origins from `CORS_ORIGINS`, with no hard-coded `localhost:5173`.
+### Phase 6: Errors, health, observability ✅ done
+- [x] **Database unavailable → 503** `{"detail": "Database unavailable"}` with `Retry-After: 5`, for `psycopg.OperationalError` (which includes the pool's `PoolTimeout`). The pool now times out after 5 s (`DB_POOL_TIMEOUT`) instead of 30 s.
+- [x] **Unexpected errors → generic 500** `{"detail": "Internal server error", "request_id": ...}`. The traceback goes only to the logs.
+- [x] **`/health`** stays a liveness check that doesn't touch the database. **`/health/ready`** runs `SELECT 1` (3 s timeout) and returns 503 if the database is unreachable. The Docker `HEALTHCHECK` (and so CI's `compose up --wait`) uses `/health/ready`. **Render keeps `/health`**, so a Neon blip or slow wake-up never makes Render restart a healthy API.
+- [x] **Structured logs** (`src/observability.py`): one JSON object per line (`LOG_JSON=false` gives plain text locally), with uvicorn's loggers routed through the same handler. A pure-ASGI middleware assigns each request an ID (the caller's `X-Request-ID` if it's safe, else a new one), returns it in the response header, includes it in every log line for that request, and writes one access-log line (method, path, query, status, duration_ms). Health checks are logged at DEBUG so they don't flood the logs. uvicorn's own access log is off (`--no-access-log`).
+- [x] CORS origins come from `CORS_ORIGINS`, and `X-Request-ID` and `X-Total-Count` are exposed to browsers.
+- **Result:** 138 tests (new `test_observability.py`: request IDs, JSON format, access log, 503 on all data endpoints with a dead pool, liveness vs readiness, generic 500 with no detail leak). In an outage drill on the compose stack (stopping the database container), `/hospitals` returned 503 in 12 ms, `/health` stayed 200, and after the database restarted the API recovered in about 2 s without restarting itself.
+- Not done: rate limiting (`slowapi`). The API is read-only with capped page sizes and mock data; add it if the URL is shared widely.
 
 ### Phase 7: Swagger UI for public testing ✅ done
 - [x] Header reads "SurgiCAL API · Healthcare transparency API", with a short description of how to try the API and its error behavior. There's no note about fictional data in Swagger; the README covers that.

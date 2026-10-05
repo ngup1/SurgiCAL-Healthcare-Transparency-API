@@ -1,11 +1,13 @@
 """Error types, response models, and the handlers that give every error the same shape."""
 
+import logging
 from typing import Any
 
 from fastapi import Request, status
 from fastapi.encoders import jsonable_encoder
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
+from psycopg import OperationalError
 from pydantic import BaseModel, Field
 
 from src.constants import PATTERN_MESSAGES
@@ -109,3 +111,13 @@ async def request_error_handler(request: Request, exc: RequestError) -> JSONResp
     if exc.suggestions is not None:
         content["suggestions"] = exc.suggestions
     return JSONResponse(status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, content=content)
+
+
+async def database_unavailable_handler(request: Request, exc: OperationalError) -> JSONResponse:
+    """Database unreachable or the pool timed out (PoolTimeout is an OperationalError): 503, retryable."""
+    logging.getLogger("surgical.error").warning("Database unavailable: %s", exc)
+    return JSONResponse(
+        status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+        content={"detail": "Database unavailable"},
+        headers={"Retry-After": "5"},
+    )

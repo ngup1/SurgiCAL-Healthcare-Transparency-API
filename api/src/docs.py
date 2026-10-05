@@ -17,7 +17,9 @@ surgeon quality, and check medical devices for recalls and adverse events.
 **Trying it out:** every endpoint below is ready to run. Expand one and click
 **Execute**. Required fields come pre-filled with working example values.
 
-**Errors:** malformed input returns `422` naming each bad field; an unknown ID returns `404`.
+**Errors:** malformed input returns `422` naming each bad field; an unknown ID returns `404`;
+`503` means the database is temporarily unavailable (retry). Every response carries an
+`X-Request-ID` header to quote when reporting a problem.
 """.strip()
 
 TAGS_METADATA = [

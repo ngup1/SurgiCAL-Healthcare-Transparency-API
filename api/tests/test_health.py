@@ -15,6 +15,7 @@ async def test_openapi_lists_all_endpoints(client):
     paths = (await client.get("/openapi.json")).json()["paths"]
     assert set(paths) == {
         "/health",
+        "/health/ready",
         "/hospitals",
         "/hospitals/{ccn}",
         "/hospitals/{ccn}/providers",
@@ -30,3 +31,9 @@ async def test_openapi_lists_all_endpoints(client):
         "/search",
         "/places",
     }
+
+
+async def test_readiness_checks_the_database(client):
+    response = await client.get("/health/ready")
+    assert response.status_code == 200
+    assert response.json() == {"status": "ok", "database": "ok"}

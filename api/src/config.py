@@ -18,12 +18,17 @@ class Settings(BaseSettings):
     # Connections per worker process (uvicorn runs 2 workers in the image).
     db_pool_min_size: int = 1
     db_pool_max_size: int = 10
+    # Seconds a request waits for a database connection before failing with a 503.
+    db_pool_timeout: float = 5.0
 
     # fastapi-best-practices: be able to hide docs; on by default for the public demo.
     show_docs: bool = True
     cors_origins: list[str] = ["http://localhost:5173"]
     # Baked into the image by CI; reported by /health.
     git_commit: str = "unknown"
+    log_level: str = "INFO"
+    # One JSON object per log line; set LOG_JSON=false for plain text when developing locally.
+    log_json: bool = True
 
     @property
     def db_conninfo(self) -> str:
