@@ -2,7 +2,7 @@
 
 import pytest
 
-EXPECTED_TAGS = {"search", "prices", "hospitals", "providers", "devices", "health"}
+EXPECTED_TAGS = {"search", "prices", "hospitals", "providers", "devices", "places", "health"}
 
 
 @pytest.fixture
@@ -46,14 +46,35 @@ async def test_every_operation_has_a_summary_and_description(spec):
 
 async def test_422_documents_the_real_error_shape(spec):
     schema = spec["components"]["schemas"]["ValidationErrorResponse"]
-    assert set(schema["properties"]) == {"code", "detail", "errors"}
+    assert set(schema["properties"]) == {"code", "detail", "errors", "suggestions"}
     for path, _, op in operations(spec):
         if op.get("parameters"):
             ref = op["responses"]["422"]["content"]["application/json"]["schema"]["$ref"]
             assert ref.endswith("/ValidationErrorResponse"), path
 
 
-@pytest.mark.parametrize("path", ["/hospitals/{ccn}", "/providers/{npi}", "/devices/{device_id}"])
+async def test_every_endpoint_documents_its_response_schema(spec):
+    for path, _, op in operations(spec):
+        schema = op["responses"]["200"]["content"]["application/json"]["schema"]
+        assert schema.get("$ref") or schema.get("items", {}).get("$ref"), f"{path} has no response model"
+
+
+async def test_list_endpoints_document_total_count_header(spec):
+    for path in ["/hospitals", "/providers", "/prices", "/devices", "/hospitals/{ccn}/providers"]:
+        assert "X-Total-Count" in spec["paths"][path]["get"]["responses"]["200"]["headers"], path
+
+
+@pytest.mark.parametrize(
+    "path",
+    [
+        "/hospitals/{ccn}",
+        "/hospitals/{ccn}/providers",
+        "/providers/{npi}",
+        "/devices/{device_id}",
+        "/devices/{device_id}/recalls",
+        "/devices/{device_id}/adverse-events",
+    ],
+)
 async def test_detail_endpoints_document_404(spec, path):
     assert "404" in spec["paths"][path]["get"]["responses"]
 

@@ -12,9 +12,17 @@ from src.config import settings
 from src.database import create_pool
 from src.devices.router import router as devices_router
 from src.docs import API_DESCRIPTION, TAGS_METADATA, VALIDATION_RESPONSES
-from src.exceptions import NotFound, not_found_handler, validation_exception_handler
+from src.exceptions import (
+    NotFound,
+    RequestError,
+    not_found_handler,
+    request_error_handler,
+    validation_exception_handler,
+)
 from src.health.router import router as health_router
 from src.hospitals.router import router as hospitals_router
+from src.locations.router import router as places_router
+from src.pagination import TOTAL_COUNT_HEADER
 from src.prices.router import router as prices_router
 from src.providers.router import router as providers_router
 from src.search.router import router as search_router
@@ -56,10 +64,12 @@ app.add_middleware(
     allow_credentials=True,
     allow_methods=["GET"],
     allow_headers=["*"],
+    expose_headers=[TOTAL_COUNT_HEADER],  # let browser clients read the page total
 )
 
 app.add_exception_handler(RequestValidationError, validation_exception_handler)
 app.add_exception_handler(NotFound, not_found_handler)
+app.add_exception_handler(RequestError, request_error_handler)
 
 for router, prefix in [
     (search_router, "/search"),
@@ -67,6 +77,7 @@ for router, prefix in [
     (hospitals_router, "/hospitals"),
     (providers_router, "/providers"),
     (devices_router, "/devices"),
+    (places_router, "/places"),
 ]:
     app.include_router(router, prefix=prefix, tags=[prefix.strip("/")], responses=VALIDATION_RESPONSES)
 app.include_router(health_router, prefix="/health", tags=["health"])

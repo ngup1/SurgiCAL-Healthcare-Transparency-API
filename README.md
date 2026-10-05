@@ -37,7 +37,19 @@ Stop with `make down`. Reset the database to the seed data with `make db-reset`.
 | Prices | `GET /prices`, `/prices/compare` |
 | Devices | `GET /devices`, `/devices/by-procedure/{cpt}`, `/devices/{id}`, `/devices/{id}/recalls`, `/devices/{id}/adverse-events` |
 | Search | `GET /search` |
+| Places | `GET /places` (valid California cities, counties, and ZIP codes) |
 | Health | `GET /health` |
+
+**Location filters** (on `/hospitals`, `/providers`, `/prices`): `city`, `county`, or `zip`, plus `radius_miles` with a city or ZIP to include nearby places, sorted nearest first. Coverage is California only, and other locations return a `422` with a specific `code`:
+
+| Request | Result |
+|---|---|
+| `?county=Los Angeles` | Hospitals in every city in the county |
+| `?city=Pasadena&radius_miles=15` | Within 15 miles of Pasadena, nearest first |
+| `?state=NV` or `?zip=89502` | `422 location_outside_coverage` |
+| `?city=Pasedena` | `422 location_not_found` with `"suggestions": ["Pasadena"]` |
+
+List endpoints take `limit`/`offset` and return the total match count in an `X-Total-Count` header. Unknown IDs return `404`, including on sub-resources such as `/hospitals/{ccn}/providers`.
 
 Malformed input returns `422` with the bad field named:
 
@@ -75,8 +87,13 @@ make seed-data     # regenerate the mock data, then make db-reset
 
 ```
 api/
-  main.py, routers/      FastAPI app and endpoints
-  validation.py          shared input formats; exceptions.py: 422 error format
+  src/                   the app, organized by domain (fastapi-best-practices)
+    main.py              app setup: lifespan (DB pool), routers, error handlers
+    config.py            settings from environment variables
+    database.py          async connection pool (psycopg 3)
+    hospitals/ providers/ prices/ devices/ search/ locations/ health/
+                         each: router.py (HTTP), service.py (SQL), schemas.py
+                         (response models), dependencies.py, exceptions.py
   tests/                 pytest suite
   seed/                  mock-data generator, JSON fixtures, seed.sql
   db/Dockerfile          PostGIS image with migrations + seed data

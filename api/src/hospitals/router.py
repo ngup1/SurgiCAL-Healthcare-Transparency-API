@@ -1,57 +1,60 @@
 """Hospital endpoints: list, detail, affiliated providers."""
 
-from fastapi import APIRouter, Depends, Path, Query
+from fastapi import APIRouter, Depends, Response
+from psycopg import AsyncConnection
 
-from src.constants import CCN_PATTERN, STATE_PATTERN
 from src.database import get_db
-from src.docs import CCN_EXAMPLES, not_found
-from src.geo import require_lat_lng_pair
+from src.docs import not_found
 from src.hospitals import service
-from src.hospitals.exceptions import HospitalNotFound
+from src.hospitals.dependencies import valid_hospital_ccn
+from src.hospitals.schemas import HospitalDetail, HospitalProvider, HospitalSummary
+from src.locations.dependencies import valid_location
+from src.locations.schemas import LocationFilter
+from src.pagination import PAGINATED_RESPONSES, Pagination, pagination, set_total_count
 
 router = APIRouter()
 
 
-@router.get("", summary="List hospitals")
+@router.get("", summary="List hospitals", response_model=list[HospitalSummary], responses=PAGINATED_RESPONSES)
 async def list_hospitals(
-    state: str = Query("CA", pattern=STATE_PATTERN, description="Two-letter state code"),
-    lat: float | None = Query(None, ge=-90, le=90),
-    lng: float | None = Query(None, ge=-180, le=180),
-    radius_miles: float = Query(25, gt=0, le=250),
-    limit: int = Query(50, ge=1, le=200),
-    offset: int = Query(0, ge=0),
-    conn=Depends(get_db),
+    response: Response,
+    location: LocationFilter = Depends(valid_location),
+    page: Pagination = Depends(pagination),
+    conn: AsyncConnection = Depends(get_db),
 ):
     """
-    List hospitals, sorted by name.
-
-    To search near a point, pass `lat` and `lng` together (e.g. `34.0522`, `-118.2437` for
-    downtown Los Angeles): results are then limited to `radius_miles` and sorted nearest first.
+    California hospitals, sorted by name. Filter by `city`, `county`, or `zip`; add
+    `radius_miles` to a city or ZIP search to include nearby places (sorted nearest first).
     """
-    require_lat_lng_pair(lat, lng)
-    return await service.list_hospitals(
-        conn, state=state, lat=lat, lng=lng, radius_miles=radius_miles, limit=limit, offset=offset
-    )
+    rows, total = await service.list_hospitals(conn, location, page)
+    set_total_count(response, total)
+    return rows
 
 
-@router.get("/{ccn}", summary="Get a hospital with quality measures", responses=not_found("No hospital has this CCN"))
-async def get_hospital(
-    ccn: str = Path(..., pattern=CCN_PATTERN, description="CMS Certification Number", openapi_examples=CCN_EXAMPLES),
-    conn=Depends(get_db),
-):
+@router.get(
+    "/{ccn}",
+    summary="Get a hospital with quality measures",
+    response_model=HospitalDetail,
+    responses=not_found("No hospital has this CCN"),
+)
+async def get_hospital(hospital: dict = Depends(valid_hospital_ccn)):
     """Hospital details and CMS quality measures: star rating, comparison groups, and procedure-specific rates."""
-    hospital = await service.get_hospital(conn, ccn)
-    if hospital is None:
-        raise HospitalNotFound()
     return hospital
 
 
-@router.get("/{ccn}/providers", summary="List providers at a hospital")
+@router.get(
+    "/{ccn}/providers",
+    summary="List providers at a hospital",
+    response_model=list[HospitalProvider],
+    responses={**not_found("No hospital has this CCN"), **PAGINATED_RESPONSES},
+)
 async def list_hospital_providers(
-    ccn: str = Path(..., pattern=CCN_PATTERN, description="CMS Certification Number", openapi_examples=CCN_EXAMPLES),
-    limit: int = Query(50, ge=1, le=200),
-    offset: int = Query(0, ge=0),
-    conn=Depends(get_db),
+    response: Response,
+    hospital: dict = Depends(valid_hospital_ccn),
+    page: Pagination = Depends(pagination),
+    conn: AsyncConnection = Depends(get_db),
 ):
     """Providers affiliated with the hospital, highest-volume first."""
-    return await service.list_hospital_providers(conn, ccn, limit=limit, offset=offset)
+    rows, total = await service.list_hospital_providers(conn, hospital["ccn"], page)
+    set_total_count(response, total)
+    return rows

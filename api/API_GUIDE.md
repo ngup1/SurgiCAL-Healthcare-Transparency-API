@@ -2,6 +2,8 @@
 
 This guide explains how the SurgiCAL API is built, why it uses FastAPI, and how well it follows REST conventions. Its examples come from the code in `api/`.
 
+> **Note:** this guide describes the API **before** the deployment-readiness work. Since then the code has moved to `api/src/` (one folder per domain), switched to async psycopg 3 with a connection pool, gained response models, location search by city/county/ZIP, and `X-Total-Count` paging, and most of the gaps listed in §6 are fixed. See [`DEPLOYMENT_PLAN.md`](DEPLOYMENT_PLAN.md) for what changed and why. The FastAPI concepts in §4 still apply.
+
 ---
 
 ## 1. What the API does

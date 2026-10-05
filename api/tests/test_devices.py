@@ -93,9 +93,8 @@ async def test_adverse_events_filter_by_type(client, seed):
     assert {r["mdr_report_key"] for r in rows} == expected
 
 
-async def test_sub_resources_of_unknown_device_return_empty(client):
-    # Current behavior; Phase 5 changes these to 404.
+async def test_sub_resources_of_unknown_device_are_404(client):
     for path in ("recalls", "adverse-events"):
         response = await client.get(f"/devices/{UNKNOWN_DEVICE_ID}/{path}")
-        assert response.status_code == 200
-        assert response.json() == []
+        assert response.status_code == 404
+        assert response.json() == {"detail": "Device not found"}

@@ -2,48 +2,46 @@
 
 from uuid import UUID
 
+from psycopg import AsyncConnection
+
 from src.database import fetch_all, fetch_one
+from src.pagination import Pagination, paginate
 
 
 async def list_devices(
-    conn,
+    conn: AsyncConnection,
     *,
     product_code: str | None,
     manufacturer: str | None,
     medical_specialty: str | None,
     q: str | None,
-    limit: int,
-    offset: int,
-) -> list[dict]:
-    where_parts = []
+    page: Pagination,
+) -> tuple[list[dict], int]:
+    where: list[str] = []
     params: list = []
     if product_code:
-        where_parts.append("fda_product_code = %s")
+        where.append("fda_product_code = %s")
         params.append(product_code)
     if manufacturer:
-        where_parts.append("manufacturer ILIKE %s")
+        where.append("manufacturer ILIKE %s")
         params.append(f"%{manufacturer}%")
     if medical_specialty:
-        where_parts.append("medical_specialty ILIKE %s")
+        where.append("medical_specialty ILIKE %s")
         params.append(f"%{medical_specialty}%")
     if q:
-        where_parts.append("%s <%% brand_name")  # trigram word similarity
+        where.append("%s <%% brand_name")  # trigram word similarity
         params.append(q)
-
-    order = "brand_name ASC"
-    if q:
-        order = "word_similarity(%s, brand_name) DESC, brand_name ASC"
-        params.append(q)
-
-    sql = f"""
+    base = f"""
         SELECT id, fda_product_code, brand_name, generic_name,
                manufacturer, device_class, medical_specialty, premarket_number
         FROM devices
-        WHERE {" AND ".join(where_parts) or "TRUE"}
-        ORDER BY {order}
-        LIMIT %s OFFSET %s
+        WHERE {" AND ".join(where) or "TRUE"}
     """
-    return await fetch_all(conn, sql, params + [limit, offset])
+    if q:
+        return await paginate(
+            conn, base, params, order_by="word_similarity(%s, brand_name) DESC, brand_name", order_params=[q], page=page
+        )
+    return await paginate(conn, base, params, order_by="brand_name", page=page)
 
 
 async def devices_by_procedure(conn, cpt: str) -> list[dict]:
@@ -92,33 +90,30 @@ async def adverse_event_summary(conn, device_id: UUID) -> list[dict]:
     return await fetch_all(conn, sql, (device_id,))
 
 
-async def list_recalls(conn, device_id: UUID, *, limit: int, offset: int) -> list[dict]:
-    sql = """
+async def list_recalls(conn: AsyncConnection, device_id: UUID, page: Pagination) -> tuple[list[dict], int]:
+    base = """
         SELECT recall_number, product_code, brand_name, manufacturer,
                recall_class, reason, status, recall_date, termination_date,
                quantity, distribution
         FROM device_recalls
         WHERE device_id = %s
-        ORDER BY recall_date DESC NULLS LAST
-        LIMIT %s OFFSET %s
     """
-    return await fetch_all(conn, sql, (device_id, limit, offset))
+    return await paginate(conn, base, [device_id], order_by="recall_date DESC NULLS LAST, recall_number", page=page)
 
 
-async def list_adverse_events(conn, device_id: UUID, *, event_type: str | None, limit: int, offset: int) -> list[dict]:
-    where_parts = ["device_id = %s"]
+async def list_adverse_events(
+    conn: AsyncConnection, device_id: UUID, *, event_type: str | None, page: Pagination
+) -> tuple[list[dict], int]:
+    where = ["device_id = %s"]
     params: list = [device_id]
     if event_type:
-        where_parts.append("event_type = %s")
+        where.append("event_type = %s")
         params.append(event_type)
-
-    sql = f"""
+    base = f"""
         SELECT mdr_report_key, product_code, brand_name, manufacturer,
                event_type, event_date, patient_outcomes, device_problems,
                event_narrative
         FROM device_adverse_events
-        WHERE {" AND ".join(where_parts)}
-        ORDER BY event_date DESC NULLS LAST
-        LIMIT %s OFFSET %s
+        WHERE {" AND ".join(where)}
     """
-    return await fetch_all(conn, sql, params + [limit, offset])
+    return await paginate(conn, base, params, order_by="event_date DESC NULLS LAST, mdr_report_key", page=page)

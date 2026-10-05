@@ -20,14 +20,24 @@ async def test_specialty_filter_is_partial_and_case_insensitive(client, seed):
     assert {r["npi"] for r in rows} == expected
 
 
-async def test_city_filter_is_partial(client, seed):
-    expected = {p["npi"] for p in seed["providers"] if "san" in p["city"].lower()}
-    rows = (await client.get("/providers", params={"city": "san", "limit": 200})).json()
+async def test_city_filter_is_exact(client, seed):
+    expected = {p["npi"] for p in seed["providers"] if p["city"] == "San Diego"}
+    rows = (await client.get("/providers", params={"city": "san diego", "limit": 200})).json()
+    assert expected
     assert {r["npi"] for r in rows} == expected
 
 
-async def test_list_within_radius_sorted_by_distance(client):
-    rows = (await client.get("/providers", params={"lat": 37.7749, "lng": -122.4194, "radius_miles": 20})).json()
+async def test_specialty_and_county_combine(client, seed):
+    cities = {p["name"] for p in seed["ca_places"] if p["place_type"] == "city" and p["county"] == "Los Angeles"}
+    expected = {p["npi"] for p in seed["providers"] if p["city"] in cities and "ortho" in p["specialty"].lower()}
+    params = {"county": "Los Angeles", "specialty": "ortho", "limit": 200}
+    response = await client.get("/providers", params=params)
+    assert {r["npi"] for r in response.json()} == expected
+    assert response.headers["X-Total-Count"] == str(len(expected))
+
+
+async def test_zip_searches_nearby_sorted_by_distance(client):
+    rows = (await client.get("/providers", params={"zip": "94107", "radius_miles": 20})).json()
     assert rows
     distances = [r["distance_miles"] for r in rows]
     assert distances == sorted(distances)

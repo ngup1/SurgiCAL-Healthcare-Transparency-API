@@ -156,7 +156,7 @@ A city name alone can't prove the place is outside California: "Reno" could be a
 
 **Production data:** fill `ca_places` from the Census Gazetteer files (places, counties and ZIP code areas, filtered to California). That is one new ETL extractor; the mock version is already generated.
 
-**Behavior changes visible to existing callers** (all approved):
+**Behavior changes visible to existing callers** (all approved, all implemented):
 
 1. **Location by place name.** `lat`/`lng` are removed from `/hospitals`, `/providers` and `/prices` and replaced by `city`/`county`/`zip` (§3a). `state` only accepts `CA`.
 2. **Unknown parent resource.** `/hospitals/{ccn}/providers` and `/devices/{id}/recalls|adverse-events` return 404 for an unknown ID instead of an empty list.
@@ -212,15 +212,14 @@ Each phase ends in a working, testable state.
 
   Against Neon, where every new connection also does a TLS handshake, the difference should be larger. All 95 tests and the 25/25 smoke checks pass.
 
-### Phase 5: Response models, validation, dependencies
-- [ ] Write the Pydantic response models listed in §3 for every endpoint, and set `response_model` on each route.
-- [ ] Add the `Pagination` dependency, plus `valid_hospital_ccn`, `valid_provider_npi` and `valid_device_id`. Following the guide's REST section, the path variable has the same name everywhere so these dependencies can be reused and chained.
-- [ ] Add pattern checks for CPT, CCN and NPI, plus the `event_type` enum.
-- [x] Switch fuzzy search to `<%` / `word_similarity` (behavior change 4). Still to do: a test that `/search?q=knee` returns procedure `27447`.
-- [ ] Build the `locations` module (§3a): `LocationQuery`, the `valid_location` dependency, coverage errors with `code` and `suggestions`, and `GET /places`. Replace `lat`/`lng` on `/hospitals`, `/providers` and `/prices`.
-- [ ] Tests for every row of the §3a error table.
-- [ ] Apply the other behavior changes from §3 and update the Phase 2 tests to match.
-- **Done when:** every endpoint in `/docs` shows its response schema, and invalid input never produces a 500.
+### Phase 5: Response models, validation, dependencies ✅ done
+- [x] **Response models** for every endpoint (`<domain>/schemas.py` on a shared `CustomModel`). Swagger now shows each response's fields, with descriptions of the less obvious ones (`negotiated_min`, `psi90_composite`, `wrvu_estimate`, ...). Responses keep their JSON shapes.
+- [x] **Paging**: a `pagination` dependency (`limit` 1–200, `offset` ≥ 0) and `paginate()`, which runs a count query plus the page query. List endpoints return `X-Total-Count` (documented in OpenAPI and exposed through CORS). Sort orders now include tie-breakers, so pages are stable.
+- [x] **Locations** (`src/locations/`, §3a): the `valid_location` dependency resolves `city` / `county` / `zip` / `radius_miles` against `ca_places`, replacing `lat`/`lng` on `/hospitals`, `/providers` and `/prices`. It returns 422s with codes `location_outside_coverage` (`state` other than CA, ZIP outside 90001–96162), `location_not_found` (with trigram `suggestions`) and `invalid_location_query`, all using the same error shape as other validation errors. New `GET /places` for autocomplete.
+- [x] **404 for unknown parents**: `valid_hospital_ccn`, `valid_provider_npi` and `valid_device_id` are shared by detail and sub-resource routes (the guide's dependency-validation pattern).
+- [x] `/prices/compare` takes `ccns` repeated or comma-separated (max 10, de-duplicated).
+- [x] Dependencies are plain functions with individual `Query` parameters, not Pydantic query models: wrapped in a dependency, a query model shows up in Swagger as one opaque parameter.
+- **Result:** 121 tests (new: `test_locations.py`, plus response-schema and header checks in `test_docs.py`). 30/30 container smoke checks pass. Throughput is unchanged at ~369 req/s despite the extra count query and response validation.
 
 ### Phase 6: Errors, health, observability
 - [ ] `src/exceptions.py`: domain exceptions (`HospitalNotFound`, ...) inherit from a `NotFound` base that the app turns into a 404. A `psycopg.OperationalError` becomes **503** `{"detail": "Database unavailable"}`, and any other unexpected error becomes 500 with the details logged only on the server.

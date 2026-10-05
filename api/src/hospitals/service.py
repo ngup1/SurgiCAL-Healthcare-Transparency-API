@@ -1,37 +1,28 @@
 """Hospital queries."""
 
-from src.database import fetch_all, fetch_one
-from src.geo import distance_select, spatial_where
+from psycopg import AsyncConnection
+
+from src.database import fetch_one
+from src.locations.schemas import LocationFilter
+from src.locations.service import location_sql
+from src.pagination import Pagination, paginate
 
 
-async def list_hospitals(
-    conn, *, state: str, lat: float | None, lng: float | None, radius_miles: float, limit: int, offset: int
-) -> list[dict]:
-    dist_sql, dist_params = distance_select(lat, lng)
-    geo_clause, geo_params = spatial_where(lat, lng, radius_miles)
-
-    where_parts = ["state = %s"]
-    # dist_params first: SELECT clause %s placeholders come before WHERE clause
-    params: list = dist_params + [state]
-    if geo_clause:
-        where_parts.append(geo_clause)
-        params.extend(geo_params)
-
-    order = "distance_miles ASC NULLS LAST" if lat is not None else "name ASC"
-    sql = f"""
-        SELECT ccn, name, address, city, state, zip, phone,
-               hospital_type, ownership, emergency_services,
-               ST_Y(location::geometry) AS lat, ST_X(location::geometry) AS lng,
+async def list_hospitals(conn: AsyncConnection, location: LocationFilter, page: Pagination) -> tuple[list[dict], int]:
+    dist_sql, dist_params, where, where_params = location_sql(location, city_col="h.city", location_col="h.location")
+    base = f"""
+        SELECT h.ccn, h.name, h.address, h.city, h.state, h.zip, h.phone,
+               h.hospital_type, h.ownership, h.emergency_services,
+               ST_Y(h.location::geometry) AS lat, ST_X(h.location::geometry) AS lng,
                {dist_sql}
-        FROM hospitals
-        WHERE {" AND ".join(where_parts)}
-        ORDER BY {order}
-        LIMIT %s OFFSET %s
+        FROM hospitals h
+        WHERE {" AND ".join(where) or "TRUE"}
     """
-    return await fetch_all(conn, sql, params + [limit, offset])
+    order_by = "distance_miles ASC" if location.is_radius else "name ASC"
+    return await paginate(conn, base, dist_params + where_params, order_by=order_by, page=page)
 
 
-async def get_hospital(conn, ccn: str) -> dict | None:
+async def get_hospital(conn: AsyncConnection, ccn: str) -> dict | None:
     sql = """
         SELECT h.ccn, h.name, h.address, h.city, h.state, h.zip, h.phone,
                h.hospital_type, h.ownership, h.emergency_services,
@@ -48,8 +39,8 @@ async def get_hospital(conn, ccn: str) -> dict | None:
     return await fetch_one(conn, sql, (ccn,))
 
 
-async def list_hospital_providers(conn, ccn: str, *, limit: int, offset: int) -> list[dict]:
-    sql = """
+async def list_hospital_providers(conn: AsyncConnection, ccn: str, page: Pagination) -> tuple[list[dict], int]:
+    base = """
         SELECT p.npi, p.first_name, p.last_name, p.credential, p.specialty,
                pm.patient_rating, pm.num_reviews, pm.volume_bucket, pm.wrvu_estimate,
                pa.is_primary
@@ -57,7 +48,5 @@ async def list_hospital_providers(conn, ccn: str, *, limit: int, offset: int) ->
         JOIN providers p ON pa.npi = p.npi
         LEFT JOIN provider_metrics pm ON p.npi = pm.npi
         WHERE pa.ccn = %s
-        ORDER BY pm.wrvu_estimate DESC NULLS LAST
-        LIMIT %s OFFSET %s
     """
-    return await fetch_all(conn, sql, (ccn, limit, offset))
+    return await paginate(conn, base, [ccn], order_by="wrvu_estimate DESC NULLS LAST, npi", page=page)

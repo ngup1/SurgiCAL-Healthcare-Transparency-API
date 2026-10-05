@@ -1,53 +1,34 @@
 """Provider queries."""
 
+from psycopg import AsyncConnection
+
 from src.database import fetch_all, fetch_one
-from src.geo import distance_select, spatial_where
+from src.locations.schemas import LocationFilter
+from src.locations.service import location_sql
+from src.pagination import Pagination, paginate
 
 
 async def list_providers(
-    conn,
-    *,
-    specialty: str | None,
-    state: str,
-    city: str | None,
-    lat: float | None,
-    lng: float | None,
-    radius_miles: float,
-    limit: int,
-    offset: int,
-) -> list[dict]:
-    dist_sql, dist_params = distance_select(lat, lng, column="p.location")
-    geo_clause, geo_params = spatial_where(lat, lng, radius_miles, column="p.location")
-
-    where_parts = ["p.state = %s"]
-    # dist_params first: SELECT clause %s placeholders come before WHERE clause
-    params: list = dist_params + [state]
+    conn: AsyncConnection, *, specialty: str | None, location: LocationFilter, page: Pagination
+) -> tuple[list[dict], int]:
+    dist_sql, dist_params, where, where_params = location_sql(location, city_col="p.city", location_col="p.location")
     if specialty:
-        where_parts.append("p.specialty ILIKE %s")
-        params.append(f"%{specialty}%")
-    if city:
-        where_parts.append("p.city ILIKE %s")
-        params.append(f"%{city}%")
-    if geo_clause:
-        where_parts.append(geo_clause)
-        params.extend(geo_params)
-
-    order = "distance_miles ASC NULLS LAST" if lat is not None else "p.last_name ASC"
-    sql = f"""
+        where.append("p.specialty ILIKE %s")
+        where_params.append(f"%{specialty}%")
+    base = f"""
         SELECT p.npi, p.first_name, p.last_name, p.credential, p.specialty,
                p.city, p.state,
                pm.patient_rating, pm.num_reviews, pm.volume_bucket, pm.wrvu_estimate,
                {dist_sql}
         FROM providers p
         LEFT JOIN provider_metrics pm ON p.npi = pm.npi
-        WHERE {" AND ".join(where_parts)}
-        ORDER BY {order}
-        LIMIT %s OFFSET %s
+        WHERE {" AND ".join(where) or "TRUE"}
     """
-    return await fetch_all(conn, sql, params + [limit, offset])
+    order_by = "distance_miles ASC" if location.is_radius else "last_name ASC, first_name ASC"
+    return await paginate(conn, base, dist_params + where_params, order_by=order_by, page=page)
 
 
-async def get_provider(conn, npi: str) -> dict | None:
+async def get_provider(conn: AsyncConnection, npi: str) -> dict | None:
     sql = """
         SELECT p.npi, p.first_name, p.last_name, p.credential, p.specialty,
                p.taxonomy_code, p.gender, p.medical_school, p.graduation_year,
@@ -64,7 +45,7 @@ async def get_provider(conn, npi: str) -> dict | None:
     return await fetch_one(conn, sql, (npi,))
 
 
-async def list_affiliations(conn, npi: str) -> list[dict]:
+async def list_affiliations(conn: AsyncConnection, npi: str) -> list[dict]:
     sql = """
         SELECT h.ccn, h.name, h.city, h.state,
                hq.overall_stars, hq.psi90_composite,

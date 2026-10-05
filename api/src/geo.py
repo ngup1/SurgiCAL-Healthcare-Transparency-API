@@ -1,16 +1,6 @@
 """PostGIS helpers for "within N miles" filters and distance columns."""
 
-from src.exceptions import raise_validation_error
-
 METERS_PER_MILE = 1609.34
-
-
-def require_lat_lng_pair(lat: float | None, lng: float | None) -> None:
-    """lat and lng only make sense together; one without the other is rejected, not ignored."""
-    if (lat is None) != (lng is None):
-        missing = "lng" if lng is None else "lat"
-        given = "lat" if missing == "lng" else "lng"
-        raise_validation_error(missing, f"'{missing}' is required when '{given}' is given", None)
 
 
 def spatial_where(
