@@ -6,7 +6,7 @@ A FastAPI service for comparing **surgical procedure prices, hospital and surgeo
 
 **Live demo:** https://surgical-api.onrender.com/docs. It runs on Render's free tier, so the first request after a period of inactivity can take up to a minute while the service wakes up.
 
-[![API CI](https://github.com/ngup1/surgical-api/actions/workflows/api-ci.yml/badge.svg)](https://github.com/ngup1/surgical-api/actions/workflows/api-ci.yml)
+[![API CI](https://github.com/ngup1/SurgiCAL-Healthcare-Transparency-API/actions/workflows/api-ci.yml/badge.svg)](https://github.com/ngup1/SurgiCAL-Healthcare-Transparency-API/actions/workflows/api-ci.yml)
 
 ## Quick start
 
