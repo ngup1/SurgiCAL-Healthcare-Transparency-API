@@ -3,17 +3,16 @@ VENV     := .venv
 PIP      := $(VENV)/bin/pip
 PYTHON_V := $(VENV)/bin/python
 
-.PHONY: venv install install-api install-dev test lint format run-api up down db-up db-reset seed-data seed-db playwright-install run-etl clean
+.PHONY: venv install install-api install-dev test lint format run-api up down db-up db-reset seed-data seed-db etl-migrate run-etl test-etl lint-etl etl-check clean
 
 ## Create virtual environment
 venv:
 	$(PYTHON) -m venv $(VENV)
 	$(PIP) install --upgrade pip
 
-## Install ETL dependencies (includes seleniumbase + playwright)
+## Install ETL + test dependencies
 install: venv
-	$(PIP) install -r etl/requirements.txt playwright
-	$(VENV)/bin/playwright install chromium
+	$(PIP) install -r etl/requirements-dev.txt
 
 ## Install API dependencies
 install-api: venv
@@ -66,13 +65,26 @@ seed-db:
 	@test -n "$$DATABASE_URL" || { echo "Set DATABASE_URL first (see Makefile comment)"; exit 1; }
 	$(PYTHON_V) api/db/seed_remote.py
 
-## Re-install Playwright Chromium browser only
-playwright-install:
-	$(VENV)/bin/playwright install chromium
+## Apply migrations to the ETL's database (DATABASE_URL or etl/.env), without loading mock data
+etl-migrate:
+	$(PYTHON_V) -m etl.migrate
 
-## Run the ETL pipeline (pass STEPS= to run specific steps, e.g. STEPS="mrf_links_scrape mrf_prices")
+## Run the ETL pipeline (pass STEPS= to run specific steps, e.g. STEPS="hospitals hospital_quality";
+## ARGS= for other options, e.g. ARGS="--mrf-limit 10")
 run-etl:
-	$(PYTHON_V) -m etl.run_pipeline $(if $(STEPS),--steps $(STEPS),)
+	$(PYTHON_V) -m etl.run_pipeline $(if $(STEPS),--steps $(STEPS),) $(ARGS)
+
+## Run ETL tests (database tests use the compose database: `make db-up`)
+test-etl:
+	cd etl && ../$(VENV)/bin/pytest $(ARGS)
+
+## Lint the ETL (what CI runs)
+lint-etl:
+	cd etl && ../$(VENV)/bin/ruff check .
+
+## Row-count and storage checks on the ETL's database; BASELINE_URL= compares with another database
+etl-check:
+	$(PYTHON_V) -m etl.checks $(if $(BASELINE_URL),--baseline-url "$(BASELINE_URL)",)
 
 ## Remove venv
 clean:

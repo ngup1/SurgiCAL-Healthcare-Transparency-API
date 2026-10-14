@@ -1,0 +1,154 @@
+{
+ "result_count": 2,
+ "results": [
+  {
+   "addresses": [
+    {
+     "address_1": "1201 W LA VETA AVE",
+     "address_purpose": "MAILING",
+     "address_type": "DOM",
+     "city": "ORANGE",
+     "country_code": "US",
+     "country_name": "United States",
+     "postal_code": "928684203",
+     "state": "CA",
+     "telephone_number": "714-633-2111"
+    },
+    {
+     "address_1": "1310 W STEWART DR STE 508",
+     "address_purpose": "LOCATION",
+     "address_type": "DOM",
+     "city": "ORANGE",
+     "country_code": "US",
+     "country_name": "United States",
+     "postal_code": "928683856",
+     "state": "CA",
+     "telephone_number": "714-633-2111"
+    }
+   ],
+   "basic": {
+    "certification_date": "2026-08-11",
+    "credential": "MD",
+    "enumeration_date": "2020-05-02",
+    "first_name": "MOHAMMED",
+    "last_name": "ABBAS",
+    "last_updated": "2026-08-11",
+    "sex": "M",
+    "sole_proprietor": "NO",
+    "status": "A"
+   },
+   "created_epoch": "1588444113000",
+   "endpoints": [],
+   "enumeration_type": "NPI-1",
+   "identifiers": [],
+   "last_updated_epoch": "1786496273000",
+   "number": "1003437872",
+   "other_names": [],
+   "practiceLocations": [],
+   "taxonomies": [
+    {
+     "code": "207X00000X",
+     "desc": "Orthopaedic Surgery",
+     "license": "A200074",
+     "primary": true,
+     "state": "CA",
+     "taxonomy_group": ""
+    }
+   ]
+  },
+  {
+   "addresses": [
+    {
+     "address_1": "1838 EL CAMINO REAL STE 100",
+     "address_purpose": "MAILING",
+     "address_type": "DOM",
+     "city": "BURLINGAME",
+     "country_code": "US",
+     "country_name": "United States",
+     "postal_code": "940103105",
+     "state": "CA",
+     "telephone_number": "650-692-1475"
+    },
+    {
+     "address_1": "1838 EL CAMINO REAL STE 100",
+     "address_purpose": "LOCATION",
+     "address_type": "DOM",
+     "city": "BURLINGAME",
+     "country_code": "US",
+     "country_name": "United States",
+     "postal_code": "940103105",
+     "state": "CA",
+     "telephone_number": "650-692-1475"
+    }
+   ],
+   "basic": {
+    "certification_date": "2024-01-22",
+    "credential": "MD",
+    "enumeration_date": "2007-10-12",
+    "first_name": "GAURAV",
+    "last_name": "ABBI",
+    "last_updated": "2024-01-22",
+    "sex": "M",
+    "sole_proprietor": "NO",
+    "status": "A"
+   },
+   "created_epoch": "1192226610000",
+   "endpoints": [],
+   "enumeration_type": "NPI-1",
+   "identifiers": [
+    {
+     "code": "01",
+     "desc": "Other (non-Medicare)",
+     "identifier": "RES000",
+     "issuer": "RES000",
+     "state": "CA"
+    }
+   ],
+   "last_updated_epoch": "1705977607000",
+   "number": "1700074853",
+   "other_names": [],
+   "practiceLocations": [
+    {
+     "address_1": "845 JACKSON ST STE B1",
+     "address_purpose": "LOCATION",
+     "address_type": "DOM",
+     "city": "SAN FRANCISCO",
+     "country_code": "US",
+     "country_name": "United States",
+     "postal_code": "941334851",
+     "state": "CA",
+     "telephone_number": "415-677-2475"
+    },
+    {
+     "address_1": "2299 POST ST STE 107",
+     "address_purpose": "LOCATION",
+     "address_type": "DOM",
+     "city": "SAN FRANCISCO",
+     "country_code": "US",
+     "country_name": "United States",
+     "postal_code": "941153460",
+     "state": "CA",
+     "telephone_number": "650-692-1475"
+    }
+   ],
+   "taxonomies": [
+    {
+     "code": "207XS0117X",
+     "desc": "Orthopaedic Surgery, Orthopaedic Surgery of the Spine",
+     "license": "A102193",
+     "primary": true,
+     "state": "CA",
+     "taxonomy_group": ""
+    },
+    {
+     "code": "207X00000X",
+     "desc": "Orthopaedic Surgery",
+     "license": "RES000",
+     "primary": false,
+     "state": "CA",
+     "taxonomy_group": ""
+    }
+   ]
+  }
+ ]
+}

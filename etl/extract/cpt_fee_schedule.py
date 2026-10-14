@@ -15,14 +15,12 @@ import zipfile
 import httpx
 import pandas as pd
 
-from etl.common.config import get_logger
+from etl.common.config import get_logger, get_settings
 from etl.common.db import upsert_batch
 
 logger = get_logger(__name__)
 
-# CMS publishes a new RVU file each calendar year.
-# Update the year suffix (YY) when CMS releases a new annual file.
-CMS_RVU_URL = "https://www.cms.gov/files/zip/rvu26a-updated-12-29-2025.zip"
+# CMS publishes a new RVU file each calendar year; its URL is the CMS_RVU_URL setting.
 
 # CPT code ranges by procedure category.
 # IMPORTANT: get_category() returns the FIRST match, so plastics must come
@@ -251,7 +249,7 @@ def run() -> int:
     Returns:
         Number of CPT codes upserted.
     """
-    zip_bytes = download_rvu_zip(CMS_RVU_URL)
+    zip_bytes = download_rvu_zip(get_settings().cms_rvu_url)
     df = parse_rvu_zip(zip_bytes)
     records = extract_codes(df)
 

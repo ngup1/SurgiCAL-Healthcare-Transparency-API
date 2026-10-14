@@ -1,0 +1,39 @@
+{
+ "results": [
+  {
+   "third_party_flag": "N",
+   "life_sustain_support_flag": "N",
+   "gmp_exempt_flag": "N",
+   "summary_malfunction_reporting": "Eligible",
+   "product_code": "JWH",
+   "openfda": {
+    "k_number": [
+     "K843242",
+     "K253144",
+     "K072858"
+    ],
+    "registration_number": [
+     "3016851379",
+     "3013055499",
+     "3021008900"
+    ],
+    "fei_number": [
+     "3016851379",
+     "3013055499",
+     "3021008900"
+    ]
+   },
+   "review_panel": "OR",
+   "medical_specialty": "OR",
+   "device_name": "Prosthesis, Knee, Patellofemorotibial, Semi-Constrained, Cemented, Polymer/Metal/Polymer",
+   "review_code": "",
+   "unclassified_reason": "",
+   "medical_specialty_description": "Orthopedic",
+   "device_class": "2",
+   "definition": "",
+   "regulation_number": "888.3560",
+   "implant_flag": "Y",
+   "submission_type_id": "1"
+  }
+ ]
+}

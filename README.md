@@ -99,10 +99,54 @@ api/
   db/Dockerfile          PostGIS image with migrations + seed data
   Dockerfile             production API image
 migrations/              database schema (SQL)
-etl/                     pipeline that loaded real CMS/FDA data (not needed for the mock setup)
+etl/                     pipeline that loads real CMS, FDA and hospital price data (not needed for the mock setup)
+  run_pipeline.py        runs the steps in dependency order and records each run in etl_runs
+  extract/               one module per source
+  reference/             hand-kept inputs: hospital websites, payer aliases, procedure-to-device map
+  checks.py              row-count and storage checks that gate promoting a refresh
+  tests/                 pytest suite on saved copies of real API responses
 ```
 
 [`api/DEPLOYMENT_PLAN.md`](api/DEPLOYMENT_PLAN.md) describes the roadmap.
+
+## Loading real data (ETL)
+
+The mock data is enough to run and test the API. `etl/` replaces it with public data:
+
+| Step | Source | Fills |
+|---|---|---|
+| `places` | Census Gazetteer | `ca_places` (cities, counties, ZIP centre points) |
+| `hospitals`, `hospital_quality` | CMS Hospital Compare | `hospitals`, `hospital_quality` |
+| `cpt_codes` | CMS Physician Fee Schedule | `cpt_codes` |
+| `providers`, `utilization` | NPPES registry, Medicare utilization | `providers`, `provider_metrics`, `provider_procedure_volumes` |
+| `fda_devices`, `fda_recalls`, `fda_maude` | openFDA | `devices`, `device_recalls`, `device_adverse_events` |
+| `device_procedures` | `etl/reference/procedure_product_codes.csv` | `device_procedure_map` |
+| `mrf_links`, `mrf_prices` | each hospital's `cms-hpt.txt` and price file | `hospital_mrf_links`, `prices` |
+
+Load into a database made for it, never the one the API is serving. Locally:
+
+```bash
+make install db-up
+docker compose exec db psql -U surgical -d surgical -c "CREATE DATABASE surgical_etl"
+export DATABASE_URL="postgresql://surgical:surgical@localhost:5433/surgical_etl?sslmode=disable"
+make etl-migrate                      # schema only, no mock data
+make run-etl ARGS="--mrf-limit 10"    # every step; prices for 10 hospitals
+make etl-check                        # row counts and database size
+```
+
+`make run-etl STEPS="hospitals hospital_quality"` runs chosen steps; `python -m etl.run_pipeline --list` shows them all
+and what each needs. A step that loads nothing counts as failed, and steps that depend on it don't run.
+Settings are in [`etl/.env.example`](etl/.env.example). For Neon, set `DATABASE_URL` to the direct (non-pooled)
+endpoint of a branch.
+
+The [ETL refresh workflow](.github/workflows/etl-refresh.yml) does this on a schedule: it loads into a new Neon
+branch, runs the checks against production, and only then swaps the branch in. Its header lists the secrets and
+variables it needs; without them it skips.
+
+```bash
+make test-etl    # needs `make db-up` for the database tests
+make lint-etl
+```
 
 ## License
 

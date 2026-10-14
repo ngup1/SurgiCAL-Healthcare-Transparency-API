@@ -1,54 +1,49 @@
 """
 CMS Hospital Quality Metrics Extractor
 
-Loads hospital quality data from multiple CMS Hospital Compare datasets:
-- Overall star ratings
-- Patient Safety Indicators (PSI-90)
-- Hospital-Acquired Conditions (HAC/HAI)
-- Readmission and mortality rates
-- Complication rates
+Loads hospital quality measures from three CMS Hospital Compare datasets:
+- Complications and Deaths (ynj2-r877): PSI-90, hip/knee complications, CABG mortality
+- Healthcare Associated Infections (77hc-ibv8): the six infection ratios (SIRs)
+- Unplanned Hospital Visits (632h-zaca): readmission rates
+
+Star ratings and the mortality/safety/readmission comparison groups are in the
+Hospital General Information dataset and are loaded by cms_hospitals.py.
 
 Sources: https://data.cms.gov/provider-data/
-Populates the `hospital_quality` table.
+Populates the measure columns of the `hospital_quality` table.
 """
 from __future__ import annotations
 
+import json
+from datetime import datetime
 
 from etl.common.config import get_logger
-from etl.common.db import upsert_batch, execute_query
-from etl.common.http import fetch_json, post_json
+from etl.common.db import execute_query, upsert_batch
+from etl.common.http import RateLimitedClient
 
 logger = get_logger(__name__)
 
-# CMS Hospital Compare API endpoints (data.cms.gov datastore query API)
-CMS_OVERALL_RATINGS_URL = (
-    "https://data.cms.gov/provider-data/api/1/datastore/query/xubh-q36u/0"
-)
-CMS_COMPLICATIONS_URL = (
-    "https://data.cms.gov/provider-data/api/1/datastore/query/ynj2-r877/0"
-)
-CMS_HAC_URL = (
-    "https://data.cms.gov/provider-data/api/1/datastore/query/yq43-i98g/0"
-)
-CMS_READMISSIONS_URL = (
-    "https://data.cms.gov/provider-data/api/1/datastore/query/9n3s-kdb3/0"
-)
+CMS_DATASTORE_URL = "https://data.cms.gov/provider-data/api/1/datastore/query/{dataset}/0"
 
-# Measure IDs we care about
-MEASURE_MAP = {
-    # PSI-90 composite
-    "PSI_90_SAFETY": "psi90_composite",
-    # Hip/knee complications and readmissions
-    "COMP_HIP_KNEE": "complication_hip_knee",
-    "READM_30_HIP_KNEE": "readmission_hip_knee",
-    # CABG mortality and readmission
-    "MORT_30_CABG": "mortality_cabg",
-    "READM_30_CABG": "readmission_cabg",
-    # Hospital-wide all-cause readmission (general quality signal for all procedures)
-    "READM_30_HOSP_WIDE": "readmission_hosp_wide",
+# Dataset ID -> {CMS measure_id: hospital_quality column}
+DATASET_MEASURES = {
+    # Complications and Deaths
+    "ynj2-r877": {
+        "PSI_90": "psi90_composite",
+        "COMP_HIP_KNEE": "complication_hip_knee",
+        "MORT_30_CABG": "mortality_cabg",
+    },
+    # Unplanned Hospital Visits
+    "632h-zaca": {
+        "READM_30_HIP_KNEE": "readmission_hip_knee",
+        "READM_30_CABG": "readmission_cabg",
+        # Hospital-wide all-cause readmission (general quality signal for all procedures)
+        "Hybrid_HWR": "readmission_hosp_wide",
+    },
 }
 
-# HAI measure IDs -> JSON keys
+# Healthcare Associated Infections: measure IDs -> keys of the hai_sirs JSON column
+HAI_DATASET = "77hc-ibv8"
 HAI_MEASURES = {
     "HAI_1_SIR": "clabsi",
     "HAI_2_SIR": "cauti",
@@ -58,6 +53,8 @@ HAI_MEASURES = {
     "HAI_6_SIR": "cdi",
 }
 
+MEASURE_COLUMNS = [col for measures in DATASET_MEASURES.values() for col in measures.values()]
+
 
 def get_state_ccns(state: str = "CA") -> set[str]:
     """Get the set of hospital CCNs for the given state already in the database."""
@@ -65,61 +62,10 @@ def get_state_ccns(state: str = "CA") -> set[str]:
     return {r["ccn"] for r in rows}
 
 
-def fetch_star_ratings(ccns: set[str]) -> dict[str, dict]:
+def fetch_measures(client: RateLimitedClient, dataset: str, state: str, measure_ids: list[str]) -> list[dict]:
     """
-    Fetch overall hospital star ratings from the Hospital General Information dataset.
-
-    Returns dict mapping CCN -> partial quality record.
-    """
-    logger.info("Fetching hospital star ratings...")
-    results = {}
-
-    # The star ratings are in the same Hospital General Information dataset
-    # Field: hospital_overall_rating
-    data = fetch_json(CMS_OVERALL_RATINGS_URL)
-    for row in data.get("results", []):
-        ccn = (row.get("facility_id") or "").strip()
-        if ccn not in ccns:
-            continue
-
-        stars_raw = row.get("hospital_overall_rating", "")
-        try:
-            stars = float(stars_raw) if stars_raw and stars_raw != "Not Available" else None
-        except ValueError:
-            stars = None
-
-        results[ccn] = {
-            "ccn": ccn,
-            "overall_stars": stars,
-            "mortality_group": _parse_group(row.get("mortality_national_comparison")),
-            "safety_group": _parse_group(row.get("safety_of_care_national_comparison")),
-            "readmission_group": _parse_group(row.get("readmission_national_comparison")),
-            "patient_experience_group": _parse_group(row.get("patient_experience_national_comparison")),
-            "timely_care_group": _parse_group(row.get("timeliness_of_care_national_comparison")),
-        }
-
-    logger.info(f"Found star ratings for {len(results)} CA hospitals")
-    return results
-
-
-def _parse_group(value: str | None) -> str | None:
-    """Parse CMS comparison text into standardized group label."""
-    if not value:
-        return None
-    v = value.strip().lower()
-    if "above" in v:
-        return "above"
-    elif "below" in v:
-        return "below"
-    elif "same" in v or "average" in v:
-        return "same"
-    return None
-
-
-def _fetch_cms_quality_dataset(url: str, state: str, measure_filter: set[str]) -> list[dict]:
-    """
-    Paginate through a CMS quality dataset filtered by state, returning only
-    rows whose measure_id is in measure_filter.
+    Page through one CMS quality dataset, filtered on the server to one state
+    and the given measure IDs.
     """
     rows: list[dict] = []
     offset = 0
@@ -128,21 +74,19 @@ def _fetch_cms_quality_dataset(url: str, state: str, measure_filter: set[str]) -
     while True:
         body = {
             "conditions": [
-                {"property": "state", "value": state, "operator": "="}
+                {"property": "state", "value": state, "operator": "="},
+                {"property": "measure_id", "value": measure_ids, "operator": "in"},
             ],
             "limit": page_size,
             "offset": offset,
+            "sort": {"property": "facility_id", "order": "asc"},
             "results": True,
             "schema": False,
             "keys": True,
             "rowIds": False,
         }
-        data = post_json(url, body)
-        page = data.get("results", [])
-        for row in page:
-            mid = (row.get("measure_id") or "").strip()
-            if mid in measure_filter:
-                rows.append(row)
+        page = client.post_json(CMS_DATASTORE_URL.format(dataset=dataset), body)["results"]
+        rows.extend(page)
         if len(page) < page_size:
             break
         offset += page_size
@@ -150,80 +94,77 @@ def _fetch_cms_quality_dataset(url: str, state: str, measure_filter: set[str]) -
     return rows
 
 
-def fetch_complications(ccns: set[str], state: str = "CA") -> dict[str, dict]:
-    """Fetch complication measures (PSI-90, hip/knee complications)."""
-    logger.info("Fetching complication measures...")
-    results: dict[str, dict] = {}
+def parse_score(raw) -> float | None:
+    """A measure score, or None for 'Not Available' and other non-numbers."""
+    try:
+        return float(raw)
+    except (TypeError, ValueError):
+        return None
 
-    for row in _fetch_cms_quality_dataset(CMS_COMPLICATIONS_URL, state, set(MEASURE_MAP)):
-        ccn = (row.get("facility_id") or row.get("provider_id") or "").strip()
+
+def quarter_of(end_date: str | None) -> str | None:
+    """'09/30/2025' -> '2025Q3', the form hospital_quality.measure_period uses."""
+    try:
+        d = datetime.strptime((end_date or "").strip(), "%m/%d/%Y")
+    except ValueError:
+        return None
+    return f"{d.year}Q{(d.month - 1) // 3 + 1}"
+
+
+def merge_quality(
+    ccns: set[str],
+    measure_rows: dict[str, list[dict]],
+    hai_rows: list[dict],
+) -> list[dict]:
+    """
+    Combine rows from the measure datasets into one hospital_quality record per
+    hospital that has at least one score.
+
+    measure_rows maps a dataset ID to that dataset's rows.
+    """
+    merged: dict[str, dict] = {}
+    periods: dict[str, str] = {}
+
+    def record_for(row: dict) -> dict | None:
+        ccn = (row.get("facility_id") or "").strip()
         if ccn not in ccns:
+            return None
+        period = quarter_of(row.get("end_date"))
+        if period and period > periods.get(ccn, ""):
+            periods[ccn] = period
+        return merged.setdefault(ccn, {"ccn": ccn, **dict.fromkeys(MEASURE_COLUMNS), "hai_sirs": {}})
+
+    for dataset, rows in measure_rows.items():
+        columns = DATASET_MEASURES[dataset]
+        for row in rows:
+            column = columns.get((row.get("measure_id") or "").strip())
+            record = record_for(row) if column else None
+            if record is not None:
+                record[column] = parse_score(row.get("score"))
+
+    for row in hai_rows:
+        key = HAI_MEASURES.get((row.get("measure_id") or "").strip())
+        score = parse_score(row.get("score"))
+        record = record_for(row) if key else None
+        if record is not None and score is not None:
+            record["hai_sirs"][key] = score
+
+    records = []
+    for ccn, record in merged.items():
+        hai = record["hai_sirs"]
+        if not hai and all(record[c] is None for c in MEASURE_COLUMNS):
             continue
-
-        col = MEASURE_MAP[row["measure_id"].strip()]
-        score_raw = row.get("score", "")
-        try:
-            score = float(score_raw) if score_raw and score_raw != "Not Available" else None
-        except ValueError:
-            score = None
-
-        results.setdefault(ccn, {})[col] = score
-
-    logger.info(f"Found complication data for {len(results)} hospitals")
-    return results
-
-
-def fetch_hai_rates(ccns: set[str], state: str = "CA") -> dict[str, dict]:
-    """Fetch Hospital-Acquired Infection SIR rates."""
-    logger.info("Fetching HAI rates...")
-    results: dict[str, dict] = {}
-
-    for row in _fetch_cms_quality_dataset(CMS_HAC_URL, state, set(HAI_MEASURES)):
-        ccn = (row.get("facility_id") or row.get("provider_id") or "").strip()
-        if ccn not in ccns:
-            continue
-
-        key = HAI_MEASURES[row["measure_id"].strip()]
-        score_raw = row.get("score", "")
-        try:
-            score = float(score_raw) if score_raw and score_raw != "Not Available" else None
-        except ValueError:
-            score = None
-
-        results.setdefault(ccn, {})[key] = score
-
-    logger.info(f"Found HAI data for {len(results)} hospitals")
-    return results
-
-
-def fetch_readmissions(ccns: set[str], state: str = "CA") -> dict[str, dict]:
-    """Fetch readmission and mortality measures."""
-    logger.info("Fetching readmission/mortality measures...")
-    results: dict[str, dict] = {}
-
-    for row in _fetch_cms_quality_dataset(CMS_READMISSIONS_URL, state, set(MEASURE_MAP)):
-        ccn = (row.get("facility_id") or row.get("provider_id") or "").strip()
-        if ccn not in ccns:
-            continue
-
-        col = MEASURE_MAP[row["measure_id"].strip()]
-        score_raw = row.get("score", "")
-        try:
-            score = float(score_raw) if score_raw and score_raw != "Not Available" else None
-        except ValueError:
-            score = None
-
-        results.setdefault(ccn, {})[col] = score
-
-    logger.info(f"Found readmission data for {len(results)} hospitals")
-    return results
+        record["hai_sirs"] = json.dumps(hai) if hai else None
+        record["measure_period"] = periods.get(ccn)
+        records.append(record)
+    return records
 
 
 def run(state: str = "CA") -> int:
     """
     Run the hospital quality extractor.
 
-    Merges data from multiple CMS datasets into hospital_quality rows.
+    Merges data from the CMS measure datasets into hospital_quality rows.
 
     Returns:
         Number of quality records upserted.
@@ -232,58 +173,33 @@ def run(state: str = "CA") -> int:
 
     ccns = get_state_ccns(state)
     if not ccns:
-        logger.warning("No CA hospitals in database. Run cms_hospitals.py first.")
+        logger.warning(f"No {state} hospitals in database. Run cms_hospitals.py first.")
         return 0
 
-    # Fetch all quality data sources
-    star_data = fetch_star_ratings(ccns)
-    complication_data = fetch_complications(ccns, state)
-    hai_data = fetch_hai_rates(ccns, state)
-    readmission_data = fetch_readmissions(ccns, state)
+    with RateLimitedClient() as client:
+        measure_rows = {}
+        for dataset, measures in DATASET_MEASURES.items():
+            measure_rows[dataset] = fetch_measures(client, dataset, state, list(measures))
+            logger.info(f"Fetched {len(measure_rows[dataset])} rows from {dataset}")
+            if not measure_rows[dataset]:
+                # Every hospital has a row per measure, scored or not, so none means the
+                # dataset or its measure IDs changed.
+                raise RuntimeError(f"CMS dataset {dataset} returned no rows for {sorted(measures)}")
+        hai_rows = fetch_measures(client, HAI_DATASET, state, list(HAI_MEASURES))
+        logger.info(f"Fetched {len(hai_rows)} rows from {HAI_DATASET}")
+        if not hai_rows:
+            raise RuntimeError(f"CMS dataset {HAI_DATASET} returned no rows for {sorted(HAI_MEASURES)}")
 
-    # Merge all data by CCN
-    merged: dict[str, dict] = {}
-    for ccn in ccns:
-        record = {"ccn": ccn}
-        record.update(star_data.get(ccn, {}))
-        record.update(complication_data.get(ccn, {}))
-        record.update(readmission_data.get(ccn, {}))
-
-        # HAI rates go into a JSONB column
-        hai = hai_data.get(ccn, {})
-        if hai:
-            import json
-            record["hai_sirs"] = json.dumps(hai)
-        else:
-            record["hai_sirs"] = None
-
-        # Only include if we have any quality data
-        has_data = any(
-            v is not None
-            for k, v in record.items()
-            if k not in ("ccn", "hai_sirs")
-        )
-        if has_data or hai:
-            merged[ccn] = record
-
-    if not merged:
-        logger.warning("No quality data found for CA hospitals")
+    records = merge_quality(ccns, measure_rows, hai_rows)
+    if not records:
+        logger.warning(f"No quality data found for {state} hospitals")
         return 0
-
-    records = list(merged.values())
-
-    # Ensure all records have all columns (fill missing with None)
-    all_keys = set()
-    for r in records:
-        all_keys.update(r.keys())
-    for r in records:
-        for k in all_keys:
-            r.setdefault(k, None)
 
     count = upsert_batch(
         table="hospital_quality",
         records=records,
         conflict_columns=["ccn"],
+        update_columns=[*MEASURE_COLUMNS, "hai_sirs", "measure_period", "updated_at"],
     )
 
     logger.info(f"Loaded quality metrics for {count} hospitals")

@@ -1,0 +1,159 @@
+{
+ "results": [
+  {
+   "manufacturer_contact_zip_ext": "",
+   "manufacturer_g1_address_2": "",
+   "event_location": "",
+   "report_to_fda": "",
+   "manufacturer_contact_t_name": "Ms.",
+   "manufacturer_contact_state": "TX",
+   "manufacturer_link_flag": "Y",
+   "manufacturer_contact_address_2": "",
+   "manufacturer_g1_city": "Austin",
+   "manufacturer_contact_address_1": "9800 Metric Blvd.",
+   "manufacturer_contact_pcity": "",
+   "event_type": "Injury",
+   "report_number": "1644408-2026-02008",
+   "type_of_report": [
+    "Initial submission"
+   ],
+   "product_problem_flag": "N",
+   "date_received": "20260930",
+   "manufacturer_address_2": "",
+   "pma_pmn_number": "K140830",
+   "date_of_event": "20260916",
+   "reprocessed_and_reused_flag": "N",
+   "manufacturer_address_1": "",
+   "exemption_number": "",
+   "manufacturer_contact_zip_code": "78758",
+   "reporter_occupation_code": "003",
+   "manufacturer_contact_plocal": "",
+   "noe_summarized": "1",
+   "manufacturer_contact_l_name": "Bonnell",
+   "source_type": [
+    "Company representation"
+   ],
+   "distributor_zip_code_ext": "",
+   "manufacturer_g1_postal_code": "78758",
+   "manufacturer_g1_state": "TX",
+   "reporter_country_code": "US",
+   "manufacturer_contact_area_code": "",
+   "date_added": "20260930",
+   "manufacturer_contact_f_name": "Stacey",
+   "previous_use_code": "I",
+   "device": [
+    {
+     "device_event_key": "",
+     "implant_flag": "",
+     "date_removed_flag": "",
+     "device_sequence_number": "87405",
+     "implant_date_year": "2020",
+     "date_removed_year": "2026",
+     "serviced_by_3rd_party_flag": "N",
+     "date_received": "20260930",
+     "brand_name": "DJO SURGICAL",
+     "generic_name": "INSERT, REVISION EXPRT, SZ C X 14.5MM, E-PLUS",
+     "manufacturer_d_name": "Encore Medical L.P",
+     "manufacturer_d_address_1": "9800 Metric Blvd.",
+     "manufacturer_d_address_2": "",
+     "manufacturer_d_city": "Austin",
+     "manufacturer_d_state": "TX",
+     "manufacturer_d_zip_code": "78758",
+     "manufacturer_d_zip_code_ext": "",
+     "manufacturer_d_country": "US",
+     "manufacturer_d_postal_code": "78758",
+     "device_operator": "HEALTH PROFESSIONAL",
+     "expiration_date_of_device": "20250221",
+     "model_number": "",
+     "catalog_number": "315-0C-714",
+     "lot_number": "012R1023",
+     "other_id_number": "",
+     "device_availability": "No",
+     "device_report_product_code": "JWH",
+     "device_age_text": "",
+     "device_evaluated_by_manufacturer": "N",
+     "combination_product_flag": "N",
+     "udi_di": "00888912114097",
+     "udi_public": "00888912114097",
+     "openfda": {
+      "device_name": "Prosthesis, Knee, Patellofemorotibial, Semi-Constrained, Cemented, Polymer/Metal/Polymer",
+      "medical_specialty_description": "Orthopedic",
+      "regulation_number": "888.3560",
+      "device_class": "2"
+     }
+    }
+   ],
+   "product_problems": [
+    "Unstable"
+   ],
+   "reporter_state_code": "LA",
+   "manufacturer_zip_code": "",
+   "suppl_dates_mfr_received": "",
+   "mfr_report_type": "Thirty-Day",
+   "manufacturer_contact_country": "US",
+   "date_changed": "20260930",
+   "health_professional": "N",
+   "summary_report_flag": "N",
+   "manufacturer_g1_zip_code_ext": "",
+   "manufacturer_contact_extension": "",
+   "manufacturer_city": "",
+   "manufacturer_contact_phone_number": "",
+   "patient": [
+    {
+     "patient_sequence_number": "1",
+     "date_received": "20260930",
+     "sequence_number_treatment": [
+      ""
+     ],
+     "sequence_number_outcome": [
+      "Required Intervention"
+     ],
+     "patient_age": "62 YR",
+     "patient_sex": "Female",
+     "patient_weight": "",
+     "patient_ethnicity": "",
+     "patient_race": "",
+     "patient_problems": [
+      "Joint Laxity"
+     ]
+    }
+   ],
+   "distributor_city": "",
+   "date_report": "20260929",
+   "initial_report_to_fda": "",
+   "distributor_state": "",
+   "event_key": "",
+   "manufacturer_g1_country": "US",
+   "manufacturer_contact_city": "Austin",
+   "mdr_report_key": "50941450",
+   "removal_correction_number": "",
+   "number_devices_in_event": "",
+   "date_manufacturer_received": "20260916",
+   "manufacturer_name": "",
+   "report_source_code": "Manufacturer report",
+   "remedial_action": [
+    ""
+   ],
+   "manufacturer_g1_zip_code": "78758",
+   "report_to_manufacturer": "",
+   "manufacturer_zip_code_ext": "",
+   "manufacturer_g1_name": "Encore Medical L.P",
+   "adverse_event_flag": "Y",
+   "distributor_address_1": "",
+   "manufacturer_state": "",
+   "distributor_address_2": "",
+   "manufacturer_postal_code": "",
+   "single_use_flag": "Y",
+   "manufacturer_country": "",
+   "mdr_text": [],
+   "number_patients_in_event": "",
+   "distributor_name": "",
+   "manufacturer_g1_address_1": "9800 Metric Blvd.",
+   "distributor_zip_code": "",
+   "manufacturer_contact_postal_code": "78758",
+   "manufacturer_contact_exchange": "",
+   "manufacturer_contact_pcountry": "",
+   "suppl_dates_fda_received": ""
+  }
+ ]
+}

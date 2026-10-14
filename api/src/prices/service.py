@@ -10,8 +10,8 @@ from src.pagination import Pagination, paginate
 PRICE_COLUMNS = """
     pr.cpt, c.description AS procedure_name,
     h.ccn, h.name AS hospital_name, h.city,
-    pr.payer, pr.plan_name, pr.billing_class,
-    pr.cash_price, pr.negotiated_rate, pr.negotiated_min, pr.negotiated_max,
+    pr.payer, pr.plan_name, pr.billing_class, pr.setting,
+    pr.cash_price, pr.gross_charge, pr.negotiated_rate, pr.negotiated_min, pr.negotiated_max,
     hq.overall_stars, hq.psi90_composite
 """
 PRICE_JOINS = """
@@ -40,7 +40,7 @@ async def search_prices(
         conn,
         base,
         dist_params + where_params,
-        order_by="negotiated_rate ASC NULLS LAST, hospital_name, payer, plan_name",
+        order_by="negotiated_rate ASC NULLS LAST, hospital_name, payer, plan_name, setting",
         page=page,
     )
 
@@ -50,6 +50,6 @@ async def compare_prices(conn: AsyncConnection, *, cpt: str, ccns: list[str]) ->
         SELECT {PRICE_COLUMNS}
         {PRICE_JOINS}
         WHERE pr.cpt = %s AND pr.ccn = ANY(%s)
-        ORDER BY h.name, pr.payer, pr.plan_name
+        ORDER BY h.name, pr.payer, pr.plan_name, pr.setting
     """
     return await fetch_all(conn, sql, (cpt, ccns))

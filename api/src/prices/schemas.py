@@ -14,7 +14,9 @@ class PriceBase(CustomModel):
     payer: str = Field(description="Insurer, `Medicare`, or `CASH` for self-pay")
     plan_name: str
     billing_class: str = Field(description="facility, professional, or both")
+    setting: str = Field(description="inpatient, outpatient, both, or empty when the hospital's file doesn't say")
     cash_price: float | None = Field(description="The hospital's discounted cash price")
+    gross_charge: float | None = Field(description="The hospital's list (chargemaster) price before any discount")
     negotiated_rate: float | None = Field(description="Rate this payer/plan pays the hospital")
     negotiated_min: float | None = Field(description="Lowest rate across this hospital's payers")
     negotiated_max: float | None = Field(description="Highest rate across this hospital's payers")
