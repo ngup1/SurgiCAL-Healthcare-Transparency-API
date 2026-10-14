@@ -228,7 +228,7 @@ Each phase ends in a working, testable state.
 - [x] **Structured logs** (`src/observability.py`): one JSON object per line (`LOG_JSON=false` gives plain text locally), with uvicorn's loggers routed through the same handler. A pure-ASGI middleware assigns each request an ID (the caller's `X-Request-ID` if it's safe, else a new one), returns it in the response header, includes it in every log line for that request, and writes one access-log line (method, path, query, status, duration_ms). Health checks are logged at DEBUG so they don't flood the logs. uvicorn's own access log is off (`--no-access-log`).
 - [x] CORS origins come from `CORS_ORIGINS`, and `X-Request-ID` and `X-Total-Count` are exposed to browsers.
 - **Result:** 138 tests (new `test_observability.py`: request IDs, JSON format, access log, 503 on all data endpoints with a dead pool, liveness vs readiness, generic 500 with no detail leak). In an outage drill on the compose stack (stopping the database container), `/hospitals` returned 503 in 12 ms, `/health` stayed 200, and after the database restarted the API recovered in about 2 s without restarting itself.
-- Not done: rate limiting (`slowapi`). The API is read-only with capped page sizes and mock data; add it if the URL is shared widely.
+- [x] **Rate limiting** (`src/rate_limit.py`, added later): an in-process token bucket per client, 120 requests a minute and 30 for `/search`, as pure ASGI middleware inside CORS (so browsers can read a `429`) and inside the request-ID middleware (so `429`s are logged). Health checks and docs are exempt. Limits are per worker process; a shared store (Redis) would make them exact across workers and instances. The client is identified by `RATE_LIMIT_CLIENT_IP_HEADER` when set, since Render appends to `X-Forwarded-For` instead of replacing it, so its first entry can be forged.
 
 ### Phase 7: Swagger UI for public testing ✅ done
 - [x] Header reads "SurgiCAL API · Healthcare transparency API", with a short description of how to try the API and its error behavior. There's no note about fictional data in Swagger; the README covers that.
@@ -358,7 +358,7 @@ python3 api/seed/generate.py      # rewrites seed/data/*.json and seed/seed.sql
 | Risk | Mitigation |
 |---|---|
 | Hosting needs Postgres with PostGIS and pg_trgm | Confirm the extensions on the chosen host before Phase 9. The fallback is a VM running `docker compose` |
-| A public, unauthenticated API could be abused | All responses are capped (`limit ≤ 200`), the data is mock, and the methods are GET-only. Add rate limiting (e.g. `slowapi`) in Phase 6 if the URL is shared widely |
+| A public, unauthenticated API could be abused | All responses are capped (`limit ≤ 200`), the data is mock, and the methods are GET-only. Per-client rate limiting (`src/rate_limit.py`) |
 | The behavior changes in §3 could break a client | No client currently depends on the API (the old frontend isn't part of this repo). Recheck before Phase 5 if one is added |
 | County search misses hospitals in places not in `ca_places` | The production gazetteer includes Census unincorporated places. If gaps remain, add a `county` column to `hospitals` filled from CMS data, which includes the county |
 | The guide says to hide docs, but the goal is public docs | `SHOW_DOCS` defaults to `false`, and the demo deployment sets it to `true` explicitly |

@@ -26,6 +26,8 @@ for key, value in {
     "DB_USER": "surgical",
     "DB_PASSWORD": "surgical",
     "DB_SSL_MODE": "disable",
+    # The suite sends many requests from one client; test_rate_limit.py covers the limiter.
+    "RATE_LIMIT_ENABLED": "false",
 }.items():
     os.environ.setdefault(key, value)
 

@@ -3,7 +3,7 @@
 from collections.abc import AsyncIterator
 from contextlib import asynccontextmanager
 
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
 from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import RedirectResponse
@@ -28,6 +28,7 @@ from src.observability import REQUEST_ID_HEADER, RequestContextMiddleware, confi
 from src.pagination import TOTAL_COUNT_HEADER
 from src.prices.router import router as prices_router
 from src.providers.router import router as providers_router
+from src.rate_limit import LIMIT_HEADER, REMAINING_HEADER, RateLimitMiddleware
 from src.search.router import router as search_router
 
 configure_logging(settings.log_level, settings.log_json)
@@ -63,13 +64,24 @@ app = FastAPI(
     },
 )
 
+# Middleware added later wraps what was added earlier. Request order:
+# RequestContext (request ID, access log) → CORS → rate limit → app, so a 429
+# is logged and carries CORS headers a browser client can read.
+if settings.rate_limit_enabled:
+    app.add_middleware(
+        RateLimitMiddleware,
+        per_minute=settings.rate_limit_per_minute,
+        search_per_minute=settings.rate_limit_search_per_minute,
+        client_ip_header=settings.rate_limit_client_ip_header,
+    )
 app.add_middleware(
     CORSMiddleware,
     allow_origins=settings.cors_origins,
     allow_credentials=True,
     allow_methods=["GET"],
     allow_headers=["*"],
-    expose_headers=[TOTAL_COUNT_HEADER, REQUEST_ID_HEADER],  # readable by browser clients
+    # readable by browser clients
+    expose_headers=[TOTAL_COUNT_HEADER, REQUEST_ID_HEADER, LIMIT_HEADER, REMAINING_HEADER, "Retry-After"],
 )
 # Added last, so it's outermost: it sees every request and response, including CORS.
 app.add_middleware(RequestContextMiddleware)
@@ -94,3 +106,11 @@ app.include_router(health_router, prefix="/health", tags=["health"])
 @app.get("/", include_in_schema=False)
 async def root():
     return RedirectResponse("/docs") if settings.show_docs else {"name": app.title, "health": "/health"}
+
+
+if settings.debug_headers:
+
+    @app.get("/debug/headers", include_in_schema=False)
+    async def debug_headers(request: Request):
+        """Temporary: what the edge actually passes through (see RATE_LIMIT_CLIENT_IP_HEADER)."""
+        return {"client": request.client.host if request.client else None, "headers": dict(request.headers)}
