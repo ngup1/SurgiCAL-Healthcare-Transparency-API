@@ -1,0 +1,272 @@
+# Scheduled data refresh.
+#
+# Each source is refreshed on its own cadence (the cron lines below). A run never
+# writes to the database the API is serving:
+#
+#   plan ──► load ──► links ──► prices (4 shards) ──► promote
+#
+#   plan     picks the steps for this cadence and makes a Neon branch of production
+#   load     applies migrations and runs the steps against that branch
+#   links    (price runs) finds each hospital's price file
+#   prices   (price runs) parses the files, split across jobs to stay under the 6-hour limit
+#   promote  runs etl.checks against production (no table may shrink by more than 20%,
+#            storage must be under the limit), then restores production from the branch.
+#            Production's previous state is kept as the branch etl-backup-<run id>.
+#
+# If any job fails, production is untouched and GitHub emails the failure to whoever
+# last edited this file. The refresh branch is left for inspection and expires by itself.
+#
+# Setup (Settings → Secrets and variables → Actions):
+#   secret   NEON_API_KEY             Neon API key (required; without it runs are skipped)
+#   secret   OPENFDA_API_KEY          optional; without it adverse events cover ~900 product types a day
+#   variable NEON_PROJECT_ID          the Neon project
+#   variable NEON_PRODUCTION_BRANCH   branch the API reads (default: main)
+#   variable NEON_DATABASE            database name (default: neondb)
+#   variable ETL_STORAGE_LIMIT_MB     fail a refresh above this size (default: 1024, the free tier)
+#   variable MRF_CPT_LIMIT, MRF_PLAN_DETAIL   size of the prices table (see etl/.env.example)
+name: ETL refresh
+
+on:
+  schedule:
+    - cron: "23 9 * * 1" # weekly, Monday: device recalls and adverse events
+    - cron: "23 10 2 * *" # monthly, the 2nd: devices (510(k)/PMA) and providers (NPPES)
+    - cron: "23 11 4 * *" # monthly, the 4th: hospital price files
+    - cron: "23 12 6 1,4,7,10 *" # quarterly: places, hospitals, quality, fee schedule
+    - cron: "23 13 15 7 *" # yearly, July 15: Medicare utilization
+  workflow_dispatch:
+    inputs:
+      group:
+        description: Which sources to refresh
+        type: choice
+        default: weekly
+        options: [weekly, monthly, prices, quarterly, yearly, all]
+      promote:
+        description: Replace production with the result if the checks pass
+        type: boolean
+        default: false
+      reset:
+        description: Empty the tables first (first real load only, with group "all"; removes the mock data)
+        type: boolean
+        default: false
+
+# One refresh at a time: promoting replaces the whole database, so two overlapping
+# runs would undo each other.
+concurrency:
+  group: etl-refresh
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+env:
+  NEON_API_KEY: ${{ secrets.NEON_API_KEY }}
+  NEON_PROJECT_ID: ${{ vars.NEON_PROJECT_ID }}
+  NEON_PRODUCTION_BRANCH: ${{ vars.NEON_PRODUCTION_BRANCH || 'main' }}
+  NEON_DATABASE: ${{ vars.NEON_DATABASE || 'neondb' }}
+  REFRESH_BRANCH: etl-refresh-${{ github.run_id }}
+  OPENFDA_API_KEY: ${{ secrets.OPENFDA_API_KEY }}
+  MRF_CPT_LIMIT: ${{ vars.MRF_CPT_LIMIT || '150' }}
+  MRF_PLAN_DETAIL: ${{ vars.MRF_PLAN_DETAIL || 'false' }}
+  NEONCTL: npx --yes neonctl@2
+
+jobs:
+  plan:
+    name: Plan + create branch
+    runs-on: ubuntu-latest
+    outputs:
+      configured: ${{ steps.plan.outputs.configured }}
+      steps: ${{ steps.plan.outputs.steps }}
+      prices: ${{ steps.plan.outputs.prices }}
+      promote: ${{ steps.plan.outputs.promote }}
+    steps:
+      - id: plan
+        name: Choose the steps for this cadence
+        env:
+          SCHEDULE: ${{ github.event.schedule }}
+          INPUT_GROUP: ${{ inputs.group }}
+          INPUT_PROMOTE: ${{ inputs.promote }}
+        run: |
+          set -euo pipefail
+          if [ -z "$NEON_API_KEY" ] || [ -z "$NEON_PROJECT_ID" ]; then
+            echo "::notice::NEON_API_KEY / NEON_PROJECT_ID are not set; skipping the refresh."
+            echo "configured=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          case "$SCHEDULE" in
+            "23 9 * * 1") group=weekly ;;
+            "23 10 2 * *") group=monthly ;;
+            "23 11 4 * *") group=prices ;;
+            "23 12 6 1,4,7,10 *") group=quarterly ;;
+            "23 13 15 7 *") group=yearly ;;
+            *) group="${INPUT_GROUP:-weekly}" ;;
+          esac
+          prices=false
+          case "$group" in
+            weekly) steps="fda_recalls fda_maude" ;;
+            monthly) steps="fda_devices device_procedures fda_recalls fda_maude providers" ;;
+            prices) steps=""; prices=true ;;
+            quarterly) steps="places hospitals hospital_quality cpt_codes" ;;
+            yearly) steps="utilization" ;;
+            all)
+              steps="places hospitals cpt_codes providers utilization hospital_quality fda_devices device_procedures fda_recalls fda_maude"
+              prices=true ;;
+          esac
+          # Scheduled runs promote; a manual run promotes only when asked to.
+          if [ "${{ github.event_name }}" = "schedule" ]; then promote=true; else promote="${INPUT_PROMOTE:-false}"; fi
+          {
+            echo "configured=true"
+            echo "steps=$steps"
+            echo "prices=$prices"
+            echo "promote=$promote"
+          } >> "$GITHUB_OUTPUT"
+          echo "### Refresh: $group" >> "$GITHUB_STEP_SUMMARY"
+          echo "Steps: \`${steps:-none}\` · prices: $prices · promote: $promote" >> "$GITHUB_STEP_SUMMARY"
+
+      # A copy-on-write branch of production. It expires by itself, so a failed run
+      # leaves nothing to clean up.
+      - name: Create the refresh branch
+        if: steps.plan.outputs.configured == 'true'
+        run: |
+          set -euo pipefail
+          expires=$(date -u -d "+3 days" +%Y-%m-%dT%H:%M:%SZ)
+          $NEONCTL branches create --project-id "$NEON_PROJECT_ID" --name "$REFRESH_BRANCH" \
+            --parent "$NEON_PRODUCTION_BRANCH" --expires-at "$expires"
+
+  load:
+    name: Load
+    needs: plan
+    if: needs.plan.outputs.configured == 'true' && needs.plan.outputs.steps != ''
+    runs-on: ubuntu-latest
+    timeout-minutes: 340
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: etl/requirements.txt
+      - run: pip install -r etl/requirements.txt
+      - name: Connect to the refresh branch
+        run: |
+          set -euo pipefail
+          # The direct (non-pooled) endpoint: loads use long transactions.
+          url=$($NEONCTL connection-string "$REFRESH_BRANCH" --project-id "$NEON_PROJECT_ID" --database-name "$NEON_DATABASE")
+          echo "::add-mask::$url"
+          echo "DATABASE_URL=$url" >> "$GITHUB_ENV"
+      - run: python -m etl.migrate
+      # Only on the refresh branch, and only when asked for on a manual full load.
+      - name: Empty the tables (first real load)
+        if: inputs.reset && inputs.group == 'all'
+        run: python -m etl.reset --yes
+      - run: python -m etl.run_pipeline --steps ${{ needs.plan.outputs.steps }}
+
+  links:
+    name: Find price files
+    needs: [plan, load]
+    # After `load` when it ran; on a prices-only run `load` is skipped.
+    if: always() && needs.plan.outputs.prices == 'true' && contains(fromJSON('["success","skipped"]'), needs.load.result)
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: etl/requirements.txt
+      - run: pip install -r etl/requirements.txt
+      - name: Connect to the refresh branch
+        run: |
+          set -euo pipefail
+          # The direct (non-pooled) endpoint: loads use long transactions.
+          url=$($NEONCTL connection-string "$REFRESH_BRANCH" --project-id "$NEON_PROJECT_ID" --database-name "$NEON_DATABASE")
+          echo "::add-mask::$url"
+          echo "DATABASE_URL=$url" >> "$GITHUB_ENV"
+      - run: python -m etl.migrate
+      - run: python -m etl.run_pipeline --steps mrf_links
+
+  prices:
+    name: Prices (shard ${{ matrix.shard }} of 4)
+    needs: [plan, links]
+    if: always() && needs.links.result == 'success'
+    runs-on: ubuntu-latest
+    timeout-minutes: 340
+    strategy:
+      fail-fast: false
+      matrix:
+        shard: [0, 1, 2, 3]
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: etl/requirements.txt
+      - run: pip install -r etl/requirements.txt
+      - name: Connect to the refresh branch
+        run: |
+          set -euo pipefail
+          # The direct (non-pooled) endpoint: loads use long transactions.
+          url=$($NEONCTL connection-string "$REFRESH_BRANCH" --project-id "$NEON_PROJECT_ID" --database-name "$NEON_DATABASE")
+          echo "::add-mask::$url"
+          echo "DATABASE_URL=$url" >> "$GITHUB_ENV"
+      - run: python -m etl.run_pipeline --steps mrf_prices --mrf-shard ${{ matrix.shard }}/4
+
+  promote:
+    name: Check + promote
+    needs: [plan, load, links, prices]
+    if: >-
+      always() && needs.plan.outputs.configured == 'true'
+      && !contains(needs.*.result, 'failure') && !contains(needs.*.result, 'cancelled')
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: etl/requirements.txt
+      - run: pip install -r etl/requirements.txt
+      - name: Connect to the refresh branch
+        run: |
+          set -euo pipefail
+          # The direct (non-pooled) endpoint: loads use long transactions.
+          url=$($NEONCTL connection-string "$REFRESH_BRANCH" --project-id "$NEON_PROJECT_ID" --database-name "$NEON_DATABASE")
+          echo "::add-mask::$url"
+          echo "DATABASE_URL=$url" >> "$GITHUB_ENV"
+
+      - name: Row-count and storage checks against production
+        run: |
+          set -euo pipefail
+          production=$($NEONCTL connection-string "$NEON_PRODUCTION_BRANCH" --project-id "$NEON_PROJECT_ID" --database-name "$NEON_DATABASE")
+          echo "::add-mask::$production"
+          python -m etl.checks --baseline-url "$production" \
+            --storage-limit-mb "${{ vars.ETL_STORAGE_LIMIT_MB || '1024' }}" | tee -a "$GITHUB_STEP_SUMMARY"
+
+      # Production becomes the refreshed data; its previous state stays as a backup branch.
+      - name: Promote
+        if: needs.plan.outputs.promote == 'true'
+        run: |
+          set -euo pipefail
+          backup="etl-backup-${{ github.run_id }}"
+          $NEONCTL branches restore "$NEON_PRODUCTION_BRANCH" "$REFRESH_BRANCH" \
+            --project-id "$NEON_PROJECT_ID" --preserve-under-name "$backup"
+          echo "Promoted. Previous production data: branch \`$backup\`." >> "$GITHUB_STEP_SUMMARY"
+
+      # Keep only the newest backup (the free tier allows few branches). Best effort.
+      - name: Delete older backups
+        if: needs.plan.outputs.promote == 'true'
+        continue-on-error: true
+        run: |
+          set -uo pipefail
+          keep="etl-backup-${{ github.run_id }}"
+          $NEONCTL branches list --project-id "$NEON_PROJECT_ID" --output json \
+            | jq -r --arg keep "$keep" '.[] | select(.name | startswith("etl-backup-")) | select(.name != $keep) | .name' \
+            | while read -r name; do
+                $NEONCTL branches delete "$name" --project-id "$NEON_PROJECT_ID" || echo "::warning::could not delete $name"
+              done
+
+      - name: Not promoted
+        if: needs.plan.outputs.promote != 'true'
+        run: echo "Checks passed; not promoted (manual run). The data is on branch \`$REFRESH_BRANCH\` for 3 days." >> "$GITHUB_STEP_SUMMARY"

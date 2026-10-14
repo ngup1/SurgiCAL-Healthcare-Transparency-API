@@ -1,0 +1,43 @@
+priority,pattern,payer
+10,\b(self[ -]?pay|cash|uninsured|discounted cash)\b,CASH
+20,medi[ -]?cal|\bmedicaid\b|\bdhcs\b,Medi-Cal
+30,\b(tricare|triwest|champva|health ?net federal)\b,TRICARE
+40,\b(veterans?|\bva\b)\b,Veterans Affairs
+50,workers'? ?comp|work comp|\bwc\b,Workers' Compensation
+100,\banthem\b|blue cross of ca,Anthem Blue Cross
+110,blue ?shield|\bbsc\b|\bbsca\b,Blue Shield of California
+120,blue ?cross|\bbcbs\b|\bbluecard\b,Blue Cross Blue Shield
+130,\baetna\b|\bcoventry\b|first health,Aetna
+140,\bcigna\b|great[ -]?west,Cigna
+150,united ?health ?care|united health|^united$|\buhc\b|\bumr\b|pacificare|\boptum\b,UnitedHealthcare
+160,\bkaiser\b|\bkfhp\b,Kaiser Permanente
+170,health ?net\b|\bcentene\b|\bwellcare\b|\bambetter\b,Health Net
+180,\bhumana\b,Humana
+190,\bmolina\b,Molina Healthcare
+200,l\.?a\.? ?care,L.A. Care
+210,inland empire health|\biehp\b,Inland Empire Health Plan
+220,cal ?optima,CalOptima
+230,partnership health ?plan,Partnership HealthPlan
+240,central california alliance|\bccah\b,Central California Alliance for Health
+250,health plan of san joaquin|\bhpsj\b,Health Plan of San Joaquin
+260,sharp health plan,Sharp Health Plan
+270,western health advantage,Western Health Advantage
+280,\bscan\b,SCAN Health Plan
+290,alignment,Alignment Health Plan
+300,brand new day,Brand New Day
+310,\boscar\b,Oscar Health
+320,multi ?plan|\bphcs\b,MultiPlan
+330,\bmagellan\b,Magellan Health
+340,blue ?shield promise|care1st,Blue Shield of California
+350,contra costa health plan|\bcchp\b,Contra Costa Health Plan
+360,san francisco health plan|\bsfhp\b,San Francisco Health Plan
+370,santa clara family health,Santa Clara Family Health Plan
+380,community health group,Community Health Group
+390,kern (family )?health,Kern Health Systems
+400,gold coast health,Gold Coast Health Plan
+410,cencal,CenCal Health
+420,health plan of san mateo|\bhpsm\b,Health Plan of San Mateo
+430,alameda alliance,Alameda Alliance for Health
+440,\bprospect\b,Prospect Medical
+450,\bhill physicians\b,Hill Physicians
+900,\bmedicare\b,Medicare

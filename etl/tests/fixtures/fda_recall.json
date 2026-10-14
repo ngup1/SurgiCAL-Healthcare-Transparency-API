@@ -1,0 +1,98 @@
+{
+ "results": [
+  {
+   "cfres_id": "165169",
+   "product_res_number": "Z-0001-2019",
+   "event_date_initiated": "2018-06-13",
+   "event_date_posted": "2018-10-01",
+   "recall_status": "Open, Classified",
+   "res_event_number": "80313",
+   "product_code": "JWH",
+   "k_numbers": [
+    "K042515"
+   ],
+   "product_description": "Journey BCS Knee CoCr Femoral Components, Catalog Numbers:\n74021210, 74021211, 74021212, 74021213, 74021214, 74021215, 74021216, 74021217, 74021218, 74021219, 74021220, 74021221, 74021222, 74021223, 74021224, 74021225, 74021226, 74021227, 74021228, 74021229",
+   "code_info": "All lots",
+   "firm_fei_number": "1020279",
+   "recalling_firm": "Smith & Nephew, Inc.",
+   "address_1": "1450 E Brooks Rd",
+   "city": "Memphis",
+   "state": "TN",
+   "postal_code": "38116-1804",
+   "additional_info_contact": "901-396-2121",
+   "reason_for_recall": "The data in the National Joint Registry of England, Wales and Northern Ireland (NJREWNI) and Australian Orthopaedic Association National Joint Replacement Registry (AOANJRR) indicate that the first generation JOURNEY BCS Knee System has a revision rate over 1.5 times the primary total knee arthroplasty device class average revision rates reported in those registries.",
+   "root_cause_description": "Other",
+   "action": "The Field Safety Notice (FSN) sent to risk managers on 06/13/2018 asks customers to inspect inventory, locate and quarantine affected, unused Journey BCS Knee CoCr Femoral Components and JOURNEY BCS OXINIUM Knee Femoral Components. Affected product subject of the voluntary removal is to be returned to Smith & Nephew.  All consignees are asked to complete an FSN Response Form, even if they do not h",
+   "product_quantity": "10,792 units",
+   "distribution_pattern": "Worldwide distribution, including US nationwide and Puerto Rico, Austria, United Arab Emirates,  Australia, Belgium, Canada, China, Switzerland, Germany, Denmark, Finland, France, Great Britain, India, Spain, Italy, Netherlands, Portugal, Sweden, Venezuela, South Africa.",
+   "openfda": {
+    "k_number": [
+     "K843242",
+     "K253144",
+     "K072858"
+    ],
+    "registration_number": [
+     "3016851379",
+     "3013055499",
+     "3021008900"
+    ],
+    "fei_number": [
+     "3016851379",
+     "3013055499",
+     "3021008900"
+    ],
+    "device_name": "Prosthesis, Knee, Patellofemorotibial, Semi-Constrained, Cemented, Polymer/Metal/Polymer",
+    "medical_specialty_description": "Orthopedic",
+    "regulation_number": "888.3560",
+    "device_class": "2"
+   }
+  },
+  {
+   "cfres_id": "165170",
+   "product_res_number": "Z-0002-2019",
+   "event_date_initiated": "2018-06-13",
+   "event_date_posted": "2018-10-01",
+   "recall_status": "Open, Classified",
+   "res_event_number": "80313",
+   "product_code": "JWH",
+   "k_numbers": [
+    "K042515"
+   ],
+   "product_description": "JOURNEY BCS OXINIUM Knee Femoral Components, Catalog Numbers:  74021110, 74021111, 74021112, 74021113, 74021114, 74021115, 74021116, 74021117, 74021118, 74021119, 74021120, 74021121, 74021122, 74021123, 74021124, 74021125, 74021126, 74021127, 74021128, 74021129, 74021130, 74021131, 74021132, 74021133, 74021134, 74021135, 74021136, 74021137, 74021138, 74021139, 74021140, 74021141, 74021142, 7402114",
+   "code_info": "All lots",
+   "firm_fei_number": "1020279",
+   "recalling_firm": "Smith & Nephew, Inc.",
+   "address_1": "1450 E Brooks Rd",
+   "city": "Memphis",
+   "state": "TN",
+   "postal_code": "38116-1804",
+   "additional_info_contact": "901-396-2121",
+   "reason_for_recall": "The data in the National Joint Registry of England, Wales and Northern Ireland (NJREWNI) and Australian Orthopaedic Association National Joint Replacement Registry (AOANJRR) indicate that the first generation JOURNEY BCS Knee System has a revision rate over 1.5 times the primary total knee arthroplasty device class average revision rates reported in those registries.",
+   "root_cause_description": "Other",
+   "action": "The Field Safety Notice (FSN) sent to risk managers on 06/13/2018 asks customers to inspect inventory, locate and quarantine affected, unused Journey BCS Knee CoCr Femoral Components and JOURNEY BCS OXINIUM Knee Femoral Components. Affected product subject of the voluntary removal is to be returned to Smith & Nephew.  All consignees are asked to complete an FSN Response Form, even if they do not h",
+   "product_quantity": "42,050  units",
+   "distribution_pattern": "Worldwide distribution, including US nationwide and Puerto Rico, Austria, United Arab Emirates,  Australia, Belgium, Canada, China, Switzerland, Germany, Denmark, Finland, France, Great Britain, India, Spain, Italy, Netherlands, Portugal, Sweden, Venezuela, South Africa.",
+   "openfda": {
+    "k_number": [
+     "K843242",
+     "K253144",
+     "K072858"
+    ],
+    "registration_number": [
+     "3016851379",
+     "3013055499",
+     "3021008900"
+    ],
+    "fei_number": [
+     "3016851379",
+     "3013055499",
+     "3021008900"
+    ],
+    "device_name": "Prosthesis, Knee, Patellofemorotibial, Semi-Constrained, Cemented, Polymer/Metal/Polymer",
+    "medical_specialty_description": "Orthopedic",
+    "regulation_number": "888.3560",
+    "device_class": "2"
+   }
+  }
+ ]
+}

@@ -1,0 +1,49 @@
+{
+ "results": [
+  {
+   "facility_id": "050002",
+   "facility_name": "ST ROSE HOSPITAL",
+   "address": "27200 CALAROGA AVE",
+   "citytown": "HAYWARD",
+   "state": "CA",
+   "zip_code": "94545",
+   "countyparish": "ALAMEDA",
+   "telephone_number": "(510) 782-6200",
+   "measure_id": "READM_30_HIP_KNEE",
+   "measure_name": "Rate of readmission after hip/knee replacement",
+   "compared_to_national": "Not Available",
+   "denominator": "101",
+   "score": "5.4",
+   "lower_estimate": "Not Available",
+   "higher_estimate": "Not Available",
+   "number_of_patients": "Not Applicable",
+   "number_of_patients_returned": "Not Applicable",
+   "footnote": "",
+   "start_date": "07/01/2023",
+   "end_date": "06/30/2025"
+  },
+  {
+   "facility_id": "050006",
+   "facility_name": "PROVIDENCE ST JOSEPH HOSPITAL",
+   "address": "2700 DOLBEER ST",
+   "citytown": "EUREKA",
+   "state": "CA",
+   "zip_code": "95501",
+   "countyparish": "HUMBOLDT",
+   "telephone_number": "(707) 445-8121",
+   "measure_id": "READM_30_HIP_KNEE",
+   "measure_name": "Rate of readmission after hip/knee replacement",
+   "compared_to_national": "Not Available",
+   "denominator": "Not Available",
+   "score": "Not Available",
+   "lower_estimate": "Not Available",
+   "higher_estimate": "Not Available",
+   "number_of_patients": "Not Applicable",
+   "number_of_patients_returned": "Not Applicable",
+   "footnote": "1",
+   "start_date": "07/01/2023",
+   "end_date": "06/30/2025"
+  }
+ ],
+ "count": 337
+}

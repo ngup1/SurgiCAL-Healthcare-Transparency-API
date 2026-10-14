@@ -1,0 +1,48 @@
+cpt,product_code,usage_type,note
+27447,JWH,implant,"Knee prosthesis, cemented"
+27447,OIY,implant,"Knee prosthesis, cemented, polymer with additive"
+27447,MBH,implant,"Knee prosthesis, uncemented"
+27447,KRO,implant,"Knee prosthesis, constrained"
+27447,LOD,consumable,Bone cement
+27130,LPH,implant,"Hip prosthesis, porous uncemented"
+27130,LZO,implant,"Hip prosthesis, metal/ceramic/polymer"
+27130,JDI,implant,"Hip prosthesis, cemented"
+27130,MEH,implant,"Hip prosthesis, calcium phosphate coated"
+27130,OQG,implant,"Hip prosthesis, polymer with additive"
+27130,LOD,consumable,Bone cement
+23472,KWS,implant,"Shoulder prosthesis, semi-constrained"
+23472,PHX,implant,"Shoulder prosthesis, reverse"
+23472,KWT,implant,"Shoulder prosthesis, non-constrained"
+23472,LOD,consumable,Bone cement
+29881,HRX,instrument,Arthroscope
+22551,ODP,implant,Cervical intervertebral fusion device
+22551,OVE,implant,Cervical fusion device with integrated fixation
+22551,KWQ,implant,Spinal intervertebral body fixation (anterior plate)
+22612,NKB,implant,Pedicle screw system
+22612,MNI,implant,Spinal pedicle fixation
+22612,MAX,implant,Lumbar intervertebral fusion device
+47562,GCJ,instrument,Laparoscope
+47562,FZP,implant,Implantable clip
+49650,FTL,implant,Polymeric surgical mesh
+49650,GCJ,instrument,Laparoscope
+44970,GCJ,instrument,Laparoscope
+44970,GDW,implant,Implantable staple
+43644,GDW,implant,Implantable staple
+43644,GCJ,instrument,Laparoscope
+58571,HET,instrument,Gynecologic laparoscope
+58571,LKF,instrument,Uterine manipulator
+92928,NIQ,implant,Coronary drug-eluting stent
+92928,MAF,implant,Coronary stent
+92928,LOX,instrument,Coronary angioplasty catheter
+33208,DXY,implant,Pacemaker pulse generator
+33208,LWP,implant,Pacemaker pulse generator (non-CRT)
+33208,DTB,implant,Pacemaker electrode
+33208,NVN,implant,Drug-eluting pacemaker electrode
+33533,DTZ,instrument,Cardiopulmonary bypass oxygenator
+33533,DWF,instrument,Cardiopulmonary bypass cannula and tubing
+66984,HQL,implant,Intraocular lens
+66984,HQC,instrument,Phacofragmentation unit
+45378,FDF,instrument,Colonoscope
+19357,LCJ,implant,Tissue expander
+96365,FPA,consumable,Intravascular administration set
+96365,FRN,instrument,Infusion pump

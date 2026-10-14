@@ -13,6 +13,10 @@ Updates:
   provider_metrics  -- trilliant_specialty, trilliant_active, patient_demographics
   provider_affiliations -- if affiliation columns are present in the Delta table
 
+Opt-in: the pipeline runs this step only when it is named (--steps trilliant) and
+TRILLIANT_SHARE_FILE is set. It needs the extra packages in
+etl/requirements-trilliant.txt.
+
 Note: This module is enrichment-only -- it loads Trilliant data for providers
 already in our providers table. If you need to bootstrap providers from
 Trilliant as the primary source, create extract/trilliant_directory.py
@@ -20,17 +24,18 @@ following the same download/filter pattern.
 """
 from __future__ import annotations
 
+import contextlib
 import json
 import re
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from difflib import SequenceMatcher
 from pathlib import Path
 
 import delta_sharing
 import pandas as pd
 
-from etl.common.config import get_settings, get_logger
-from etl.common.db import execute_query, get_db_connection, upsert_batch
+from etl.common.config import get_logger, get_settings
+from etl.common.db import execute_query, update_batch, upsert_batch
 
 logger = get_logger(__name__)
 
@@ -86,7 +91,7 @@ def check_token_expiry(share_file: str) -> None:
         if not exp_str:
             return
         exp = datetime.fromisoformat(exp_str.replace("Z", "+00:00"))
-        now = datetime.now(timezone.utc)
+        now = datetime.now(UTC)
         if exp < now:
             delta = now - exp
             days = delta.days
@@ -304,10 +309,8 @@ def build_providers_records(df: pd.DataFrame, resolved_map: dict[str, str]) -> l
             record["medical_school"] = str(mapped["medical_school"]).strip() or None
 
         if "graduation_year" in mapped:
-            try:
+            with contextlib.suppress(ValueError, TypeError):
                 record["graduation_year"] = int(float(mapped["graduation_year"]))
-            except (ValueError, TypeError):
-                pass
 
         if len(record) > 1:  # has more than just npi
             records.append(record)
@@ -317,7 +320,7 @@ def build_providers_records(df: pd.DataFrame, resolved_map: dict[str, str]) -> l
 
 def build_metrics_records(df: pd.DataFrame, resolved_map: dict[str, str]) -> list[dict]:
     """Build upsert records for the provider_metrics table."""
-    now = datetime.now(timezone.utc)
+    now = datetime.now(UTC)
     records = []
 
     for _, row in df.iterrows():
@@ -341,10 +344,8 @@ def build_metrics_records(df: pd.DataFrame, resolved_map: dict[str, str]) -> lis
             elif isinstance(val, str):
                 record["trilliant_active"] = val.strip().lower() in ("true", "1", "yes", "active")
             else:
-                try:
+                with contextlib.suppress(ValueError, TypeError):
                     record["trilliant_active"] = bool(val)
-                except (ValueError, TypeError):
-                    pass
 
         # Assemble flat panel columns into a single patient_demographics JSONB dict
         demo = {}
@@ -360,10 +361,8 @@ def build_metrics_records(df: pd.DataFrame, resolved_map: dict[str, str]) -> lis
         }
         for internal_field, json_key in demo_key_map.items():
             if internal_field in mapped:
-                try:
+                with contextlib.suppress(ValueError, TypeError):
                     demo[json_key] = float(mapped[internal_field])
-                except (ValueError, TypeError):
-                    pass
         if demo:
             record["patient_demographics"] = json.dumps(demo)
 
@@ -551,10 +550,12 @@ def run(dry_run: bool = False, affiliation_threshold: float = 0.75) -> int:
         return len(metrics_records)
 
     if provider_records:
-        upsert_batch(
+        # Update only: these records carry just the enrichment fields, and providers
+        # come from NPPES, so a provider Trilliant knows and we don't is not inserted.
+        update_batch(
             table="providers",
             records=provider_records,
-            conflict_columns=["npi"],
+            key_columns=["npi"],
             update_columns=["medical_school", "graduation_year"],
         )
 

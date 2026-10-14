@@ -1,767 +1,371 @@
 """
 Hospital MRF (Machine Readable File) Price Parser
 
-Downloads and parses hospital price transparency MRF files sourced from the
-hospital_mrf_links table (populated by hospitalpricingfiles_scraper.py).
+Downloads and parses hospital price transparency files (the CMS "standard
+charges" template) listed in the hospital_mrf_links table, which mrf_links.py
+fills.
 
-Supports:
-  - CMS in-network JSON (direct)
-  - Table-of-Contents JSON (follows one level of in_network_files links)
-  - CSV tall format (one row per code × payer)
-  - CSV wide format (payer/plan encoded in column headers)
-  - Gzip-compressed variants of any of the above
-  - Skips: files larger than MAX_FILE_BYTES
+Supports the three layouts of the CMS template, versions 2 and 3:
+  - JSON: charges under standard_charge_information
+  - CSV tall: one row per code × payer
+  - CSV wide: one row per code, with payer and plan in the column headers
+  - any of them gzip-compressed or inside a zip archive
 
-Uses ijson for streaming JSON parsing to handle multi-GB files without loading
-the entire payload into RAM.
+Files are downloaded to disk and read as a stream, so a multi-gigabyte file
+costs disk space, not memory. Files over MRF_MAX_FILE_MB are skipped.
 
-Only stores rates for CPT codes present in the cpt_codes table and hospitals
-present in the hospitals table (CCN FK constraint).
+Each hospital is loaded on its own: its prices are replaced in one transaction,
+and a failure is recorded on its link and does not stop the other hospitals.
 
 Populates the `prices` table with source='mrf_parsed'.
-
-Requires migration 006_fix_prices_index.sql to be applied first (makes
-plan_name and billing_class NOT NULL DEFAULT '' so upsert_batch works).
 """
 from __future__ import annotations
 
+import csv
 import gzip
+import hashlib
 import io
-import json
 import re
-from collections import defaultdict
-from datetime import datetime, timezone
-from urllib.parse import urlparse
+import statistics
+import zipfile
+import zlib
+from collections.abc import Iterator
+from contextlib import contextmanager
+from datetime import UTC, date, datetime
+from pathlib import Path
 
-import httpx
 import ijson
-import pandas as pd
 
-from etl.common.config import get_logger, get_settings
-from etl.common.db import execute_query, get_db_connection, upsert_batch
+from etl.common.config import ETL_DIR, get_logger, get_settings
+from etl.common.db import execute, execute_query, replace_rows
+from etl.common.http import RateLimitedClient
 
 logger = get_logger(__name__)
 
-# Recognised payer name patterns -- matched against the URL (lowercase)
-PAYER_PATTERNS = [
-    (r"aetna",                          "Aetna"),
-    (r"anthem",                         "Anthem BCBS"),
-    (r"blue.?cross|bcbs|bluecross",     "Blue Cross Blue Shield"),
-    (r"blue.?shield",                   "Blue Shield of CA"),
-    (r"cigna",                          "Cigna"),
-    (r"humana",                         "Humana"),
-    (r"kaiser|kp\.org",                 "Kaiser Permanente"),
-    (r"molina",                         "Molina Healthcare"),
-    (r"united.?health|uhc\b",           "UnitedHealthcare"),
-    (r"centene",                        "Centene"),
-    (r"health.?net",                    "Health Net"),
-    (r"magellan",                       "Magellan Health"),
-    (r"oscar",                          "Oscar Health"),
-    (r"medi.?cal|medicaid",             "Medi-Cal"),
-    (r"medicare",                       "Medicare"),
-    (r"tricare",                        "TRICARE"),
-    (r"cash|self.?pay|self-pay|chargemaster", "Cash Price"),
-]
-_PAYER_RE = [(re.compile(p, re.I), name) for p, name in PAYER_PATTERNS]
+SOURCE = "mrf_parsed"
+CASH_PAYER = "CASH"
+PAYER_ALIASES_FILE = ETL_DIR / "reference" / "payer_aliases.csv"
 
-# Conflict columns matching the unique index created by migration 006
-PRICES_CONFLICT_COLS = ["cpt", "ccn", "payer", "plan_name", "billing_class"]
-PRICES_UPDATE_COLS = [
-    "cash_price", "negotiated_rate", "negotiated_min", "negotiated_max",
-    "source", "measure_date",
-]
+CODE_TYPES = {"CPT", "HCPCS"}
+SETTINGS = {"inpatient", "outpatient", "both"}
+BILLING_CLASSES = {"facility", "professional", "both"}
+# A hospital's file lists what the hospital charges; without a billing class that is the facility fee.
+DEFAULT_BILLING_CLASS = "facility"
+
+csv.field_size_limit(16 * 1024 * 1024)
 
 
 # ---------------------------------------------------------------------------
 # Database helpers
 # ---------------------------------------------------------------------------
 
-def get_parseable_links(state: str = "CA", limit: int | None = None) -> list[dict]:
-    """
-    Return active MRF links that have a known CCN.
-
-    Only links with a non-null CCN can be loaded into the prices table
-    (FK constraint on prices.ccn -> hospitals.ccn).
-    """
-    limit_clause = f"LIMIT {limit}" if limit else ""
-    return execute_query(
-        f"""
-        SELECT id, ccn, hospital_name, machine_readable_url, file_format, url_status
+def get_links_by_hospital(state: str = "CA") -> dict[str, list[dict]]:
+    """Price-file links grouped by CCN (a hospital can publish one file per campus)."""
+    rows = execute_query(
+        """
+        SELECT id, ccn, hospital_name, machine_readable_url
         FROM hospital_mrf_links
-        WHERE ccn IS NOT NULL
-          AND state = %s
-          AND url_status IN ('active', 'unknown')
-        ORDER BY url_status = 'active' DESC, hospital_name
-        {limit_clause}
+        WHERE ccn IS NOT NULL AND state = %s
+        ORDER BY ccn, machine_readable_url
         """,
         (state,),
     )
+    by_ccn: dict[str, list[dict]] = {}
+    for row in rows:
+        by_ccn.setdefault(row["ccn"], []).append(row)
+    return by_ccn
 
 
-def get_target_cpts() -> set[str]:
-    """Return CPT codes present in the cpt_codes table."""
-    rows = execute_query("SELECT code FROM cpt_codes")
+def get_target_cpts(limit: int | None = None) -> set[str]:
+    """
+    CPT codes to keep prices for.
+
+    Every hospital prices thousands of codes for dozens of payers; keeping all of
+    them is what makes the prices table large. With a limit, the codes are those
+    in the curated device map plus the `limit` surgical and imaging codes that
+    the state's surgeons bill most (by Medicare volume). 0 keeps every code.
+    """
+    if limit is None:
+        limit = get_settings().mrf_cpt_limit
+    if limit <= 0:
+        return {r["code"] for r in execute_query("SELECT code FROM cpt_codes")}
+
+    rows = execute_query(
+        """
+        SELECT cpt AS code FROM procedure_product_codes
+        UNION
+        (SELECT v.cpt FROM provider_procedure_volumes v
+         JOIN cpt_codes c ON c.code = v.cpt
+         WHERE c.is_surgical OR c.category = 'scans'
+         GROUP BY v.cpt
+         ORDER BY sum(v.total_services) DESC
+         LIMIT %s)
+        """,
+        (limit,),
+    )
     return {r["code"] for r in rows}
 
 
-def get_valid_ccns() -> set[str]:
-    """Return CCNs present in the hospitals table."""
-    rows = execute_query("SELECT ccn FROM hospitals")
-    return {r["ccn"] for r in rows}
-
-
-def _set_link_status(link_id: str, status: str) -> None:
-    """Update url_status and last_checked for a hospital_mrf_links row."""
-    conn = get_db_connection()
-    try:
-        with conn.cursor() as cur:
-            cur.execute(
-                """
-                UPDATE hospital_mrf_links
-                SET url_status = %s, last_checked = %s
-                WHERE id = %s
-                """,
-                (status, datetime.now(timezone.utc), link_id),
-            )
-        conn.commit()
-    finally:
-        conn.close()
-
-
-# ---------------------------------------------------------------------------
-# URL / payer helpers
-# ---------------------------------------------------------------------------
-
-def extract_payer_from_url(url: str) -> str:
-    """
-    Extract a human-readable payer name from a MRF URL.
-
-    Tries known payer patterns against the full URL. Falls back to the
-    second-level domain name if nothing matches (e.g. 'community-health').
-    """
-    for pattern, name in _PAYER_RE:
-        if pattern.search(url):
-            return name
-
-    try:
-        host = urlparse(url).hostname or ""
-        # Strip www. and TLD, return the meaningful part
-        parts = host.replace("www.", "").split(".")
-        return parts[0].replace("-", " ").title() if parts else "Unknown Payer"
-    except Exception:
-        return "Unknown Payer"
-
-
-# ---------------------------------------------------------------------------
-# Download helpers
-# ---------------------------------------------------------------------------
-
-def _download_bytes(url: str, timeout: int = 120) -> bytes | None:
-    """
-    Download a URL, enforcing MAX_FILE_BYTES.
-
-    Returns raw bytes, or None if the file is too large, the request fails,
-    or the response is not 2xx.
-    """
-    try:
-        with httpx.stream(
-            "GET", url,
-            timeout=timeout,
-            follow_redirects=True,
-            headers={"User-Agent": "SurgiCAL-ETL/0.1 (Healthcare price transparency research)"},
-        ) as response:
-            if response.status_code != 200:
-                logger.warning(f"HTTP {response.status_code} for {url}")
-                return None
-
-            chunks: list[bytes] = []
-            total = 0
-            for chunk in response.iter_bytes(chunk_size=512 * 1024):
-                total += len(chunk)
-                chunks.append(chunk)
-
-            logger.info(f"Downloaded {total / 1024 / 1024:.1f} MB from {url[:80]}")
-            return b"".join(chunks)
-
-    except httpx.TimeoutException:
-        logger.warning(f"Timeout downloading {url}")
-        return None
-    except Exception as e:
-        logger.warning(f"Download failed for {url}: {e}")
-        return None
-
-
-def _decompress(data: bytes, url: str) -> bytes | None:
-    """Gunzip if the URL or Content-Encoding suggests gzip compression."""
-    if url.endswith(".gz") or url.endswith(".gzip"):
-        try:
-            return gzip.decompress(data)
-        except Exception as e:
-            logger.warning(f"Failed to decompress {url}: {e}")
-            return None
-    return data
-
-
-# ---------------------------------------------------------------------------
-# JSON structure detection
-# ---------------------------------------------------------------------------
-
-def _detect_structure(data: bytes) -> str:
-    """
-    Return 'in_network', 'toc', or 'unknown' by peeking at the first 64 KB.
-
-    TOC files have a 'reporting_structure' or 'in_network_files' key at the
-    top level. In-network files have an 'in_network' array.
-    """
-    preview = data[:65536].decode("utf-8", errors="replace")
-    if "reporting_structure" in preview or (
-        "in_network_files" in preview and "in_network" not in preview[:512]
-    ):
-        return "toc"
-    if '"in_network"' in preview:
-        return "in_network"
-    return "unknown"
-
-
-# ---------------------------------------------------------------------------
-# CSV detection and parsing (CMS tall and wide formats)
-#
-# CMS CSV file layout (v3.0.0):
-#   Row 0 : General field names  (hospital_name, last_updated_on, version, ...)
-#   Row 1 : General field values
-#   Row N : Standard charge column headers (description, code | 1, payer_name, ...)
-#   Row N+1+: Charge data rows
-#
-# Tall format: one row per code × payer combination.
-#   Distinguishing column: payer_name
-#
-# Wide format: one row per code; payer/plan baked into column headers.
-#   Distinguishing column pattern: standard_charge | <payer> | <plan> | negotiated_dollar
-# ---------------------------------------------------------------------------
-
-def _is_csv(data: bytes, url: str) -> bool:
-    """Return True if data is a CSV MRF (not JSON)."""
-    if url.lower().split("?")[0].endswith(".csv"):
-        return True
-    stripped = data.lstrip()
-    return not (stripped.startswith(b"{") or stripped.startswith(b"["))
-
-
-def _read_csv_metadata(data: bytes) -> pd.DataFrame | None:
-    """
-    Parse just the first 2 rows of a CSV into a DataFrame.
-    Used exclusively to extract hospital-level metadata fields.
-    """
-    for encoding in ("utf-8-sig", "utf-8", "latin-1", "cp1252"):
-        try:
-            df = pd.read_csv(
-                io.BytesIO(data),
-                header=None,
-                dtype=str,
-                encoding=encoding,
-                nrows=2,
-                skip_blank_lines=True,
-            )
-            if not df.empty:
-                return df
-        except Exception:
-            continue
-    return None
-
-
-def _extract_csv_metadata(df: pd.DataFrame) -> dict:
-    """
-    Pull hospital metadata from the CMS general data element rows (rows 0–1).
-
-    Row 0 contains field names (hospital_name, last_updated_on, version, ...),
-    row 1 contains the corresponding values.
-    """
-    if len(df) < 2:
-        return {}
-    headers = [str(v).strip().lower() for v in df.iloc[0]]
-    values  = [str(v).strip()         for v in df.iloc[1]]
-    meta: dict = {}
-    for key, val in zip(headers, values):
-        if not val or val.lower() in ("nan", "none"):
-            continue
-        if "hospital_name" in key:
-            meta["hospital_name"] = val
-        elif "last_updated_on" in key or "mrf_date" in key:
-            meta["measure_date"] = val
-        elif key == "version":
-            meta["version"] = val
-    return meta
-
-
-_HEADER_CODE_EXACT = {"cpt", "hcpcs", "ndc", "procedure", "rev", "revenue", "cdt"}
-_HEADER_DESC_SUBS  = {"description", "charge_name", "item_name"}
-_HEADER_DESC_EXACT = {"desc", "service", "item"}
-
-
-def _find_charge_header_offset(data: bytes) -> int | None:
-    """
-    Scan the first 20 newline-delimited lines of raw CSV bytes to find the
-    charge data header row.
-
-    Returns the byte offset of that line, or None if not found.
-    A fallback offset is returned when only a description-like header is found
-    (no code column), so CDM files without explicit code columns still parse.
-    """
-    offset = 0
-    fallback_offset: int | None = None
-
-    for _ in range(20):
-        if offset >= len(data):
-            break
-
-        nl = data.find(b"\n", offset)
-        end = nl + 1 if nl != -1 else len(data)
-        line = data[offset:end].decode("utf-8-sig", errors="replace").rstrip("\r\n")
-
-        # Simple comma split — good enough for header rows (no embedded newlines)
-        cells = [c.strip().lower() for c in line.split(",")]
-        has_desc = any(
-            any(sub in c for sub in _HEADER_DESC_SUBS) or c in _HEADER_DESC_EXACT
-            for c in cells
-        )
-        has_code = any(
-            "code" in c or c in _HEADER_CODE_EXACT
-            for c in cells
-        )
-
-        if has_desc and has_code:
-            return offset
-        if has_desc and fallback_offset is None:
-            fallback_offset = offset
-
-        offset = end
-
-    return fallback_offset
-
-
-_PIPE_RE = re.compile(r"\s*\|\s*")
-
-
-def _col(df: pd.DataFrame, *candidates: str) -> str | None:
-    """
-    Return the first matching column name (case-insensitive), or None.
-
-    Normalises whitespace around pipe characters so that
-    'standard_charge | gross' and 'standard_charge|gross' are equivalent.
-    """
-    cols_map = {_PIPE_RE.sub("|", c.lower()): c for c in df.columns}
-    for cand in candidates:
-        found = cols_map.get(_PIPE_RE.sub("|", cand.lower()))
-        if found is not None:
-            return found
-    return None
-
-
-def _find_code_cols(df: pd.DataFrame) -> list[tuple[str, str | None]]:
-    """
-    Find all (code_col, type_col_or_None) pairs.
-
-    CMS spec names them: code | 1, code | 1 | type, code | 2, code | 2 | type, ...
-    """
-    all_cols = list(df.columns)
-    lower_map = {c.lower(): c for c in all_cols}
-    pairs: list[tuple[str, str | None]] = []
-    for col in all_cols:
-        if re.match(r"code\s*\|\s*\d+$", col.strip().lower()):
-            # Support both 'code | 1 | type' (spaced) and 'code|1|type' (no spaces)
-            base = _PIPE_RE.sub("|", col.strip().lower())
-            type_col = lower_map.get(base + "|type") or lower_map.get(col.strip().lower() + " | type")
-            pairs.append((col, type_col))
-    return pairs
-
-
-def _detect_csv_format(charge_df: pd.DataFrame) -> str:
-    """
-    Return 'tall' or 'wide' for the charge-section DataFrame.
-
-    Tall: has a 'payer_name' column (one row per payer).
-    Wide: has columns like 'standard_charge | PayerX | PlanY | negotiated_dollar'.
-    Defaults to 'tall' when ambiguous.
-    """
-    cols_lower = [_PIPE_RE.sub("|", c.lower()) for c in charge_df.columns]
-    if "payer_name" in cols_lower or "payer" in cols_lower or "insurance_name" in cols_lower:
-        return "tall"
-    if any(
-        c.startswith("standard_charge|") and c.count("|") >= 3
-        for c in cols_lower
-    ):
-        return "wide"
-    return "tall"
-
-
-def _to_float(val) -> float | None:
-    """Convert a cell value to float; return None on any failure."""
-    if val is None:
-        return None
-    s = str(val).replace(",", "").strip()
-    if s.lower() in ("", "nan", "none", "n/a"):
-        return None
-    try:
-        return float(s)
-    except (ValueError, TypeError):
-        return None
-
-
-def _resolve_cpt(
-    row: pd.Series,
-    code_cols: list[tuple[str, str | None]],
-    target_cpts: set[str],
-) -> str | None:
-    """
-    Return the first CPT/HCPCS code in this row present in target_cpts.
-    Tries both stripped-leading-zeros and original padded forms.
-    Skips code columns whose type is set to something other than CPT/HCPCS.
-    """
-    for code_col, type_col in code_cols:
-        if not pd.notna(row[code_col]):
-            continue
-        raw = str(row[code_col]).strip()
-        if not raw or raw.lower() in ("nan", "none"):
-            continue
-        if type_col and pd.notna(row[type_col]):
-            code_type = str(row[type_col]).strip().upper()
-            if code_type and code_type not in ("CPT", "HCPCS"):
-                continue
-        stripped = raw.lstrip("0") or raw
-        if stripped in target_cpts:
-            return stripped
-        if raw in target_cpts:
-            return raw
-    return None
-
-
-def _aggregate_rate_groups(
-    rate_groups: dict[tuple, dict],
-    measure_date: str | None,
-) -> list[dict]:
-    """Convert aggregated rate groups into price records ready for upsert."""
-    records: list[dict] = []
-    for (cpt, ccn_, payer_, plan_, b_class), grp in rate_groups.items():
-        rates = sorted(grp["rates"])
-        if not rates and grp["cash"] is None:
-            continue
-        median = rates[len(rates) // 2] if rates else None
-        records.append({
-            "cpt":             cpt,
-            "ccn":             ccn_,
-            "payer":           payer_,
-            "plan_name":       plan_,
-            "billing_class":   b_class,
-            "negotiated_rate": round(median, 2) if median is not None else None,
-            "negotiated_min":  round(rates[0], 2) if rates else (
-                               round(grp["min"], 2) if grp["min"] is not None else None),
-            "negotiated_max":  round(rates[-1], 2) if rates else (
-                               round(grp["max"], 2) if grp["max"] is not None else None),
-            "cash_price":      round(grp["cash"], 2) if grp["cash"] is not None else None,
-            "source":          "mrf_parsed",
-            "measure_date":    measure_date,
-        })
-    return records
-
-
-def _parse_csv_tall(
-    charge_df: pd.DataFrame,
-    ccn: str,
-    meta: dict,
-    target_cpts: set[str],
-) -> list[dict]:
-    """
-    Parse CMS tall CSV format: one row per code × payer combination.
-
-    Relevant columns (case-insensitive):
-      payer_name, plan_name, billing_class (optional)
-      standard_charge | gross
-      standard_charge | discounted_cash
-      standard_charge | negotiated_dollar
-      standard_charge | min, standard_charge | max
-
-    Multiple rows for the same (cpt, ccn, payer, plan, billing_class) are
-    collapsed into a single record with negotiated_min/max/rate(median).
-    """
-    payer_col  = _col(charge_df, "payer_name", "payer", "insurance_name", "insurer")
-    plan_col   = _col(charge_df, "plan_name", "plan", "insurance_plan")
-    bclass_col = _col(charge_df, "billing_class", "setting")
-    gross_col  = _col(charge_df, "standard_charge | gross", "gross_charge", "gross", "chargemaster_rate", "charge_amount")
-    cash_col   = _col(charge_df, "standard_charge | discounted_cash", "discounted_cash", "cash_price", "cash", "self_pay")
-    neg_col    = _col(charge_df, "standard_charge | negotiated_dollar", "negotiated_dollar", "negotiated_rate", "negotiated_charge", "negotiated")
-    min_col    = _col(charge_df, "standard_charge | min", "min_negotiated", "min_charge", "min")
-    max_col    = _col(charge_df, "standard_charge | max", "max_negotiated", "max_charge", "max")
-    code_cols  = _find_code_cols(charge_df)
-    # Fallback: CDM formats may use a single non-CMS-style code column
-    if not code_cols:
-        fallback = _col(charge_df, "cpt_code", "procedure_code", "hcpcs_code", "item_code", "charge_code", "code", "cpt", "hcpcs")
-        if fallback:
-            code_cols = [(fallback, None)]
-    measure_date = meta.get("measure_date")
-
-    rate_groups: dict[tuple, dict] = defaultdict(
-        lambda: {"rates": [], "min": None, "max": None, "cash": None}
+def _set_link_status(link_id: str, status: str, error: str | None = None, price_rows: int | None = None) -> None:
+    """Record the outcome of loading one hospital_mrf_links row."""
+    execute(
+        """
+        UPDATE hospital_mrf_links
+        SET url_status = %s, last_error = %s, price_rows = %s, last_checked = %s
+        WHERE id = %s
+        """,
+        (status, error[:500] if error else None, price_rows, datetime.now(UTC), link_id),
     )
 
-    for _, row in charge_df.iterrows():
-        cpt = _resolve_cpt(row, code_cols, target_cpts)
-        if not cpt:
-            continue
-
-        payer   = str(row[payer_col]).strip()         if payer_col  and pd.notna(row[payer_col])  else "Cash Price"
-        plan    = str(row[plan_col]).strip()           if plan_col   and pd.notna(row[plan_col])   else ""
-        b_class = str(row[bclass_col]).strip().lower() if bclass_col and pd.notna(row[bclass_col]) else ""
-        if b_class not in ("professional", "facility"):
-            b_class = ""
-
-        rate = _to_float(row[neg_col])  if neg_col  else None
-        cash = (_to_float(row[cash_col]) if cash_col else None) or (_to_float(row[gross_col]) if gross_col else None)
-        rmin = _to_float(row[min_col])  if min_col  else None
-        rmax = _to_float(row[max_col])  if max_col  else None
-
-        key = (cpt, ccn, payer, plan, b_class)
-        grp = rate_groups[key]
-        if rate is not None and rate > 0:
-            grp["rates"].append(rate)
-        if rmin is not None:
-            grp["min"] = min(rmin, grp["min"]) if grp["min"] is not None else rmin
-        if rmax is not None:
-            grp["max"] = max(rmax, grp["max"]) if grp["max"] is not None else rmax
-        if cash is not None:
-            grp["cash"] = cash
-
-    return _aggregate_rate_groups(rate_groups, measure_date)
-
-
-def _parse_csv_wide(
-    charge_df: pd.DataFrame,
-    ccn: str,
-    meta: dict,
-    target_cpts: set[str],
-) -> list[dict]:
-    """
-    Parse CMS wide CSV format: payer/plan encoded directly in column headers.
-
-    Payer-keyed negotiated dollar column pattern:
-      standard_charge | <payer_name> | <plan_name> | negotiated_dollar
-
-    Row-level columns (shared across all payers):
-      standard_charge | gross, standard_charge | discounted_cash
-      standard_charge | min,   standard_charge | max
-      billing_class (optional)
-    """
-    cash_col   = _col(charge_df, "standard_charge | discounted_cash", "discounted_cash", "cash_price", "cash")
-    gross_col  = _col(charge_df, "standard_charge | gross", "gross_charge", "gross", "chargemaster_rate")
-    min_col    = _col(charge_df, "standard_charge | min", "min_negotiated", "min_charge", "min")
-    max_col    = _col(charge_df, "standard_charge | max", "max_negotiated", "max_charge", "max")
-    bclass_col = _col(charge_df, "billing_class", "setting")
-    code_cols  = _find_code_cols(charge_df)
-    if not code_cols:
-        fallback = _col(charge_df, "cpt_code", "procedure_code", "hcpcs_code", "item_code", "charge_code", "code", "cpt", "hcpcs")
-        if fallback:
-            code_cols = [(fallback, None)]
-    measure_date = meta.get("measure_date")
-
-    # Map (payer_name, plan_name) -> negotiated_dollar column name
-    payer_neg_cols: dict[tuple[str, str], str] = {}
-    for col in charge_df.columns:
-        parts = [p.strip() for p in col.split("|")]
-        if (
-            len(parts) >= 4
-            and parts[0].lower() == "standard_charge"
-            and parts[-1].lower() == "negotiated_dollar"
-        ):
-            payer_neg_cols[(parts[1], parts[2])] = col
-
-    if not payer_neg_cols:
-        logger.warning("Wide CSV has no payer negotiated_dollar columns — nothing to parse")
-        return []
-
-    rate_groups: dict[tuple, dict] = defaultdict(
-        lambda: {"rates": [], "min": None, "max": None, "cash": None}
-    )
-
-    for _, row in charge_df.iterrows():
-        cpt = _resolve_cpt(row, code_cols, target_cpts)
-        if not cpt:
-            continue
-
-        b_class = str(row[bclass_col]).strip().lower() if bclass_col and pd.notna(row[bclass_col]) else ""
-        if b_class not in ("professional", "facility"):
-            b_class = ""
-
-        cash = (_to_float(row[cash_col]) if cash_col else None) or (_to_float(row[gross_col]) if gross_col else None)
-        rmin = _to_float(row[min_col]) if min_col else None
-        rmax = _to_float(row[max_col]) if max_col else None
-
-        for (payer, plan), neg_col in payer_neg_cols.items():
-            rate = _to_float(row[neg_col])
-            if rate is None or rate <= 0:
-                continue
-            key = (cpt, ccn, payer, plan, b_class)
-            grp = rate_groups[key]
-            grp["rates"].append(rate)
-            if rmin is not None:
-                grp["min"] = min(rmin, grp["min"]) if grp["min"] is not None else rmin
-            if rmax is not None:
-                grp["max"] = max(rmax, grp["max"]) if grp["max"] is not None else rmax
-            if cash is not None:
-                grp["cash"] = cash
-
-    return _aggregate_rate_groups(rate_groups, measure_date)
-
-
-def _log_csv_preview(data: bytes, url: str) -> None:
-    """Log the first 5 raw lines of the CSV bytes for diagnosis."""
-    try:
-        text = data[:4096].decode("utf-8-sig", errors="replace")
-        lines = text.splitlines()[:5]
-        preview = "\n".join(f"  line{i}: {line[:200]}" for i, line in enumerate(lines))
-        logger.warning(f"CSV preview (first lines) for {url[:80]}:\n{preview}")
-    except Exception:
-        pass
-
-
-def _parse_csv(data: bytes, ccn: str, url: str, target_cpts: set[str]) -> list[dict]:
-    """
-    Top-level CSV entry point.
-
-    Scans the raw bytes to locate the charge header row, then passes only
-    the charge section (header row + data rows) to pandas. This avoids the
-    column-count mismatch that occurs when pandas reads the full file with
-    header=None: the 9-column CMS metadata rows cause pandas to treat the
-    28-column charge rows as 'bad lines' and skip them silently.
-    """
-    # Extract hospital metadata from the first 2 rows only
-    meta: dict = {}
-    meta_df = _read_csv_metadata(data)
-    if meta_df is not None and not meta_df.empty:
-        meta = _extract_csv_metadata(meta_df)
-
-    # Find byte offset of the charge header line via raw line scan
-    header_offset = _find_charge_header_offset(data)
-    if header_offset is None:
-        _log_csv_preview(data, url)
-        logger.warning(f"Could not locate charge header row in CSV: {url}")
-        return []
-
-    # Parse only the charge section (header + data rows)
-    charge_bytes = data[header_offset:]
-    charge_df: pd.DataFrame | None = None
-    for encoding in ("utf-8-sig", "utf-8", "latin-1", "cp1252"):
-        try:
-            charge_df = pd.read_csv(
-                io.BytesIO(charge_bytes),
-                header=0,
-                dtype=str,
-                encoding=encoding,
-                on_bad_lines="skip",
-                skip_blank_lines=True,
-            )
-            if charge_df is not None and not charge_df.empty:
-                break
-        except Exception:
-            charge_df = None
-            continue
-
-    if charge_df is None or charge_df.empty:
-        logger.warning(f"Could not parse charge section of CSV: {url}")
-        return []
-
-    charge_df.columns = [str(c).strip() for c in charge_df.columns]
-    charge_df = charge_df.dropna(how="all").reset_index(drop=True)
-
-    if charge_df.empty:
-        logger.warning(f"No charge data rows in CSV: {url}")
-        return []
-
-    fmt = _detect_csv_format(charge_df)
-    logger.info(f"CSV format: {fmt} | {len(charge_df)} rows | {url[:80]}")
-
-    if fmt == "tall":
-        return _parse_csv_tall(charge_df, ccn, meta, target_cpts)
-    else:
-        return _parse_csv_wide(charge_df, ccn, meta, target_cpts)
-
 
 # ---------------------------------------------------------------------------
-# TOC parser
+# Payer names
 # ---------------------------------------------------------------------------
 
-def _extract_toc_links(data: bytes) -> list[dict]:
-    """
-    Parse a Table-of-Contents MRF JSON and return a list of
-    {'location': url, 'plan_name': str} dicts for in_network_files entries.
+def load_payer_aliases() -> list[tuple[re.Pattern, str]]:
+    """(pattern, payer) pairs from payer_aliases.csv, in priority order."""
+    with open(PAYER_ALIASES_FILE, newline="") as fh:
+        rows = sorted(csv.DictReader(fh), key=lambda r: int(r["priority"]))
+    return [(re.compile(r["pattern"], re.I), r["payer"]) for r in rows]
 
-    Handles two common TOC formats:
-      Format A (hospital):  top-level 'in_network_files' list
-      Format B (insurer):   nested under 'reporting_structure[].in_network_files'
-    """
-    try:
-        doc = json.loads(data)
-    except json.JSONDecodeError as e:
-        logger.warning(f"Failed to parse TOC JSON: {e}")
-        return []
 
-    links: list[dict] = []
-
-    def _collect(in_network_files: list, plan_names: list[str]) -> None:
-        plan = ", ".join(plan_names) if plan_names else ""
-        for entry in in_network_files:
-            loc = entry.get("location", "")
-            if loc:
-                links.append({"location": loc, "plan_name": plan})
-
-    # Format A: top-level in_network_files
-    if "in_network_files" in doc:
-        plan_names = [
-            p.get("plan_name", "")
-            for p in doc.get("reporting_plans", [])
-            if p.get("plan_name")
+def sync_payer_aliases() -> None:
+    """Copy payer_aliases.csv into the payer_aliases table, so the rules in use are queryable."""
+    with open(PAYER_ALIASES_FILE, newline="") as fh:
+        rows = [
+            {"pattern": r["pattern"], "payer": r["payer"], "priority": int(r["priority"])}
+            for r in csv.DictReader(fh)
         ]
-        _collect(doc["in_network_files"], plan_names)
+    replace_rows("payer_aliases", rows, "TRUE", ())
 
-    # Format B: reporting_structure[].in_network_files
-    elif "reporting_structure" in doc:
-        for section in doc.get("reporting_structure", []):
-            plan_names = [
-                p.get("plan_name", "")
-                for p in section.get("reporting_plans", [])
-                if p.get("plan_name")
-            ]
-            _collect(section.get("in_network_files", []), plan_names)
 
-    return links
+_ALL_PLANS_RE = re.compile(r"\s*[-|:(]?\s*all (other )?plans\)?$", re.I)
+
+
+class PayerNames:
+    """Maps payer names as hospitals write them to one name per insurer."""
+
+    def __init__(self, aliases: list[tuple[re.Pattern, str]]):
+        self._aliases = aliases
+        self._cache: dict[str, str] = {}
+
+    def normalize(self, raw: str) -> str:
+        name = self._cache.get(raw)
+        if name is None:
+            # "Interplan-All Plans" and "Interplan" are one payer.
+            cleaned = _ALL_PLANS_RE.sub("", " ".join(raw.split()))
+            name = next((payer for pattern, payer in self._aliases if pattern.search(cleaned)), None)
+            if name is None:
+                # No alias: keep the hospital's name, in title case if it shouts or whispers.
+                name = cleaned.title() if cleaned.isupper() or cleaned.islower() else cleaned
+            self._cache[raw] = name = name[:200]
+        return name
 
 
 # ---------------------------------------------------------------------------
-# In-network JSON streaming parser
+# Value helpers
 # ---------------------------------------------------------------------------
 
-def _parse_in_network_stream(
-    stream: io.BytesIO,
-    ccn: str,
-    payer: str,
-    plan_name: str,
-    target_cpts: set[str],
-) -> list[dict]:
+def to_amount(val) -> float | None:
+    """A positive dollar amount from a cell or JSON value; None for anything else."""
+    if val is None or isinstance(val, bool):
+        return None
+    if isinstance(val, (int, float)):
+        amount = float(val)
+    else:
+        s = str(val).replace(",", "").replace("$", "").strip()
+        if not s:
+            return None
+        try:
+            amount = float(s)
+        except ValueError:
+            return None
+    # NaN fails both comparisons; a price of zero or less is a placeholder.
+    return amount if 0 < amount < 1e9 else None
+
+
+def parse_measure_date(raw) -> date | None:
+    """The file's last_updated_on as a date. Hospitals write it many ways; None if unreadable."""
+    s = str(raw or "").strip()
+    for fmt in ("%Y-%m-%d", "%m/%d/%Y", "%m-%d-%Y", "%Y/%m/%d", "%m/%d/%y", "%Y%m%d"):
+        try:
+            parsed = datetime.strptime(s[:10] if fmt == "%Y-%m-%d" else s, fmt).date()
+        except ValueError:
+            continue
+        return parsed if 2015 <= parsed.year <= date.today().year + 1 else None
+    return None
+
+
+def match_code(code, code_type, target_cpts: set[str]) -> str | None:
+    """The code if it is a CPT/HCPCS code we keep, else None."""
+    if code is None or str(code_type or "").strip().upper() not in CODE_TYPES:
+        return None
+    code = str(code).strip().upper()
+    return code if code in target_cpts else None
+
+
+def _choice(raw, allowed: set[str], default: str) -> str:
+    value = str(raw or "").strip().lower()
+    return value if value in allowed else default
+
+
+# ---------------------------------------------------------------------------
+# Collecting charges into price records
+# ---------------------------------------------------------------------------
+
+class PriceBook:
     """
-    Stream-parse a CMS in-network MRF JSON using ijson.
+    Collects the charges read from one hospital's files and turns them into
+    prices rows.
 
-    Expected structure:
+    A file can list one procedure many times (per description, per plan), so
+    values are gathered per (code, setting, billing class) and per payer, and
+    summarised once at the end: the median for rates, cash and gross prices, and
+    the extremes for the minimum and maximum.
+    """
+
+    def __init__(self, ccn: str, payers: PayerNames, plan_detail: bool):
+        self.ccn = ccn
+        self._payers = payers
+        self._plan_detail = plan_detail
+        self._items: dict[tuple[str, str, str], dict[str, list[float]]] = {}
+        self._rates: dict[tuple[str, str, str, str, str], list[float]] = {}
+        self.measure_date: date | None = None
+
+    def add_item(self, cpt: str, setting: str, billing_class: str, *, gross=None, cash=None, low=None, high=None):
+        """Charges that apply to every payer: gross, discounted cash, and the min/max negotiated."""
+        item = self._items.setdefault((cpt, setting, billing_class), {"gross": [], "cash": [], "low": [], "high": []})
+        for key, value in (("gross", gross), ("cash", cash), ("low", low), ("high", high)):
+            amount = to_amount(value)
+            if amount is not None:
+                item[key].append(amount)
+
+    def add_rate(self, cpt: str, setting: str, billing_class: str, payer, plan, rate):
+        """One payer's negotiated rate."""
+        amount = to_amount(rate)
+        payer = " ".join(str(payer or "").split())
+        if amount is None or not payer:
+            return
+        plan_name = " ".join(str(plan or "").split())[:200] if self._plan_detail else ""
+        self._rates.setdefault(
+            (cpt, setting, billing_class, self._payers.normalize(payer), plan_name), []
+        ).append(amount)
+
+    def records(self) -> list[dict]:
+        """prices rows: one per payer (and plan, with plan detail), plus a CASH row per item."""
+        def item_values(key: tuple[str, str, str]) -> dict:
+            item = self._items.get(key, {})
+            return {
+                "cash_price": round(statistics.median(item["cash"]), 2) if item.get("cash") else None,
+                "gross_charge": round(statistics.median(item["gross"]), 2) if item.get("gross") else None,
+                "negotiated_min": round(min(item["low"]), 2) if item.get("low") else None,
+                "negotiated_max": round(max(item["high"]), 2) if item.get("high") else None,
+            }
+
+        def row(key: tuple[str, str, str], payer: str, plan: str, values: dict) -> dict:
+            cpt, setting, billing_class = key
+            return {
+                "cpt": cpt, "ccn": self.ccn, "payer": payer, "plan_name": plan,
+                "billing_class": billing_class, "setting": setting,
+                **values, "source": SOURCE, "measure_date": self.measure_date,
+            }
+
+        # A hospital that lists self-pay as if it were a payer: that is the cash price.
+        for (cpt, setting, billing_class, payer, _), rates in self._rates.items():
+            if payer == CASH_PAYER:
+                self.add_item(cpt, setting, billing_class, cash=statistics.median(rates))
+
+        records = []
+        for (cpt, setting, billing_class, payer, plan), rates in self._rates.items():
+            if payer == CASH_PAYER:
+                continue
+            key = (cpt, setting, billing_class)
+            values = item_values(key)
+            values["negotiated_rate"] = round(statistics.median(rates), 2)
+            # Without the file's own min/max, the spread of this payer's rates.
+            if values["negotiated_min"] is None:
+                values["negotiated_min"] = round(min(rates), 2)
+            if values["negotiated_max"] is None:
+                values["negotiated_max"] = round(max(rates), 2)
+            records.append(row(key, payer, plan, values))
+
+        for key in self._items:
+            values = item_values(key)
+            if values["cash_price"] is not None or values["gross_charge"] is not None:
+                records.append(row(key, CASH_PAYER, "", {**values, "negotiated_rate": None}))
+        return records
+
+
+# ---------------------------------------------------------------------------
+# Opening downloaded files
+# ---------------------------------------------------------------------------
+
+@contextmanager
+def open_price_file(path: Path) -> Iterator[tuple[io.BufferedIOBase, str]]:
+    """
+    Open a downloaded price file as (binary stream, 'json' | 'csv'), looking at
+    its content, not its name: unwraps gzip and zip (the largest member).
+    """
+    with open(path, "rb") as fh:
+        magic = fh.read(4)
+
+    if magic[:2] == b"PK":
+        with zipfile.ZipFile(path) as zf:
+            members = [m for m in zf.infolist() if not m.is_dir()]
+            if not members:
+                raise ValueError("zip archive is empty")
+            with zf.open(max(members, key=lambda m: m.file_size)) as stream:
+                yield _prepare(io.BufferedReader(stream, buffer_size=_BUFFER_SIZE))
+        return
+
+    opener = gzip.open if magic[:2] == b"\x1f\x8b" else io.FileIO
+    with opener(path, "rb") as stream:
+        yield _prepare(io.BufferedReader(stream, buffer_size=_BUFFER_SIZE))
+
+
+# Large enough that peek() sees the general fields at the top of a JSON file.
+_BUFFER_SIZE = 64 * 1024
+
+_BOM = b"\xef\xbb\xbf"
+
+
+def _prepare(buffered: io.BufferedReader) -> tuple[io.BufferedReader, str]:
+    """Sniff the format and skip a UTF-8 byte-order mark, which the JSON parser rejects."""
+    head = buffered.peek(2048)
+    if head.startswith(_BOM):
+        buffered.read(len(_BOM))
+        head = head[len(_BOM):]
+    return buffered, _sniff_format(head)
+
+
+def _sniff_format(head: bytes) -> str:
+    return "json" if head.lstrip(b" \t\r\n")[:1] in (b"{", b"[") else "csv"
+
+
+# ---------------------------------------------------------------------------
+# JSON (standard_charge_information)
+# ---------------------------------------------------------------------------
+
+_JSON_DATE_RE = re.compile(rb'"last_updated_on"\s*:\s*"([^"]*)"')
+
+
+def parse_json(stream: io.BufferedIOBase, book: PriceBook, target_cpts: set[str]) -> int:
+    """
+    Stream-parse the hospital JSON template:
+
     {
-      "in_network": [
+      "hospital_name": ..., "last_updated_on": "2026-01-01", "version": "3.0.0",
+      "standard_charge_information": [
         {
-          "billing_code_type": "CPT",
-          "billing_code": "27447",
-          "negotiated_rates": [
+          "description": ...,
+          "code_information": [{"code": "27447", "type": "CPT"}],
+          "standard_charges": [
             {
-              "negotiated_prices": [
-                {
-                  "negotiated_type": "negotiated",
-                  "negotiated_rate": 15000.00,
-                  "billing_class": "facility"
-                }
+              "setting": "inpatient", "billing_class": "facility",
+              "gross_charge": 90000, "discounted_cash": 45000, "minimum": 18000, "maximum": 61000,
+              "payers_information": [
+                {"payer_name": "Aetna", "plan_name": "PPO", "standard_charge_dollar": 25000,
+                 "median_amount": ...}
               ]
             }
           ]
@@ -769,219 +373,282 @@ def _parse_in_network_stream(
       ]
     }
 
-    Aggregates multiple rate entries for the same
-    (cpt, ccn, payer, plan_name, billing_class) into a single record with
-    negotiated_min / negotiated_max / negotiated_rate (median).
-
-    Returns a list of price dicts ready for upsert_batch().
+    Returns the number of items read (all codes), to tell an empty file from one
+    that simply has none of our codes.
     """
-    # key -> list of rates
-    rate_groups: dict[tuple, list[float]] = defaultdict(list)
+    match = _JSON_DATE_RE.search(stream.peek(_BUFFER_SIZE))
+    if match and book.measure_date is None:
+        book.measure_date = parse_measure_date(match.group(1).decode("utf-8", "replace"))
 
-    try:
-        for item in ijson.items(stream, "in_network.item"):
-            code_type = (item.get("billing_code_type") or "").upper()
-            if code_type not in ("CPT", "HCPCS"):
-                continue
-
-            cpt_code = str(item.get("billing_code") or "").strip().lstrip("0") or ""
-            # CMS sometimes zero-pads; our cpt_codes table uses plain codes
-            if cpt_code not in target_cpts:
-                # Also try zero-padded form
-                padded = str(item.get("billing_code") or "").strip()
-                if padded not in target_cpts:
-                    continue
-                cpt_code = padded
-
-            for rate_group in item.get("negotiated_rates") or []:
-                for price in rate_group.get("negotiated_prices") or []:
-                    raw_rate = price.get("negotiated_rate")
-                    if raw_rate is None:
-                        continue
-                    try:
-                        rate = float(raw_rate)
-                    except (ValueError, TypeError):
-                        continue
-                    if rate <= 0:
-                        continue
-
-                    b_class = (price.get("billing_class") or "").strip().lower()
-                    if b_class not in ("professional", "facility"):
-                        b_class = ""
-
-                    key = (cpt_code, ccn, payer, plan_name, b_class)
-                    rate_groups[key].append(rate)
-
-    except Exception as e:
-        logger.warning(f"Error during ijson streaming: {e}")
-
-    # Aggregate into one record per key
-    records: list[dict] = []
-    for (cpt_code, ccn_, payer_, plan_name_, b_class), rates in rate_groups.items():
-        rates_sorted = sorted(rates)
-        n = len(rates_sorted)
-        median_rate = rates_sorted[n // 2]
-
-        records.append({
-            "cpt":             cpt_code,
-            "ccn":             ccn_,
-            "payer":           payer_,
-            "plan_name":       plan_name_,
-            "billing_class":   b_class,
-            "negotiated_rate": round(median_rate, 2),
-            "negotiated_min":  round(rates_sorted[0], 2),
-            "negotiated_max":  round(rates_sorted[-1], 2),
-            "cash_price":      None,
-            "source":          "mrf_parsed",
-            "measure_date":    None,
-        })
-
-    return records
-
-
-# ---------------------------------------------------------------------------
-# Per-link processing
-# ---------------------------------------------------------------------------
-
-def _process_url(
-    url: str,
-    ccn: str,
-    plan_name: str,
-    target_cpts: set[str],
-    valid_ccns: set[str],
-) -> list[dict]:
-    """
-    Download one MRF URL and return price records.
-
-    Returns an empty list on any failure (errors are logged, not raised).
-    """
-    if ccn not in valid_ccns:
-        logger.debug(f"CCN {ccn} not in hospitals table, skipping {url}")
-        return []
-
-    payer = extract_payer_from_url(url)
-    data = _download_bytes(url)
-    if data is None:
-        return []
-
-    data = _decompress(data, url)
-    if data is None:
-        return []
-
-    # CSV must be checked before JSON structure detection
-    if _is_csv(data, url):
-        return _parse_csv(data, ccn, url, target_cpts)
-
-    structure = _detect_structure(data)
-
-    if structure == "in_network":
-        return _parse_in_network_stream(
-            io.BytesIO(data), ccn, payer, plan_name, target_cpts
+    items = 0
+    for item in ijson.items(stream, "standard_charge_information.item", use_float=True):
+        items += 1
+        cpt = next(
+            (c for c in (match_code(ci.get("code"), ci.get("type"), target_cpts)
+                         for ci in item.get("code_information") or [] if isinstance(ci, dict)) if c),
+            None,
         )
-
-    if structure == "toc":
-        toc_links = _extract_toc_links(data)
-        records: list[dict] = []
-        for entry in toc_links[:20]:  # cap at 20 sub-links per TOC
-            sub_url = entry["location"]
-            sub_plan = entry.get("plan_name") or plan_name or extract_payer_from_url(sub_url)
-            logger.info(f"  Following TOC link: {sub_url[:80]}")
-            sub_data = _download_bytes(sub_url)
-            if sub_data is None:
+        if cpt is None:
+            continue
+        for charge in item.get("standard_charges") or []:
+            # A modifier changes the price (bilateral, assistant surgeon...).
+            if charge.get("modifier_code") or charge.get("modifiers"):
                 continue
-            sub_data = _decompress(sub_data, sub_url)
-            if sub_data is None:
-                continue
-            if _detect_structure(sub_data) == "in_network":
-                records.extend(
-                    _parse_in_network_stream(
-                        io.BytesIO(sub_data), ccn,
-                        extract_payer_from_url(sub_url),
-                        sub_plan, target_cpts,
-                    )
+            setting = _choice(charge.get("setting"), SETTINGS, "")
+            billing_class = _choice(charge.get("billing_class"), BILLING_CLASSES, DEFAULT_BILLING_CLASS)
+            book.add_item(
+                cpt, setting, billing_class,
+                gross=charge.get("gross_charge"), cash=charge.get("discounted_cash"),
+                low=charge.get("minimum"), high=charge.get("maximum"),
+            )
+            for payer in charge.get("payers_information") or []:
+                # A dollar rate if the contract has one; otherwise the hospital's
+                # median allowed amount (v3) or estimate (v2) for a percentage or formula.
+                rate = (
+                    to_amount(payer.get("standard_charge_dollar"))
+                    or to_amount(payer.get("median_amount"))
+                    or to_amount(payer.get("estimated_amount"))
                 )
-        return records
-
-    logger.debug(f"Unknown MRF structure at {url}, skipping")
-    return []
+                book.add_rate(cpt, setting, billing_class, payer.get("payer_name"), payer.get("plan_name"), rate)
+    return items
 
 
-def _process_link(
-    link: dict,
+# ---------------------------------------------------------------------------
+# CSV (tall and wide)
+#
+# Layout of the CMS template:
+#   Row 1 : general field names  (hospital_name, last_updated_on, version, ...)
+#   Row 2 : general field values
+#   Row 3 : charge column headers (description, code|1, code|1|type, setting, ...)
+#   Row 4+: charge rows
+#
+# Tall: one row per code × payer, with payer_name and plan_name columns.
+# Wide: one row per code, with a group of columns per payer and plan:
+#   standard_charge|<payer>|<plan>|negotiated_dollar, median_amount|<payer>|<plan>, ...
+# ---------------------------------------------------------------------------
+
+_PIPE_RE = re.compile(r"\s*\|\s*")
+
+
+def _normalize_header(cell: str) -> str:
+    """'Standard_Charge | Gross ' -> 'standard_charge|gross'."""
+    return _PIPE_RE.sub("|", cell.strip().lower())
+
+
+def parse_csv(stream: io.BufferedIOBase, book: PriceBook, target_cpts: set[str]) -> int:
+    """Stream-parse the tall or wide CSV template. Returns the number of charge rows read."""
+    text = io.TextIOWrapper(stream, encoding="utf-8-sig", errors="replace", newline="")
+    reader = csv.reader(text)
+
+    # General rows, then the charge header: the first row with a description and a code column.
+    header: list[str] | None = None
+    header_raw: list[str] = []
+    preamble: list[list[str]] = []
+    for row in reader:
+        cells = [_normalize_header(c) for c in row]
+        if "description" in cells and any(c.startswith("code|") for c in cells):
+            header, header_raw = cells, row
+            break
+        preamble.append(row)
+        if len(preamble) >= 10:
+            break
+    if header is None:
+        raise ValueError("no charge header row (description, code|1, ...) in the first rows of the CSV")
+
+    if len(preamble) >= 2 and book.measure_date is None:
+        general = dict(zip((_normalize_header(c) for c in preamble[0]), preamble[1], strict=False))
+        book.measure_date = parse_measure_date(general.get("last_updated_on"))
+
+    col = {name: i for i, name in reversed(list(enumerate(header)))}  # first column wins on repeats
+    code_cols = [
+        (i, col.get(f"{name}|type"))
+        for i, name in enumerate(header)
+        if re.fullmatch(r"code\|\d+", name)
+    ]
+    i_setting, i_billing, i_modifiers = col.get("setting"), col.get("billing_class"), col.get("modifiers")
+    i_gross, i_cash = col.get("standard_charge|gross"), col.get("standard_charge|discounted_cash")
+    i_min, i_max = col.get("standard_charge|min"), col.get("standard_charge|max")
+
+    tall = "payer_name" in col
+    if tall:
+        i_payer, i_plan = col["payer_name"], col.get("plan_name")
+        rate_columns = ("standard_charge|negotiated_dollar", "median_amount", "estimated_amount")
+        i_rates = [col[n] for n in rate_columns if n in col]
+    else:
+        # (payer, plan) -> columns to try for its rate, in order of preference
+        wide: dict[tuple[str, str], dict[str, int]] = {}
+        for i, name in enumerate(header):
+            parts = name.split("|")
+            raw_parts = [p.strip() for p in header_raw[i].split("|")]  # payer and plan as written
+            if len(parts) == 4 and parts[0] == "standard_charge" and parts[3] == "negotiated_dollar":
+                wide.setdefault((raw_parts[1], raw_parts[2]), {})["dollar"] = i
+            elif len(parts) == 3 and parts[0] in ("median_amount", "estimated_amount"):
+                wide.setdefault((raw_parts[1], raw_parts[2]), {})["estimate"] = i
+        if not wide:
+            raise ValueError("CSV has neither a payer_name column nor per-payer negotiated_dollar columns")
+
+    def cell(row: list[str], i: int | None) -> str | None:
+        return row[i] if i is not None and i < len(row) else None
+
+    rows = 0
+    for row in reader:
+        rows += 1
+        cpt = None
+        for i_code, i_type in code_cols:
+            cpt = match_code(cell(row, i_code), cell(row, i_type), target_cpts)
+            if cpt:
+                break
+        if cpt is None or (cell(row, i_modifiers) or "").strip():
+            continue
+
+        setting = _choice(cell(row, i_setting), SETTINGS, "")
+        billing_class = _choice(cell(row, i_billing), BILLING_CLASSES, DEFAULT_BILLING_CLASS)
+        book.add_item(
+            cpt, setting, billing_class,
+            gross=cell(row, i_gross), cash=cell(row, i_cash), low=cell(row, i_min), high=cell(row, i_max),
+        )
+        if tall:
+            rate = next((a for a in (to_amount(cell(row, i)) for i in i_rates) if a is not None), None)
+            book.add_rate(cpt, setting, billing_class, cell(row, i_payer), cell(row, i_plan), rate)
+        else:
+            for (payer, plan), columns in wide.items():
+                rate = to_amount(cell(row, columns.get("dollar"))) or to_amount(cell(row, columns.get("estimate")))
+                if rate is not None:
+                    book.add_rate(cpt, setting, billing_class, payer, plan, rate)
+    return rows
+
+
+# ---------------------------------------------------------------------------
+# Per-hospital processing
+# ---------------------------------------------------------------------------
+
+def parse_file(path: Path, book: PriceBook, target_cpts: set[str]) -> int:
+    """Parse one downloaded file into the book. Returns rows/items read; raises if it has none."""
+    with open_price_file(path) as (stream, fmt):
+        try:
+            count = parse_json(stream, book, target_cpts) if fmt == "json" else parse_csv(stream, book, target_cpts)
+        except (ijson.JSONError, csv.Error, zlib.error, EOFError, UnicodeError) as exc:
+            raise ValueError(f"unreadable {fmt} file: {exc}") from exc
+    if count == 0:
+        raise ValueError(f"{fmt} file has no standard charges")
+    return count
+
+
+def load_hospital(
+    client: RateLimitedClient,
+    ccn: str,
+    links: list[dict],
     target_cpts: set[str],
-    valid_ccns: set[str],
-) -> list[dict]:
+    payers: PayerNames,
+    plan_detail: bool,
+) -> int:
     """
-    Process one hospital_mrf_links row. Updates url_status in the DB.
-    Returns price records (may be empty).
+    Download and parse every price file of one hospital, then replace its prices.
+
+    A file that fails is marked broken on its link; the hospital's prices are
+    replaced only if at least one file produced prices, so a bad download never
+    wipes what an earlier run loaded.
+
+    Returns the number of price rows loaded.
     """
-    url = link["machine_readable_url"]
-    ccn = link["ccn"]
-    link_id = str(link["id"])
-    hospital = link.get("hospital_name", "")
+    settings = get_settings()
+    data_dir = Path(settings.data_dir) / "mrf"
+    max_bytes = settings.mrf_max_file_mb * 1024 * 1024
+    book = PriceBook(ccn, payers, plan_detail)
+    errors: dict[str, str | None] = {}  # url -> why it failed, or None
 
-    logger.info(f"Processing MRF: {hospital} ({ccn}) -- {url[:80]}")
+    # Several locations of one hospital often point at the same file: read it once.
+    for url in dict.fromkeys(link["machine_readable_url"] for link in links):
+        path = data_dir / f"{ccn}-{hashlib.sha1(url.encode()).hexdigest()[:12]}"
+        try:
+            client.download(url, path, max_bytes=max_bytes)
+            rows = parse_file(path, book, target_cpts)
+            logger.info(f"  Read {rows} rows from {url[:90]}")
+            errors[url] = None
+        except Exception as exc:  # one bad file must not stop the hospital or the run
+            logger.warning(f"  Failed {url[:90]}: {type(exc).__name__}: {exc}")
+            errors[url] = f"{type(exc).__name__}: {exc}"
+        finally:
+            path.unlink(missing_ok=True)
 
-    try:
-        records = _process_url(url, ccn, plan_name="", target_cpts=target_cpts, valid_ccns=valid_ccns)
-        status = "active" if records is not None else "broken"
-        _set_link_status(link_id, status)
-        return records or []
-    except Exception as e:
-        logger.warning(f"Failed processing {url}: {e}")
-        _set_link_status(link_id, "broken")
-        return []
+    records = book.records()
+    if records:
+        replace_rows("prices", records, "ccn = %s AND source = %s", (ccn, SOURCE), batch_size=5000)
+    for link in links:
+        error = errors[link["machine_readable_url"]]
+        if error:
+            _set_link_status(str(link["id"]), "broken", error)
+        else:
+            note = None if records else "no prices for the tracked codes"
+            _set_link_status(str(link["id"]), "active", note, len(records))
+    return len(records)
+
+
+def in_shard(ccn: str, shard: str | None) -> bool:
+    """Whether a hospital belongs to shard 'I/N' (0-based I). Stable across runs."""
+    if not shard:
+        return True
+    index, total = (int(x) for x in shard.split("/"))
+    return zlib.crc32(ccn.encode()) % total == index
 
 
 # ---------------------------------------------------------------------------
 # Entry point
 # ---------------------------------------------------------------------------
 
-def run(state: str = "CA", limit: int | None = None) -> int:
+def run(state: str = "CA", limit: int | None = None, shard: str | None = None) -> int:
     """
-    Parse MRF files for CA hospitals and load negotiated rates into prices.
+    Parse price files for the state's hospitals and load them into prices.
 
     Args:
         state: State filter for hospital_mrf_links (default: CA).
-        limit: Max number of MRF links to process in this run (default: all).
+        limit: Max number of hospitals to process in this run (default: all).
+        shard: 'I/N' to process only the I-th of N stable groups of hospitals.
 
     Returns:
-        Total number of price records upserted.
+        Total number of price records loaded.
     """
     logger.info(f"Starting MRF price extraction (state={state})")
+    settings = get_settings()
 
-    links = get_parseable_links(state=state, limit=limit)
-    if not links:
-        logger.warning("No parseable MRF links found. Run hospitalpricingfiles_scraper.py first.")
+    by_hospital = {c: links for c, links in get_links_by_hospital(state).items() if in_shard(c, shard)}
+    if limit:
+        by_hospital = dict(list(by_hospital.items())[:limit])
+    if not by_hospital:
+        logger.warning("No price-file links to parse. Run mrf_links.py first.")
         return 0
 
     target_cpts = get_target_cpts()
-    valid_ccns = get_valid_ccns()
+    if not target_cpts:
+        raise RuntimeError("No target CPT codes: load cpt_codes (and utilization, for the volume ranking) first")
+    payers = PayerNames(load_payer_aliases())
+    plan_detail = settings.mrf_plan_detail
 
     logger.info(
-        f"Processing {len(links)} MRF links | "
-        f"{len(target_cpts)} target CPT codes | "
-        f"{len(valid_ccns)} valid CCNs"
+        f"Processing {len(by_hospital)} hospitals | {len(target_cpts)} target CPT codes | "
+        f"one row per {'plan' if plan_detail else 'payer'}"
     )
 
     total_loaded = 0
-    for i, link in enumerate(links, 1):
-        logger.info(f"[{i}/{len(links)}] {link.get('hospital_name', link['ccn'])}")
-        records = _process_link(link, target_cpts, valid_ccns)
+    failed = 0
+    with RateLimitedClient(delay_ms=0, timeout=120.0) as client:
+        for i, (ccn, links) in enumerate(by_hospital.items(), 1):
+            logger.info(f"[{i}/{len(by_hospital)}] {links[0]['hospital_name']} ({ccn}), {len(links)} file(s)")
+            try:
+                count = load_hospital(client, ccn, links, target_cpts, payers, plan_detail)
+            except Exception as exc:  # e.g. the database write; the next hospital still runs
+                logger.error(f"  Hospital {ccn} failed: {type(exc).__name__}: {exc}")
+                failed += 1
+                continue
+            total_loaded += count
+            if count == 0:
+                failed += 1
+            logger.info(f"  Loaded {count} price records")
 
-        if not records:
-            continue
-
-        count = upsert_batch(
-            table="prices",
-            records=records,
-            conflict_columns=PRICES_CONFLICT_COLS,
-            update_columns=PRICES_UPDATE_COLS,
-        )
-        total_loaded += count
-        logger.info(f"  Loaded {count} price records")
-
-    logger.info(f"MRF extraction complete -- {total_loaded} total price records loaded")
+    logger.info(
+        f"MRF extraction complete -- {total_loaded} price records for "
+        f"{len(by_hospital) - failed} of {len(by_hospital)} hospitals"
+    )
     return total_loaded
 
 
@@ -990,6 +657,7 @@ if __name__ == "__main__":
 
     parser = argparse.ArgumentParser(description="Parse hospital MRF price files")
     parser.add_argument("--state", default="CA", help="State filter (default: CA)")
-    parser.add_argument("--limit", type=int, default=None, help="Max MRF links to process")
+    parser.add_argument("--limit", type=int, default=None, help="Max hospitals to process")
+    parser.add_argument("--shard", default=None, metavar="I/N", help="Process shard I of N")
     args = parser.parse_args()
-    run(state=args.state, limit=args.limit)
+    run(state=args.state, limit=args.limit, shard=args.shard)

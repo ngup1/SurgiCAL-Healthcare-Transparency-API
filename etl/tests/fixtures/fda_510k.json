@@ -1,0 +1,86 @@
+{
+ "results": [
+  {
+   "third_party_flag": "N",
+   "city": "Castel San Pietro",
+   "advisory_committee_description": "Orthopedic",
+   "address_1": "Strada Regina",
+   "address_2": "",
+   "statement_or_summary": "Summary",
+   "product_code": "JWH",
+   "openfda": {
+    "registration_number": [
+     "3016851379",
+     "3013055499",
+     "3021008900"
+    ],
+    "fei_number": [
+     "3016851379",
+     "3013055499",
+     "3021008900"
+    ],
+    "device_name": "Prosthesis, Knee, Patellofemorotibial, Semi-Constrained, Cemented, Polymer/Metal/Polymer",
+    "medical_specialty_description": "Orthopedic",
+    "regulation_number": "888.3560",
+    "device_class": "2"
+   },
+   "zip_code": "CH 6874",
+   "applicant": "Medacta International SA",
+   "decision_date": "2026-09-15",
+   "decision_code": "SESE",
+   "country_code": "CH",
+   "device_name": "GMK Extension",
+   "advisory_committee": "OR",
+   "contact": "Stefano  Baj",
+   "expedited_review_flag": "",
+   "k_number": "K262057",
+   "state": "",
+   "date_received": "2026-06-18",
+   "review_advisory_committee": "OR",
+   "postal_code": "CH 6874",
+   "decision_description": "Substantially Equivalent",
+   "clearance_type": "Traditional"
+  },
+  {
+   "third_party_flag": "N",
+   "city": "Somerville",
+   "advisory_committee_description": "Orthopedic",
+   "address_1": "General Hospital",
+   "address_2": "Mgb Innovation Suite 999, 399 Revolution Dr.",
+   "statement_or_summary": "Summary",
+   "product_code": "JWH",
+   "openfda": {
+    "registration_number": [
+     "3016851379",
+     "3013055499",
+     "3021008900"
+    ],
+    "fei_number": [
+     "3016851379",
+     "3013055499",
+     "3021008900"
+    ],
+    "device_name": "Prosthesis, Knee, Patellofemorotibial, Semi-Constrained, Cemented, Polymer/Metal/Polymer",
+    "medical_specialty_description": "Orthopedic",
+    "regulation_number": "888.3560",
+    "device_class": "2"
+   },
+   "zip_code": "02145",
+   "applicant": "The General Hospital Corporation, d/b/a Massachusetts",
+   "decision_date": "2026-09-11",
+   "decision_code": "SESE",
+   "country_code": "US",
+   "device_name": "GSPE Spacer",
+   "advisory_committee": "OR",
+   "contact": "Orhun  Muratoglu",
+   "expedited_review_flag": "",
+   "k_number": "K260063",
+   "state": "MA",
+   "date_received": "2026-01-08",
+   "review_advisory_committee": "OR",
+   "postal_code": "02145",
+   "decision_description": "Substantially Equivalent",
+   "clearance_type": "Traditional"
+  }
+ ]
+}

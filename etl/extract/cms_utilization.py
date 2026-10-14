@@ -8,25 +8,27 @@ Source: https://data.cms.gov/provider-summary-by-type-of-service/
        medicare-physician-other-practitioners/
        medicare-physician-other-practitioners-by-provider-and-service
 
-Populates volume-related fields in the `provider_metrics` table.
+Populates volume-related fields in the `provider_metrics` table and the
+`provider_procedure_volumes` table.
 """
 from __future__ import annotations
 
+from collections.abc import Iterable, Iterator
 
-import pandas as pd
-
-from etl.common.config import get_logger
-from etl.common.db import upsert_batch, execute_query
-from etl.common.http import fetch_csv, RateLimitedClient
+from etl.common.config import get_logger, get_settings
+from etl.common.db import execute_query, upsert_batch
+from etl.common.http import RateLimitedClient
 
 logger = get_logger(__name__)
 
 # The Medicare Physician & Other Practitioners - By Provider and Service dataset.
-# Dataset UUID: 92396110-2aed-4d63-a6a2-5d6207d46a29 (2023 data, published 2025)
-# The UUID changes when CMS publishes new annual data — check catalog.data.gov.
-CMS_UTILIZATION_URL = (
-    "https://data.cms.gov/data-api/v1/dataset/92396110-2aed-4d63-a6a2-5d6207d46a29/data"
-)
+# The dataset ID changes when CMS publishes new annual data; it and the year are
+# the CMS_UTILIZATION_DATASET_ID and CMS_UTILIZATION_YEAR settings.
+CMS_UTILIZATION_URL = "https://data.cms.gov/data-api/v1/dataset/{dataset_id}/data"
+
+# The only columns read; asking for just these makes each page about a tenth the size.
+COLUMNS = ["Rndrng_NPI", "HCPCS_Cd", "Place_Of_Srvc", "Tot_Benes", "Tot_Srvcs", "Avg_Mdcr_Pymt_Amt"]
+PAGE_SIZE = 5000
 
 # Volume bucket thresholds (total annual Medicare services)
 VOLUME_THRESHOLDS = {
@@ -35,22 +37,17 @@ VOLUME_THRESHOLDS = {
     # HIGH > 200
 }
 
-# CMS dataset year — update when new annual data is published
-MEASURE_YEAR = 2023
 
-
-def get_ca_npis() -> set[str]:
-    """Get the set of CA provider NPIs already in the database."""
-    rows = execute_query("SELECT npi FROM providers WHERE state = 'CA'")
+def get_state_npis(state: str) -> set[str]:
+    """Get the set of provider NPIs for the state already in the database."""
+    rows = execute_query("SELECT npi FROM providers WHERE state = %s", (state,))
     return {r["npi"] for r in rows}
 
 
-def get_wrvu_lookup() -> dict[str, float]:
-    """Get CPT -> avg_work_rvu mapping from cpt_codes table."""
-    rows = execute_query(
-        "SELECT code, avg_work_rvu FROM cpt_codes WHERE avg_work_rvu IS NOT NULL"
-    )
-    return {r["code"]: float(r["avg_work_rvu"]) for r in rows}
+def get_wrvu_lookup() -> dict[str, float | None]:
+    """Get CPT -> avg_work_rvu for every code in cpt_codes (None where CMS assigns no work RVU)."""
+    rows = execute_query("SELECT code, avg_work_rvu FROM cpt_codes")
+    return {r["code"]: float(r["avg_work_rvu"]) if r["avg_work_rvu"] is not None else None for r in rows}
 
 
 def classify_volume(total_services: int) -> str:
@@ -62,90 +59,108 @@ def classify_volume(total_services: int) -> str:
     return "HIGH"
 
 
-def fetch_utilization_by_provider(
-    ca_npis: set[str],
-) -> tuple[dict[str, dict], list[dict]]:
+def fetch_utilization_rows(client: RateLimitedClient, state: str) -> Iterator[dict]:
     """
-    Fetch utilization data from CMS.
+    Page through the utilization dataset for one state.
+
+    The state filter runs on the server, so this reads the state's rows
+    (about 830,000 for CA) instead of the national file's 9.8 million.
+    Errors are raised, not skipped: half a year of volumes is worse than none.
+    """
+    url = CMS_UTILIZATION_URL.format(dataset_id=get_settings().cms_utilization_dataset_id)
+    offset = 0
+    while True:
+        rows = client.get_json(
+            url,
+            params={
+                "filter[Rndrng_Prvdr_State_Abrvtn]": state,
+                "column": ",".join(COLUMNS),
+                "size": PAGE_SIZE,
+                "offset": offset,
+            },
+        )
+        if not isinstance(rows, list):
+            raise RuntimeError(f"Unexpected utilization response at offset {offset}: {str(rows)[:200]}")
+        yield from rows
+        logger.debug(f"Processed utilization page (offset={offset}, {len(rows)} rows)")
+        if len(rows) < PAGE_SIZE:
+            break
+        offset += PAGE_SIZE
+        if offset % 100_000 == 0:
+            logger.info(f"  {offset} utilization rows read")
+
+
+def aggregate_utilization(
+    rows: Iterable[dict],
+    npis: set[str],
+    wrvu_lookup: dict[str, float | None],
+    measure_year: int,
+) -> tuple[list[dict], list[dict]]:
+    """
+    Aggregate raw utilization rows.
+
+    CMS reports a provider's procedure once per place of service (facility and
+    office), so rows are summed into one per provider and procedure. Only
+    providers in `npis` and codes in `wrvu_lookup` (the cpt_codes table) are
+    kept; that drops drug and supply codes, which are not procedures.
 
     Returns:
-        provider_data: aggregated totals per NPI (for provider_metrics)
-        procedure_rows: per-NPI × per-CPT rows (for provider_procedure_volumes)
+        provider_records: totals per NPI (for provider_metrics)
+        procedure_records: per-NPI × per-CPT rows (for provider_procedure_volumes)
     """
-    logger.info("Fetching Medicare utilization data...")
+    by_procedure: dict[tuple[str, str], dict] = {}
 
-    wrvu_lookup = get_wrvu_lookup()
+    for row in rows:
+        npi = str(row.get("Rndrng_NPI") or "").strip()
+        hcpcs = str(row.get("HCPCS_Cd") or "").strip()
+        if npi not in npis or hcpcs not in wrvu_lookup:
+            continue
 
-    provider_data: dict[str, dict] = {}
-    procedure_rows: list[dict] = []
-    offset = 0
-    page_size = 1000
+        services = _safe_float(row.get("Tot_Srvcs")) or 0.0
+        beneficiaries = _safe_int(row.get("Tot_Benes")) or 0
+        payment = _safe_float(row.get("Avg_Mdcr_Pymt_Amt")) or 0.0
 
-    while True:
-        try:
-            with RateLimitedClient(delay_ms=200) as client:
-                response = client.get(
-                    CMS_UTILIZATION_URL,
-                    params={"offset": offset, "size": page_size},
-                )
-                result = response.json()
+        agg = by_procedure.setdefault((npi, hcpcs), {"services": 0.0, "beneficiaries": 0, "payment": 0.0})
+        agg["services"] += services
+        agg["beneficiaries"] += beneficiaries
+        agg["payment"] += payment * services
 
-            # data-api/v1 returns a plain JSON array; older endpoints wrap in {"results": []}
-            rows = result if isinstance(result, list) else result.get("results", [])
-            if not rows:
-                break
+    providers: dict[str, dict] = {}
+    procedure_records: list[dict] = []
 
-            for row in rows:
-                npi = str(row.get("rndrng_npi") or row.get("npi", "")).strip()
-                if npi not in ca_npis:
-                    continue
+    for (npi, hcpcs), agg in by_procedure.items():
+        services = round(agg["services"])
+        wrvu = (wrvu_lookup[hcpcs] or 0.0) * agg["services"]
+        procedure_records.append({
+            "npi": npi,
+            "cpt": hcpcs,
+            "total_services": services,
+            "total_beneficiaries": agg["beneficiaries"],
+            "total_payment": round(agg["payment"], 2),
+            "wrvu_estimate": round(wrvu, 2),
+            "measure_year": measure_year,
+        })
 
-                hcpcs = str(row.get("hcpcs_cd") or row.get("hcpcs_code", "")).strip()
-                services = _safe_int(row.get("tot_srvcs") or row.get("total_services"))
-                beneficiaries = _safe_int(row.get("tot_benes") or row.get("total_beneficiaries"))
-                payment = _safe_float(row.get("avg_mdcr_pymt_amt") or row.get("average_medicare_payment"))
+        pdata = providers.setdefault(npi, {
+            "npi": npi,
+            "total_medicare_services": 0,
+            "total_medicare_beneficiaries": 0,
+            "total_medicare_payment": 0.0,
+            "wrvu_estimate": 0.0,
+        })
+        pdata["total_medicare_services"] += services
+        pdata["total_medicare_beneficiaries"] += agg["beneficiaries"]
+        pdata["total_medicare_payment"] += agg["payment"]
+        pdata["wrvu_estimate"] += wrvu
 
-                # Aggregate into provider-level totals
-                if npi not in provider_data:
-                    provider_data[npi] = {
-                        "npi": npi,
-                        "total_medicare_services": 0,
-                        "total_medicare_beneficiaries": 0,
-                        "total_medicare_payment": 0.0,
-                        "wrvu_estimate": 0.0,
-                    }
+    provider_records = []
+    for pdata in providers.values():
+        pdata["volume_bucket"] = classify_volume(pdata["total_medicare_services"])
+        pdata["wrvu_estimate"] = round(pdata["wrvu_estimate"], 2)
+        pdata["total_medicare_payment"] = round(pdata["total_medicare_payment"], 2)
+        provider_records.append(pdata)
 
-                pdata = provider_data[npi]
-                pdata["total_medicare_services"] += services or 0
-                pdata["total_medicare_beneficiaries"] += beneficiaries or 0
-                pdata["total_medicare_payment"] += (payment or 0.0) * (services or 0)
-
-                cpt_wrvu = wrvu_lookup.get(hcpcs, 0.0)
-                if hcpcs in wrvu_lookup and services:
-                    pdata["wrvu_estimate"] += cpt_wrvu * services
-
-                # Store per-CPT row for provider_procedure_volumes
-                if hcpcs:
-                    procedure_rows.append({
-                        "npi": npi,
-                        "cpt": hcpcs,
-                        "total_services": services,
-                        "total_beneficiaries": beneficiaries,
-                        "total_payment": round((payment or 0.0) * (services or 0), 2),
-                        "wrvu_estimate": round(cpt_wrvu * (services or 0), 2),
-                        "measure_year": MEASURE_YEAR,
-                    })
-
-            logger.debug(f"Processed utilization page (offset={offset}, {len(rows)} rows)")
-            if len(rows) < page_size:
-                break
-            offset += page_size
-
-        except Exception as e:
-            logger.error(f"Error fetching utilization at offset {offset}: {e}")
-            break
-
-    return provider_data, procedure_rows
+    return provider_records, procedure_records
 
 
 def _safe_int(val) -> int | None:
@@ -166,41 +181,38 @@ def _safe_float(val) -> float | None:
         return None
 
 
-def run() -> int:
+def run(state: str = "CA") -> int:
     """
     Run the Medicare utilization extractor.
 
-    Fetches utilization data for CA providers and upserts volume metrics
-    into provider_metrics.
+    Fetches utilization data for the state's providers and upserts volume
+    metrics into provider_metrics and provider_procedure_volumes.
 
     Returns:
         Number of provider metrics updated.
     """
-    logger.info("Starting CMS utilization extraction")
+    settings = get_settings()
+    measure_year = settings.cms_utilization_year
+    logger.info(f"Starting CMS utilization extraction ({measure_year} data, state={state})")
 
-    ca_npis = get_ca_npis()
-    if not ca_npis:
-        logger.warning("No CA providers in database. Run cms_physicians.py first.")
+    npis = get_state_npis(state)
+    if not npis:
+        logger.warning(f"No {state} providers in database. Run cms_physicians.py first.")
         return 0
 
-    logger.info(f"Looking up utilization for {len(ca_npis)} CA providers")
-    provider_data, procedure_rows = fetch_utilization_by_provider(ca_npis)
+    logger.info(f"Looking up utilization for {len(npis)} {state} providers")
+    with RateLimitedClient(delay_ms=200, timeout=120.0) as client:
+        provider_records, procedure_records = aggregate_utilization(
+            fetch_utilization_rows(client, state), npis, get_wrvu_lookup(), measure_year
+        )
 
-    if not provider_data:
-        logger.warning("No utilization data found for CA providers")
+    if not provider_records:
+        logger.warning(f"No utilization data found for {state} providers")
         return 0
-
-    # Add volume bucket classification
-    records = []
-    for npi, data in provider_data.items():
-        data["volume_bucket"] = classify_volume(data["total_medicare_services"])
-        data["wrvu_estimate"] = round(data["wrvu_estimate"], 2)
-        data["total_medicare_payment"] = round(data["total_medicare_payment"], 2)
-        records.append(data)
 
     count = upsert_batch(
         table="provider_metrics",
-        records=records,
+        records=provider_records,
         conflict_columns=["npi"],
         update_columns=[
             "total_medicare_services",
@@ -216,9 +228,10 @@ def run() -> int:
     # Upsert per-procedure volumes
     proc_count = upsert_batch(
         table="provider_procedure_volumes",
-        records=procedure_rows,
+        records=procedure_records,
         conflict_columns=["npi", "cpt", "measure_year"],
         update_columns=["total_services", "total_beneficiaries", "total_payment", "wrvu_estimate", "updated_at"],
+        batch_size=5000,
     )
     logger.info(f"Upserted {proc_count} provider procedure volume rows")
 

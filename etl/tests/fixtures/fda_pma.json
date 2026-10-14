@@ -1,0 +1,85 @@
+{
+ "results": [
+  {
+   "pma_number": "P160043",
+   "supplement_number": "",
+   "applicant": "Medtronic Vascular",
+   "street_1": "3576 Unocal Pl.",
+   "street_2": "",
+   "city": "Santa Rosa",
+   "state": "CA",
+   "zip": "95403",
+   "zip_ext": "",
+   "generic_name": "Coronary drug-eluting stent",
+   "trade_name": "RESOLUTE ONYX ZOTAROLIMUS-ELUTING CORONARY STENT SYSTEM",
+   "product_code": "NIQ",
+   "advisory_committee": "CV",
+   "advisory_committee_description": "Cardiovascular",
+   "supplement_type": "",
+   "supplement_reason": "",
+   "expedited_review_flag": "N",
+   "date_received": "2016-09-27",
+   "decision_date": "2017-04-28",
+   "docket_number": "17M-2767",
+   "fed_reg_notice_date": "2017-05-02",
+   "decision_code": "APPR",
+   "ao_statement": "Approval for the Resolute Onyx Zotarolimus-Eluting Coronary Stent System.  This device is indicated for improving coronary luminal diameters in patients, including those with diabetes mellitus, with symptomatic ischemic heart disease due to de novo lesions of length less than or equal to 35 mm in native coronary arteries with reference vessel diameters of 2.25 mm to 5.0 mm.",
+   "openfda": {
+    "registration_number": [
+     "9681260",
+     "2124215",
+     "3004091615"
+    ],
+    "fei_number": [
+     "2124215",
+     "3004091615",
+     "3009380063"
+    ],
+    "device_name": "Coronary Drug-Eluting Stent",
+    "medical_specialty_description": "Unknown",
+    "regulation_number": "",
+    "device_class": "3"
+   }
+  },
+  {
+   "pma_number": "P160043",
+   "supplement_number": "S002",
+   "applicant": "Medtronic Vascular",
+   "street_1": "3576 Unocal Pl.",
+   "street_2": "",
+   "city": "Santa Rosa",
+   "state": "CA",
+   "zip": "95403",
+   "zip_ext": "",
+   "generic_name": "Coronary drug-eluting stent",
+   "trade_name": "Resolute Onyx Zotarolimus-Eluting Coronary Stent System",
+   "product_code": "NIQ",
+   "advisory_committee": "CV",
+   "advisory_committee_description": "Cardiovascular",
+   "supplement_type": "30-Day Notice",
+   "supplement_reason": "Process Change - Manufacturer/Sterilizer/Packager/Supplier",
+   "expedited_review_flag": "N",
+   "date_received": "2017-05-26",
+   "decision_date": "2017-06-21",
+   "docket_number": "",
+   "decision_code": "OK30",
+   "ao_statement": "Add an alternate vendor for rapamycin, the zotarolimus starting material.",
+   "openfda": {
+    "registration_number": [
+     "9681260",
+     "2124215",
+     "3004091615"
+    ],
+    "fei_number": [
+     "2124215",
+     "3004091615",
+     "3009380063"
+    ],
+    "device_name": "Coronary Drug-Eluting Stent",
+    "medical_specialty_description": "Unknown",
+    "regulation_number": "",
+    "device_class": "3"
+   }
+  }
+ ]
+}

@@ -1,0 +1,30 @@
+{
+ "results": [
+  {
+   "country": "United States",
+   "city": "Memphis",
+   "address_1": "1450 E Brooks Rd",
+   "reason_for_recall": "The data in the National Joint Registry of England, Wales and Northern Ireland (NJREWNI) and Australian Orthopaedic Association National Joint Replacement Registry (AOANJRR) indicate that the first generation JOURNEY BCS Knee System has a revision rate over 1.5 times the primary total knee arthroplasty device class average revision rates reported in those registries.",
+   "address_2": "",
+   "product_quantity": "10,792 units",
+   "code_info": "All lots",
+   "center_classification_date": "20181001",
+   "distribution_pattern": "Worldwide distribution, including US nationwide and Puerto Rico, Austria, United Arab Emirates,  Australia, Belgium, Canada, China, Switzerland, Germany, Denmark, Finland, France, Great Britain, India, Spain, Italy, Netherlands, Portugal, Sweden, Venezuela, South Africa.",
+   "state": "TN",
+   "product_description": "Journey BCS Knee CoCr Femoral Components, Catalog Numbers:  74021210, 74021211, 74021212, 74021213, 74021214, 74021215, 74021216, 74021217, 74021218, 74021219, 74021220, 74021221, 74021222, 74021223, 74021224, 74021225, 74021226, 74021227, 74021228, 74021229",
+   "report_date": "20181010",
+   "classification": "Class II",
+   "openfda": {},
+   "recalling_firm": "Smith & Nephew, Inc.",
+   "recall_number": "Z-0001-2019",
+   "initial_firm_notification": "Letter",
+   "product_type": "Devices",
+   "event_id": "80313",
+   "more_code_info": "",
+   "recall_initiation_date": "20180613",
+   "postal_code": "38116-1804",
+   "voluntary_mandated": "Voluntary: Firm initiated",
+   "status": "Ongoing"
+  }
+ ]
+}
