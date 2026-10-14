@@ -7,7 +7,8 @@ examples into the form, and a pre-filled optional filter would silently narrow r
 
 from typing import Any
 
-from src.exceptions import NotFoundResponse, ValidationErrorResponse
+from src.config import settings
+from src.exceptions import NotFoundResponse, RateLimitedResponse, ValidationErrorResponse
 
 API_DESCRIPTION = """
 
@@ -20,7 +21,10 @@ surgeon quality, and check medical devices for recalls and adverse events.
 **Errors:** malformed input returns `422` naming each bad field; an unknown ID returns `404`;
 `503` means the database is temporarily unavailable (retry). Every response carries an
 `X-Request-ID` header to quote when reporting a problem.
-""".strip()
+
+**Rate limits:** {per_minute} requests a minute per client ({search_per_minute} for `/search`). Past the
+limit you get `429` with a `Retry-After` header; `X-RateLimit-Remaining` shows what's left.
+""".strip().format(per_minute=settings.rate_limit_per_minute, search_per_minute=settings.rate_limit_search_per_minute)
 
 TAGS_METADATA = [
     {
@@ -90,6 +94,11 @@ SEARCH_EXAMPLES = examples(
 # shape api/exceptions.py actually returns.
 VALIDATION_RESPONSES: dict[int | str, dict[str, Any]] = {
     422: {"model": ValidationErrorResponse, "description": "Malformed input; each bad field is named"},
+    429: {
+        "model": RateLimitedResponse,
+        "description": "Rate limit exceeded; retry after `Retry-After` seconds",
+        "headers": {"Retry-After": {"description": "Seconds to wait", "schema": {"type": "integer"}}},
+    },
 }
 
 

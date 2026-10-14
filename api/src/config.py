@@ -30,6 +30,17 @@ class Settings(BaseSettings):
     # One JSON object per log line; set LOG_JSON=false for plain text when developing locally.
     log_json: bool = True
 
+    # Requests per minute per client, per worker process (src/rate_limit.py).
+    rate_limit_enabled: bool = True
+    rate_limit_per_minute: int = 120
+    rate_limit_search_per_minute: int = 30
+    # Header holding the real client IP, set by the host's edge and not forgeable by
+    # clients (e.g. True-Client-IP behind Cloudflare). Empty: the connection's address.
+    rate_limit_client_ip_header: str = ""
+    # Temporary: GET /debug/headers echoes the request headers the app receives, to
+    # confirm the header above arrives and can't be forged. Leave off otherwise.
+    debug_headers: bool = False
+
     @property
     def db_conninfo(self) -> str:
         """libpq connection string: DATABASE_URL as-is, or built from DB_*."""

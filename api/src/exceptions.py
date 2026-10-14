@@ -37,6 +37,12 @@ class NotFoundResponse(BaseModel):
     detail: str
 
 
+class RateLimitedResponse(BaseModel):
+    """Body of a 429 (written by src/rate_limit.py)."""
+
+    detail: str
+
+
 class NotFound(Exception):
     """Base for domain "no such record" errors; each domain sets its own DETAIL."""
 

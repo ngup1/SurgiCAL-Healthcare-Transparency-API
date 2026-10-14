@@ -51,6 +51,8 @@ Stop with `make down`. Reset the database to the seed data with `make db-reset`.
 
 List endpoints take `limit`/`offset` and return the total match count in an `X-Total-Count` header. Unknown IDs return `404`, including on sub-resources such as `/hospitals/{ccn}/providers`.
 
+Each client can make 120 requests a minute (30 to `/search`); past that the API returns `429` with a `Retry-After` header. Limits are per worker process and set with `RATE_LIMIT_PER_MINUTE`, `RATE_LIMIT_SEARCH_PER_MINUTE` and `RATE_LIMIT_ENABLED`. Behind a proxy, set `RATE_LIMIT_CLIENT_IP_HEADER` to a header the proxy sets and clients can't forge (e.g. `True-Client-IP`); otherwise clients are told apart by connection address.
+
 Malformed input returns `422` with the bad field named:
 
 ```json
