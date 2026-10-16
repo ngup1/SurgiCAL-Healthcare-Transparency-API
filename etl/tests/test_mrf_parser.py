@@ -109,6 +109,58 @@ def test_inpatient_and_outpatient_are_kept_apart(tmp_path, payers):
     assert records[("27447", "outpatient", "Aetna", "")]["negotiated_rate"] == 19000.0
 
 
+FLOOR_CSV = GENERAL + (
+    "description,code|1,code|1|type,setting,billing_class,standard_charge|gross,standard_charge|discounted_cash,"
+    "payer_name,plan_name,standard_charge|negotiated_dollar,standard_charge|min,standard_charge|max\n"
+    "KNEE REPLACEMENT,27447,CPT,outpatient,facility,70000,30000,Aetna,PPO,19000,15000,40000\n"
+    "KNEE REPLACEMENT,27447,CPT,outpatient,facility,70000,30000,Aetna,HMO,17000,15000,40000\n"
+    # The code on a supply line: every value is far below what Medicare pays the surgeon.
+    "KNEE SUPPLY KIT,27447,CPT,outpatient,facility,90,65,Aetna,PPO,65,65,65\n"
+    "KNEE SUPPLY KIT,27447,CPT,outpatient,facility,90,65,Self Pay,,40,40,40\n"
+    # No floor for this code: its low price is kept.
+    "KNEE ARTHROSCOPY,29881,CPT,outpatient,facility,500,,Aetna,PPO,90,,\n"
+)
+
+
+def test_values_below_the_floor_are_dropped_before_summarizing(tmp_path, payers):
+    path = tmp_path / "file"
+    path.write_bytes(FLOOR_CSV.encode())
+    book = PriceBook("050002", payers, False, floors={"27447": 580.0})
+    parse_file(path, book, TARGETS)
+    records = by_key(book.records())
+
+    aetna = records[("27447", "outpatient", "Aetna", "")]
+    assert aetna["negotiated_rate"] == 18000.0  # median of 19000 and 17000; the $65 line is gone
+    assert (aetna["negotiated_min"], aetna["negotiated_max"]) == (15000.0, 40000.0)
+    cash = records[("27447", "outpatient", "CASH", "")]
+    assert (cash["cash_price"], cash["gross_charge"]) == (30000.0, 70000.0)
+    # gross, cash, min, max and the rate of each of the two supply lines.
+    assert book.dropped == 10
+    assert records[("29881", "outpatient", "Aetna", "")]["negotiated_rate"] == 90.0
+
+
+def test_a_payer_with_only_implausible_rates_gets_no_row(tmp_path, payers):
+    path = tmp_path / "file"
+    path.write_bytes(FLOOR_CSV.encode())
+    book = PriceBook("050002", payers, False, floors={"27447": 50000.0, "29881": 1000.0})
+    parse_file(path, book, TARGETS)
+    records = by_key(book.records())
+    assert ("27447", "outpatient", "Aetna", "") not in records
+    assert ("29881", "outpatient", "Aetna", "") not in records
+    # Only the gross charge of 70000 clears the 50000 floor.
+    assert records[("27447", "outpatient", "CASH", "")]["gross_charge"] == 70000.0
+
+
+def test_without_floors_nothing_is_dropped(tmp_path, payers):
+    path = tmp_path / "file"
+    path.write_bytes(FLOOR_CSV.encode())
+    book = PriceBook("050002", payers, False)
+    parse_file(path, book, TARGETS)
+    assert book.dropped == 0
+    # The self-pay supply line's minimum of $40 becomes everyone's minimum.
+    assert by_key(book.records())[("27447", "outpatient", "Aetna", "")]["negotiated_min"] == 40.0
+
+
 def test_cash_price_is_never_the_gross_charge(tmp_path, payers):
     outpatient_cash = by_key(parse(tmp_path, TALL_CSV.encode(), payers))[("27447", "outpatient", "CASH", "")]
     assert outpatient_cash["cash_price"] is None

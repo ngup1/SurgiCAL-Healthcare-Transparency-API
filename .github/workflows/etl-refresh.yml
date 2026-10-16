@@ -24,6 +24,7 @@
 #   variable NEON_DATABASE            database name (default: neondb)
 #   variable ETL_STORAGE_LIMIT_MB     fail a refresh above this size (default: 1024, the free tier)
 #   variable MRF_CPT_LIMIT, MRF_PLAN_DETAIL   size of the prices table (see etl/.env.example)
+#   variable PRICE_FLOOR_RATIO        drop prices below this x the Medicare physician payment (default: 0.5)
 name: ETL refresh
 
 on:
@@ -67,6 +68,7 @@ env:
   OPENFDA_API_KEY: ${{ secrets.OPENFDA_API_KEY }}
   MRF_CPT_LIMIT: ${{ vars.MRF_CPT_LIMIT || '150' }}
   MRF_PLAN_DETAIL: ${{ vars.MRF_PLAN_DETAIL || 'false' }}
+  PRICE_FLOOR_RATIO: ${{ vars.PRICE_FLOOR_RATIO || '0.5' }}
   NEONCTL: npx --yes neonctl@2
 
 jobs:
