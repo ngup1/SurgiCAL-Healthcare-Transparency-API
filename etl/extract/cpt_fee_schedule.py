@@ -2,7 +2,8 @@
 CMS Physician Fee Schedule / CPT Code Extractor
 
 Downloads the CMS Physician Fee Schedule RVU file and loads all active CPT codes
-with descriptions, work RVUs, and surgical classification into the `cpt_codes` table.
+with descriptions, work RVUs, the Medicare payment amount (the floor mrf_parser checks
+hospital prices against), and surgical classification into the `cpt_codes` table.
 
 Source: https://www.cms.gov/medicare/payment/fee-schedules/physician
 File:   PPRRVU{YY}.zip  (published annually by CMS)
@@ -195,13 +196,26 @@ def extract_codes(df: pd.DataFrame) -> list[dict]:
     if "code" not in col_map and "CODE" in df.columns:
         col_map["code"] = "CODE"
 
-    required = {"code", "description", "status", "work_rvu"}
+    # Columns for the Medicare payment. The 2026 CSV's last header row says only "TOTAL"
+    # for both the non-facility and facility totals, so pandas names the second "TOTAL.1";
+    # "FACTOR" is the conversion factor.
+    for key, names in (
+        ("modifier", ("MOD", "MODIFIER")),
+        ("facility_total", ("FACILITY_TOTAL", "TOTAL.1")),
+        ("conversion_factor", ("CONV_FACTOR", "CONVERSION_FACTOR", "FACTOR")),
+    ):
+        found = next((name for name in names if name in df.columns), None)
+        if found:
+            col_map[key] = found
+
+    required = {"code", "description", "status", "work_rvu", "modifier", "facility_total", "conversion_factor"}
     missing = required - set(col_map)
     if missing:
         raise ValueError(f"Missing expected columns in RVU file: {missing}. Available: {list(df.columns)}")
 
     records = []
     skipped = 0
+    medicare_amounts = medicare_amounts_by_code(df, col_map)
 
     for _, row in df.iterrows():
         code = str(row[col_map["code"]]).strip()
@@ -236,10 +250,45 @@ def extract_codes(df: pd.DataFrame) -> list[dict]:
             "body_system": body_system,
             "avg_work_rvu": work_rvu if work_rvu and work_rvu > 0 else None,
             "is_surgical": is_surgical,
+            "medicare_amount": medicare_amounts.get(code),
         })
 
-    logger.info(f"Parsed {len(records)} active numeric CPT codes ({skipped} skipped)")
+    logger.info(
+        f"Parsed {len(records)} active numeric CPT codes ({skipped} skipped), "
+        f"{sum(1 for r in records if r['medicare_amount'])} with a Medicare amount"
+    )
     return records
+
+
+# Rows that price the whole service or one component of it. Modifier 53 (discontinued
+# procedure) is a reduced payment and says nothing about the full service.
+PAYMENT_MODIFIERS = {"", "26", "TC"}
+
+
+def medicare_amounts_by_code(df: pd.DataFrame, col_map: dict[str, str]) -> dict[str, float]:
+    """
+    Medicare's national payment per code in the facility setting: facility total RVUs ×
+    the conversion factor. A code split into professional (26) and technical (TC)
+    components (imaging, pathology) gets the lowest of its global and component amounts,
+    because a price file may list either component alone. Codes Medicare doesn't price
+    nationally (zero RVUs) have no amount.
+    """
+    amounts: dict[str, float] = {}
+    for code, modifier, total, factor in zip(
+        df[col_map["code"]], df[col_map["modifier"]], df[col_map["facility_total"]], df[col_map["conversion_factor"]],
+        strict=True,
+    ):
+        if str(modifier if isinstance(modifier, str) else "").strip().upper() not in PAYMENT_MODIFIERS:
+            continue
+        try:
+            amount = round(float(total) * float(factor), 2)
+        except (ValueError, TypeError):
+            continue
+        # NaN fails the comparison.
+        if amount > 0:
+            code = str(code).strip()
+            amounts[code] = min(amount, amounts.get(code, amount))
+    return amounts
 
 
 def run() -> int:

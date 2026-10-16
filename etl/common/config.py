@@ -54,6 +54,10 @@ class Settings:
     # MRF_CPT_LIMIT=0 keeps every code; MRF_PLAN_DETAIL=true keeps one row per plan.
     mrf_cpt_limit: int = int(os.getenv("MRF_CPT_LIMIT", "150"))
     mrf_plan_detail: bool = os.getenv("MRF_PLAN_DETAIL", "false").strip().lower() in ("1", "true", "yes")
+    # Price values below this fraction of the code's Medicare physician payment
+    # (cpt_codes.medicare_amount) are dropped as implausible, e.g. a code on a supply line.
+    # 0 turns the floor off.
+    price_floor_ratio: float = float(os.getenv("PRICE_FLOOR_RATIO", "0.5"))
 
     trilliant_share_file: str = os.getenv("TRILLIANT_SHARE_FILE", "")
     trilliant_share_name: str = os.getenv("TRILLIANT_SHARE_NAME", "provider_directory")
