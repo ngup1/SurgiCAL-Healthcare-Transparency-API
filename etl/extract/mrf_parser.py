@@ -106,15 +106,35 @@ def get_target_cpts(limit: int | None = None) -> set[str]:
     return {r["code"] for r in rows}
 
 
-def _set_link_status(link_id: str, status: str, error: str | None = None, price_rows: int | None = None) -> None:
+def get_price_floors(target_cpts: set[str], ratio: float | None = None) -> dict[str, float]:
+    """
+    The lowest believable price per code: `ratio` × what Medicare pays the physician
+    (cpt_codes.medicare_amount). Anything lower is a code on the wrong line of a price
+    file (a supply, an add-on), not the procedure. Codes without a Medicare amount, and
+    a ratio of 0, have no floor.
+    """
+    if ratio is None:
+        ratio = get_settings().price_floor_ratio
+    if ratio <= 0:
+        return {}
+    rows = execute_query(
+        "SELECT code, medicare_amount FROM cpt_codes WHERE code = ANY(%s) AND medicare_amount > 0",
+        (sorted(target_cpts),),
+    )
+    return {r["code"]: round(float(r["medicare_amount"]) * ratio, 2) for r in rows}
+
+
+def _set_link_status(
+    link_id: str, status: str, error: str | None = None, price_rows: int | None = None, rates_dropped: int | None = None
+) -> None:
     """Record the outcome of loading one hospital_mrf_links row."""
     execute(
         """
         UPDATE hospital_mrf_links
-        SET url_status = %s, last_error = %s, price_rows = %s, last_checked = %s
+        SET url_status = %s, last_error = %s, price_rows = %s, rates_dropped = %s, last_checked = %s
         WHERE id = %s
         """,
-        (status, error[:500] if error else None, price_rows, datetime.now(UTC), link_id),
+        (status, error[:500] if error else None, price_rows, rates_dropped, datetime.now(UTC), link_id),
     )
 
 
@@ -222,29 +242,45 @@ class PriceBook:
     values are gathered per (code, setting, billing class) and per payer, and
     summarised once at the end: the median for rates, cash and gross prices, and
     the extremes for the minimum and maximum.
+
+    Values below the code's floor (see get_price_floors) are dropped as they are
+    added, before any summary, so one supply line can't become a payer's minimum.
+    `dropped` counts them.
     """
 
-    def __init__(self, ccn: str, payers: PayerNames, plan_detail: bool):
+    def __init__(self, ccn: str, payers: PayerNames, plan_detail: bool, floors: dict[str, float] | None = None):
         self.ccn = ccn
         self._payers = payers
         self._plan_detail = plan_detail
+        self._floors = floors or {}
         self._items: dict[tuple[str, str, str], dict[str, list[float]]] = {}
         self._rates: dict[tuple[str, str, str, str, str], list[float]] = {}
         self.measure_date: date | None = None
+        self.dropped = 0
+
+    def _amount(self, cpt: str, value) -> float | None:
+        """A dollar amount from the file, or None if there is none or it is below the code's floor."""
+        amount = to_amount(value)
+        if amount is not None and amount < self._floors.get(cpt, 0):
+            self.dropped += 1
+            return None
+        return amount
 
     def add_item(self, cpt: str, setting: str, billing_class: str, *, gross=None, cash=None, low=None, high=None):
         """Charges that apply to every payer: gross, discounted cash, and the min/max negotiated."""
         item = self._items.setdefault((cpt, setting, billing_class), {"gross": [], "cash": [], "low": [], "high": []})
         for key, value in (("gross", gross), ("cash", cash), ("low", low), ("high", high)):
-            amount = to_amount(value)
+            amount = self._amount(cpt, value)
             if amount is not None:
                 item[key].append(amount)
 
     def add_rate(self, cpt: str, setting: str, billing_class: str, payer, plan, rate):
         """One payer's negotiated rate."""
-        amount = to_amount(rate)
         payer = " ".join(str(payer or "").split())
-        if amount is None or not payer:
+        if not payer:
+            return
+        amount = self._amount(cpt, rate)
+        if amount is None:
             return
         plan_name = " ".join(str(plan or "").split())[:200] if self._plan_detail else ""
         self._rates.setdefault(
@@ -541,6 +577,7 @@ def load_hospital(
     target_cpts: set[str],
     payers: PayerNames,
     plan_detail: bool,
+    floors: dict[str, float] | None = None,
 ) -> int:
     """
     Download and parse every price file of one hospital, then replace its prices.
@@ -554,7 +591,7 @@ def load_hospital(
     settings = get_settings()
     data_dir = Path(settings.data_dir) / "mrf"
     max_bytes = settings.mrf_max_file_mb * 1024 * 1024
-    book = PriceBook(ccn, payers, plan_detail)
+    book = PriceBook(ccn, payers, plan_detail, floors)
     errors: dict[str, str | None] = {}  # url -> why it failed, or None
 
     # Several locations of one hospital often point at the same file: read it once.
@@ -574,13 +611,15 @@ def load_hospital(
     records = book.records()
     if records:
         replace_rows("prices", records, "ccn = %s AND source = %s", (ccn, SOURCE), batch_size=5000)
+    if book.dropped:
+        logger.info(f"  Dropped {book.dropped} values below the price floor")
     for link in links:
         error = errors[link["machine_readable_url"]]
         if error:
             _set_link_status(str(link["id"]), "broken", error)
         else:
             note = None if records else "no prices for the tracked codes"
-            _set_link_status(str(link["id"]), "active", note, len(records))
+            _set_link_status(str(link["id"]), "active", note, len(records), book.dropped)
     return len(records)
 
 
@@ -623,11 +662,14 @@ def run(state: str = "CA", limit: int | None = None, shard: str | None = None) -
         raise RuntimeError("No target CPT codes: load cpt_codes (and utilization, for the volume ranking) first")
     payers = PayerNames(load_payer_aliases())
     plan_detail = settings.mrf_plan_detail
+    floors = get_price_floors(target_cpts)
 
     logger.info(
-        f"Processing {len(by_hospital)} hospitals | {len(target_cpts)} target CPT codes | "
-        f"one row per {'plan' if plan_detail else 'payer'}"
+        f"Processing {len(by_hospital)} hospitals | {len(target_cpts)} target CPT codes "
+        f"({len(floors)} with a price floor) | one row per {'plan' if plan_detail else 'payer'}"
     )
+    if settings.price_floor_ratio > 0 and not floors:
+        logger.warning("No price floors: cpt_codes.medicare_amount is empty. Re-run the cpt_codes step.")
 
     total_loaded = 0
     failed = 0
@@ -635,7 +677,7 @@ def run(state: str = "CA", limit: int | None = None, shard: str | None = None) -
         for i, (ccn, links) in enumerate(by_hospital.items(), 1):
             logger.info(f"[{i}/{len(by_hospital)}] {links[0]['hospital_name']} ({ccn}), {len(links)} file(s)")
             try:
-                count = load_hospital(client, ccn, links, target_cpts, payers, plan_detail)
+                count = load_hospital(client, ccn, links, target_cpts, payers, plan_detail, floors)
             except Exception as exc:  # e.g. the database write; the next hospital still runs
                 logger.error(f"  Hospital {ccn} failed: {type(exc).__name__}: {exc}")
                 failed += 1
