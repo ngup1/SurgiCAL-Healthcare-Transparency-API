@@ -21,26 +21,28 @@ Swagger UI at `/docs` lets you try every endpoint. Some values to try:
 
 | Try | Example |
 |---|---|
-| Hospital | `GET /hospitals/050801` |
-| Knee replacement prices, cheapest first | `GET /prices?cpt=27447` |
-| Search across procedures, providers, hospitals and devices | `GET /search?q=knee` |
-| Device recalls and adverse events | `GET /devices/68670191-dbe2-5dbd-a693-5f7118cab2c2` |
+| Hospital | `GET /v1/hospitals/050801` |
+| Knee replacement prices, cheapest first | `GET /v1/prices?cpt=27447` |
+| Search across procedures, providers, hospitals and devices | `GET /v1/search?q=knee` |
+| Device recalls and adverse events | `GET /v1/devices/68670191-dbe2-5dbd-a693-5f7118cab2c2` |
 
 Stop with `make down`. Reset the database to the seed data with `make db-reset`.
 
 ## Endpoints
 
+Data endpoints are versioned under `/v1`. A breaking change would ship as `/v2` alongside it. `/health` and the docs are unversioned.
+
 | Area | Endpoints |
 |---|---|
-| Hospitals | `GET /hospitals`, `/hospitals/{ccn}`, `/hospitals/{ccn}/providers` |
-| Providers | `GET /providers`, `/providers/{npi}` |
-| Prices | `GET /prices`, `/prices/compare` |
-| Devices | `GET /devices`, `/devices/by-procedure/{cpt}`, `/devices/{id}`, `/devices/{id}/recalls`, `/devices/{id}/adverse-events` |
-| Search | `GET /search` |
-| Places | `GET /places` (valid California cities, counties, and ZIP codes) |
+| Hospitals | `GET /v1/hospitals`, `/v1/hospitals/{ccn}`, `/v1/hospitals/{ccn}/providers` |
+| Providers | `GET /v1/providers`, `/v1/providers/{npi}` |
+| Prices | `GET /v1/prices`, `/v1/prices/compare` |
+| Devices | `GET /v1/devices`, `/v1/devices/by-procedure/{cpt}`, `/v1/devices/{id}`, `/v1/devices/{id}/recalls`, `/v1/devices/{id}/adverse-events` |
+| Search | `GET /v1/search` |
+| Places | `GET /v1/places` (valid California cities, counties, and ZIP codes) |
 | Health | `GET /health` |
 
-**Location filters** (on `/hospitals`, `/providers`, `/prices`): `city`, `county`, or `zip`, plus `radius_miles` with a city or ZIP to include nearby places, sorted nearest first. Coverage is California only, and other locations return a `422` with a specific `code`:
+**Location filters** (on `/v1/hospitals`, `/v1/providers`, `/v1/prices`): `city`, `county`, or `zip`, plus `radius_miles` with a city or ZIP to include nearby places, sorted nearest first. Coverage is California only, and other locations return a `422` with a specific `code`:
 
 | Request | Result |
 |---|---|
@@ -49,9 +51,9 @@ Stop with `make down`. Reset the database to the seed data with `make db-reset`.
 | `?state=NV` or `?zip=89502` | `422 location_outside_coverage` |
 | `?city=Pasedena` | `422 location_not_found` with `"suggestions": ["Pasadena"]` |
 
-List endpoints take `limit`/`offset` and return the total match count in an `X-Total-Count` header. Unknown IDs return `404`, including on sub-resources such as `/hospitals/{ccn}/providers`.
+List endpoints take `limit`/`offset` and return the total match count in an `X-Total-Count` header. Unknown IDs return `404`, including on sub-resources such as `/v1/hospitals/{ccn}/providers`.
 
-Each client can make 120 requests a minute (30 to `/search`); past that the API returns `429` with a `Retry-After` header. Limits are per worker process and set with `RATE_LIMIT_PER_MINUTE`, `RATE_LIMIT_SEARCH_PER_MINUTE` and `RATE_LIMIT_ENABLED`. Behind a proxy, set `RATE_LIMIT_CLIENT_IP_HEADER` to a header the proxy sets and clients can't forge (e.g. `True-Client-IP`); otherwise clients are told apart by connection address.
+Each client can make 120 requests a minute (30 to `/v1/search`); past that the API returns `429` with a `Retry-After` header. Limits are per worker process and set with `RATE_LIMIT_PER_MINUTE`, `RATE_LIMIT_SEARCH_PER_MINUTE` and `RATE_LIMIT_ENABLED`. Behind a proxy, set `RATE_LIMIT_CLIENT_IP_HEADER` to a header the proxy sets and clients can't forge (e.g. `True-Client-IP`); otherwise clients are told apart by connection address.
 
 Malformed input returns `422` with the bad field named:
 

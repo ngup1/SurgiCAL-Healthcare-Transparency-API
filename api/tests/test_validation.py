@@ -7,52 +7,52 @@ ELEVEN_CCNS = ",".join(f"0508{i:02d}" for i in range(11))
 
 # (path, query params, field named in the error)
 CASES = [
-    ("/hospitals", {"offset": -1}, "offset"),
-    ("/hospitals", {"limit": 0}, "limit"),
-    ("/hospitals", {"limit": 201}, "limit"),
-    ("/hospitals", {"limit": "abc"}, "limit"),
-    ("/hospitals", {"city": "Pasadena", "radius_miles": 0}, "radius_miles"),
-    ("/hospitals", {"city": "Pasadena", "radius_miles": 101}, "radius_miles"),
-    ("/hospitals", {"zip": "9410"}, "zip"),
-    ("/hospitals", {"city": "x"}, "city"),
-    ("/hospitals/12", {}, "ccn"),
-    ("/hospitals/abc/providers", {}, "ccn"),
-    ("/hospitals/050801/providers", {"offset": -1}, "offset"),
-    ("/providers", {"offset": -5}, "offset"),
-    ("/providers", {"zip": "abcde"}, "zip"),
-    ("/providers/123", {}, "npi"),
-    ("/prices", {}, "cpt"),
-    ("/prices", {"cpt": "knee"}, "cpt"),
-    ("/prices", {"cpt": KNEE_CPT, "limit": 500}, "limit"),
-    ("/prices/compare", {"cpt": KNEE_CPT}, "ccns"),
-    ("/prices/compare", {"cpt": KNEE_CPT, "ccns": "050801,xyz"}, "ccns"),
-    ("/prices/compare", {"cpt": KNEE_CPT, "ccns": ","}, "ccns"),
-    ("/prices/compare", {"cpt": KNEE_CPT, "ccns": ELEVEN_CCNS}, "ccns"),
-    ("/prices/compare", {"cpt": "27", "ccns": "050801"}, "cpt"),
-    ("/devices", {"q": "k"}, "q"),
-    ("/devices", {"product_code": "jwh"}, "product_code"),
-    ("/devices/by-procedure/abc", {}, "cpt"),
-    ("/devices/hello", {}, "device_id"),
-    ("/devices/hello/recalls", {}, "device_id"),
-    ("/devices/hello/adverse-events", {}, "device_id"),
-    (f"/devices/{PACEMAKER_ID}/recalls", {"offset": -1}, "offset"),
-    (f"/devices/{PACEMAKER_ID}/adverse-events", {"event_type": "bad"}, "event_type"),
-    ("/search", {}, "q"),
-    ("/search", {"q": "k"}, "q"),
-    ("/search", {"q": "x" * 101}, "q"),
-    ("/search", {"q": "knee", "limit": 0}, "limit"),
-    ("/search", {"q": "knee", "limit": 51}, "limit"),
+    ("/v1/hospitals", {"offset": -1}, "offset"),
+    ("/v1/hospitals", {"limit": 0}, "limit"),
+    ("/v1/hospitals", {"limit": 201}, "limit"),
+    ("/v1/hospitals", {"limit": "abc"}, "limit"),
+    ("/v1/hospitals", {"city": "Pasadena", "radius_miles": 0}, "radius_miles"),
+    ("/v1/hospitals", {"city": "Pasadena", "radius_miles": 101}, "radius_miles"),
+    ("/v1/hospitals", {"zip": "9410"}, "zip"),
+    ("/v1/hospitals", {"city": "x"}, "city"),
+    ("/v1/hospitals/12", {}, "ccn"),
+    ("/v1/hospitals/abc/providers", {}, "ccn"),
+    ("/v1/hospitals/050801/providers", {"offset": -1}, "offset"),
+    ("/v1/providers", {"offset": -5}, "offset"),
+    ("/v1/providers", {"zip": "abcde"}, "zip"),
+    ("/v1/providers/123", {}, "npi"),
+    ("/v1/prices", {}, "cpt"),
+    ("/v1/prices", {"cpt": "knee"}, "cpt"),
+    ("/v1/prices", {"cpt": KNEE_CPT, "limit": 500}, "limit"),
+    ("/v1/prices/compare", {"cpt": KNEE_CPT}, "ccns"),
+    ("/v1/prices/compare", {"cpt": KNEE_CPT, "ccns": "050801,xyz"}, "ccns"),
+    ("/v1/prices/compare", {"cpt": KNEE_CPT, "ccns": ","}, "ccns"),
+    ("/v1/prices/compare", {"cpt": KNEE_CPT, "ccns": ELEVEN_CCNS}, "ccns"),
+    ("/v1/prices/compare", {"cpt": "27", "ccns": "050801"}, "cpt"),
+    ("/v1/devices", {"q": "k"}, "q"),
+    ("/v1/devices", {"product_code": "jwh"}, "product_code"),
+    ("/v1/devices/by-procedure/abc", {}, "cpt"),
+    ("/v1/devices/hello", {}, "device_id"),
+    ("/v1/devices/hello/recalls", {}, "device_id"),
+    ("/v1/devices/hello/adverse-events", {}, "device_id"),
+    (f"/v1/devices/{PACEMAKER_ID}/recalls", {"offset": -1}, "offset"),
+    (f"/v1/devices/{PACEMAKER_ID}/adverse-events", {"event_type": "bad"}, "event_type"),
+    ("/v1/search", {}, "q"),
+    ("/v1/search", {"q": "k"}, "q"),
+    ("/v1/search", {"q": "x" * 101}, "q"),
+    ("/v1/search", {"q": "knee", "limit": 0}, "limit"),
+    ("/v1/search", {"q": "knee", "limit": 51}, "limit"),
 ]
 
 # Cases where the bad value is in the URL path rather than the query string.
 MALFORMED_PATHS = {
-    "/hospitals/12",
-    "/hospitals/abc/providers",
-    "/providers/123",
-    "/devices/by-procedure/abc",
-    "/devices/hello",
-    "/devices/hello/recalls",
-    "/devices/hello/adverse-events",
+    "/v1/hospitals/12",
+    "/v1/hospitals/abc/providers",
+    "/v1/providers/123",
+    "/v1/devices/by-procedure/abc",
+    "/v1/devices/hello",
+    "/v1/devices/hello/recalls",
+    "/v1/devices/hello/adverse-events",
 }
 
 
@@ -70,7 +70,7 @@ async def test_malformed_input_is_422_naming_the_field(client, path, params, fie
 
 
 async def test_every_bad_field_is_reported(client):
-    response = await client.get("/hospitals", params={"limit": "abc", "offset": -1})
+    response = await client.get("/v1/hospitals", params={"limit": "abc", "offset": -1})
     body = response.json()
     assert response.status_code == 422
     assert body["detail"] == "Invalid values for 'limit', 'offset'"
@@ -78,6 +78,6 @@ async def test_every_bad_field_is_reported(client):
 
 
 async def test_format_errors_use_readable_messages(client):
-    body = (await client.get("/providers/123")).json()
+    body = (await client.get("/v1/providers/123")).json()
     assert body["errors"][0]["message"] == "Must be a 10-digit National Provider Identifier, e.g. 1572628497"
     assert body["detail"] == "Invalid value for 'npi': Must be a 10-digit National Provider Identifier, e.g. 1572628497"

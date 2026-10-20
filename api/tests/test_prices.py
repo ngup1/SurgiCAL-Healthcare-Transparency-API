@@ -8,7 +8,7 @@ def seed_prices(seed, cpt, ccns=None):
 
 
 async def test_prices_for_procedure_sorted_cheapest_first(client, seed):
-    rows = (await client.get("/prices", params={"cpt": KNEE_CPT, "limit": 200})).json()
+    rows = (await client.get("/v1/prices", params={"cpt": KNEE_CPT, "limit": 200})).json()
     assert len(rows) == len(seed_prices(seed, KNEE_CPT))
     assert {r["procedure_name"] for r in rows} == {"Total knee replacement (arthroplasty)"}
     rates = [r["negotiated_rate"] for r in rows]
@@ -17,13 +17,13 @@ async def test_prices_for_procedure_sorted_cheapest_first(client, seed):
 
 async def test_prices_include_hospital_quality(client, seed):
     stars = {q["ccn"]: q["overall_stars"] for q in seed["hospital_quality"]}
-    rows = (await client.get("/prices", params={"cpt": KNEE_CPT, "limit": 200})).json()
+    rows = (await client.get("/v1/prices", params={"cpt": KNEE_CPT, "limit": 200})).json()
     assert all(r["overall_stars"] == stars.get(r["ccn"]) for r in rows)
 
 
 async def test_payer_filter_is_partial_and_case_insensitive(client, seed):
     expected = [p for p in seed_prices(seed, KNEE_CPT) if "aetna" in p["payer"].lower()]
-    rows = (await client.get("/prices", params={"cpt": KNEE_CPT, "payer": "aetna", "limit": 200})).json()
+    rows = (await client.get("/v1/prices", params={"cpt": KNEE_CPT, "payer": "aetna", "limit": 200})).json()
     assert expected
     assert len(rows) == len(expected)
     assert all("Aetna" in r["payer"] for r in rows)
@@ -31,7 +31,7 @@ async def test_payer_filter_is_partial_and_case_insensitive(client, seed):
 
 async def test_prices_within_radius_of_a_city(client):
     params = {"cpt": KNEE_CPT, "city": "San Francisco", "radius_miles": 30, "limit": 200}
-    rows = (await client.get("/prices", params=params)).json()
+    rows = (await client.get("/v1/prices", params=params)).json()
     assert rows
     assert all(r["distance_miles"] <= 30 for r in rows)
 
@@ -40,29 +40,29 @@ async def test_prices_in_a_county_with_total(client, seed):
     cities = {p["name"] for p in seed["ca_places"] if p["place_type"] == "city" and p["county"] == "Los Angeles"}
     ccns = {h["ccn"] for h in seed["hospitals"] if h["city"] in cities}
     expected = [p for p in seed_prices(seed, KNEE_CPT) if p["ccn"] in ccns]
-    response = await client.get("/prices", params={"cpt": KNEE_CPT, "county": "Los Angeles", "limit": 5})
+    response = await client.get("/v1/prices", params={"cpt": KNEE_CPT, "county": "Los Angeles", "limit": 5})
     assert response.headers["X-Total-Count"] == str(len(expected))
     assert {r["ccn"] for r in response.json()} <= ccns
 
 
 async def test_compare_accepts_repeated_and_comma_separated_ccns(client):
     repeated = await client.get(
-        "/prices/compare", params=[("cpt", KNEE_CPT), ("ccns", BAYSHORE_CCN), ("ccns", SECOND_CCN)]
+        "/v1/prices/compare", params=[("cpt", KNEE_CPT), ("ccns", BAYSHORE_CCN), ("ccns", SECOND_CCN)]
     )
-    commas = await client.get("/prices/compare", params={"cpt": KNEE_CPT, "ccns": f"{BAYSHORE_CCN},{SECOND_CCN}"})
+    commas = await client.get("/v1/prices/compare", params={"cpt": KNEE_CPT, "ccns": f"{BAYSHORE_CCN},{SECOND_CCN}"})
     assert repeated.status_code == commas.status_code == 200
     assert repeated.json() == commas.json()
 
 
 async def test_unknown_procedure_returns_empty(client):
-    response = await client.get("/prices", params={"cpt": "99999"})
+    response = await client.get("/v1/prices", params={"cpt": "99999"})
     assert response.status_code == 200
     assert response.json() == []
 
 
 async def test_compare_returns_only_requested_hospitals(client, seed):
     ccns = {BAYSHORE_CCN, SECOND_CCN}
-    rows = (await client.get("/prices/compare", params={"cpt": KNEE_CPT, "ccns": ",".join(ccns)})).json()
+    rows = (await client.get("/v1/prices/compare", params={"cpt": KNEE_CPT, "ccns": ",".join(ccns)})).json()
     assert {r["ccn"] for r in rows} == ccns
     assert len(rows) == len(seed_prices(seed, KNEE_CPT, ccns))
     keys = [(r["hospital_name"], r["payer"]) for r in rows]
@@ -71,5 +71,5 @@ async def test_compare_returns_only_requested_hospitals(client, seed):
 
 async def test_compare_ignores_unknown_hospitals(client, seed):
     params = {"cpt": KNEE_CPT, "ccns": f"{BAYSHORE_CCN}, {UNKNOWN_CCN}"}
-    rows = (await client.get("/prices/compare", params=params)).json()
+    rows = (await client.get("/v1/prices/compare", params=params)).json()
     assert {r["ccn"] for r in rows} == {BAYSHORE_CCN}

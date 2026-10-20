@@ -25,11 +25,15 @@ from dataclasses import dataclass
 
 from starlette.types import ASGIApp, Message, Receive, Scope, Send
 
+from src.constants import API_PREFIX
+
 LIMIT_HEADER = "X-RateLimit-Limit"
 REMAINING_HEADER = "X-RateLimit-Remaining"
 
 # Never limited: load-balancer health checks and the interactive docs.
 _EXEMPT_PATHS = {"/", "/health", "/health/ready", "/docs", "/docs/oauth2-redirect", "/redoc", "/openapi.json"}
+# Requests to this path (and below it) use the stricter search tier.
+_SEARCH_PATH = f"{API_PREFIX}/search"
 # Idle buckets are dropped once this many clients are tracked, so memory stays bounded.
 _MAX_TRACKED = 10_000
 
@@ -111,7 +115,7 @@ class RateLimitMiddleware:
             await self.app(scope, receive, send)
             return
 
-        tier = self.search if path == "/search" or path.startswith("/search/") else self.default
+        tier = self.search if path == _SEARCH_PATH or path.startswith(f"{_SEARCH_PATH}/") else self.default
         allowed, remaining, retry_after = self.limiter.take(self._client(scope), tier)
         limit_headers = [
             (LIMIT_HEADER.lower().encode(), str(tier.per_minute).encode()),

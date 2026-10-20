@@ -12,13 +12,13 @@ from src.observability import JsonFormatter, request_id_var
 from src.pagination import pagination
 
 DATA_ENDPOINTS = [
-    "/hospitals",
-    "/hospitals/050801",
-    "/providers/1572628497",
-    "/prices?cpt=27447",
-    "/devices",
-    "/search?q=knee",
-    "/places?q=san",
+    "/v1/hospitals",
+    "/v1/hospitals/050801",
+    "/v1/providers/1572628497",
+    "/v1/prices?cpt=27447",
+    "/v1/devices",
+    "/v1/search?q=knee",
+    "/v1/places?q=san",
 ]
 
 
@@ -26,7 +26,7 @@ DATA_ENDPOINTS = [
 
 
 async def test_every_response_has_a_request_id(client):
-    response = await client.get("/hospitals/050801")
+    response = await client.get("/v1/hospitals/050801")
     assert len(response.headers["X-Request-ID"]) == 32
 
 
@@ -42,7 +42,7 @@ async def test_unsafe_request_id_is_replaced(client):
 
 
 async def test_request_id_also_on_errors(client):
-    for path in ("/hospitals/999999", "/providers/123"):
+    for path in ("/v1/hospitals/999999", "/v1/providers/123"):
         assert "X-Request-ID" in (await client.get(path)).headers
 
 
@@ -64,9 +64,9 @@ def test_json_formatter_includes_request_id_and_fields():
 
 async def test_access_log_line_per_request(client, caplog):
     with caplog.at_level(logging.INFO, logger="surgical.access"):
-        response = await client.get("/hospitals", params={"limit": 2})
+        response = await client.get("/v1/hospitals", params={"limit": 2})
     record = next(r for r in caplog.records if r.name == "surgical.access")
-    assert (record.method, record.path, record.status) == ("GET", "/hospitals", 200)
+    assert (record.method, record.path, record.status) == ("GET", "/v1/hospitals", 200)
     assert record.query == "limit=2"
     assert record.duration_ms >= 0
     assert response.headers["X-Request-ID"]
@@ -124,7 +124,7 @@ async def test_unexpected_error_is_a_generic_500_and_is_logged(client, caplog):
     app.dependency_overrides[pagination] = broken_dependency
     try:
         with caplog.at_level(logging.ERROR, logger="surgical.error"):
-            response = await client.get("/hospitals")
+            response = await client.get("/v1/hospitals")
     finally:
         app.dependency_overrides.clear()
 

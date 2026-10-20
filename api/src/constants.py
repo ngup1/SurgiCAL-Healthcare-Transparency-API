@@ -1,8 +1,11 @@
-"""Identifier formats shared across domains.
+"""Identifier formats and paths shared across domains.
 
 Format rules live on the route parameters (Query/Path `pattern`), so FastAPI rejects
 bad input with a 422 before any SQL runs.
 """
+
+# Every data endpoint sits under this prefix; /health and the docs are unversioned.
+API_PREFIX = "/v1"
 
 # CMS Certification Number: 6 characters, e.g. 050801 (some units use a letter, e.g. 05S001).
 CCN_PATTERN = r"^[0-9A-Z]{6}$"

@@ -50,11 +50,11 @@ def test_retry_after_reflects_the_refill_rate():
 def make_app(**options) -> FastAPI:
     app = FastAPI()
 
-    @app.get("/hospitals")
+    @app.get("/v1/hospitals")
     async def hospitals():
         return []
 
-    @app.get("/search")
+    @app.get("/v1/search")
     async def search():
         return {}
 
@@ -74,21 +74,21 @@ async def limited_client():
 
 async def test_over_the_limit_returns_429_with_retry_after(limited_client):
     for remaining in (2, 1, 0):
-        response = await limited_client.get("/hospitals")
+        response = await limited_client.get("/v1/hospitals")
         assert response.status_code == 200
         assert response.headers["X-RateLimit-Limit"] == "3"
         assert response.headers["X-RateLimit-Remaining"] == str(remaining)
 
-    response = await limited_client.get("/hospitals")
+    response = await limited_client.get("/v1/hospitals")
     assert response.status_code == 429
     assert int(response.headers["Retry-After"]) >= 1
     assert "3 requests per minute" in response.json()["detail"]
 
 
 async def test_search_has_its_own_stricter_limit(limited_client):
-    assert (await limited_client.get("/search")).status_code == 200
-    assert (await limited_client.get("/search")).status_code == 429
-    assert (await limited_client.get("/hospitals")).status_code == 200
+    assert (await limited_client.get("/v1/search")).status_code == 200
+    assert (await limited_client.get("/v1/search")).status_code == 429
+    assert (await limited_client.get("/v1/hospitals")).status_code == 200
 
 
 async def test_health_checks_are_never_limited(limited_client):
@@ -100,7 +100,7 @@ async def test_client_ip_header_identifies_clients():
     app = make_app(client_ip_header="True-Client-IP")
     async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as ac:
         for _ in range(3):
-            await ac.get("/hospitals", headers={"True-Client-IP": "203.0.113.1"})
-        assert (await ac.get("/hospitals", headers={"True-Client-IP": "203.0.113.1"})).status_code == 429
+            await ac.get("/v1/hospitals", headers={"True-Client-IP": "203.0.113.1"})
+        assert (await ac.get("/v1/hospitals", headers={"True-Client-IP": "203.0.113.1"})).status_code == 429
         # Another client behind the same proxy connection has its own allowance.
-        assert (await ac.get("/hospitals", headers={"True-Client-IP": "203.0.113.2"})).status_code == 200
+        assert (await ac.get("/v1/hospitals", headers={"True-Client-IP": "203.0.113.2"})).status_code == 200

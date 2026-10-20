@@ -16,21 +16,27 @@ async def test_openapi_lists_all_endpoints(client):
     assert set(paths) == {
         "/health",
         "/health/ready",
-        "/hospitals",
-        "/hospitals/{ccn}",
-        "/hospitals/{ccn}/providers",
-        "/providers",
-        "/providers/{npi}",
-        "/prices",
-        "/prices/compare",
-        "/devices",
-        "/devices/by-procedure/{cpt}",
-        "/devices/{device_id}",
-        "/devices/{device_id}/recalls",
-        "/devices/{device_id}/adverse-events",
-        "/search",
-        "/places",
+        "/v1/hospitals",
+        "/v1/hospitals/{ccn}",
+        "/v1/hospitals/{ccn}/providers",
+        "/v1/providers",
+        "/v1/providers/{npi}",
+        "/v1/prices",
+        "/v1/prices/compare",
+        "/v1/devices",
+        "/v1/devices/by-procedure/{cpt}",
+        "/v1/devices/{device_id}",
+        "/v1/devices/{device_id}/recalls",
+        "/v1/devices/{device_id}/adverse-events",
+        "/v1/search",
+        "/v1/places",
     }
+
+
+async def test_unversioned_data_paths_are_gone(client):
+    assert (await client.get("/hospitals")).status_code == 404
+    assert (await client.get("/v1/hospitals")).status_code == 200
+    assert (await client.get("/health")).status_code == 200
 
 
 async def test_readiness_checks_the_database(client):

@@ -60,19 +60,19 @@ async def test_every_endpoint_documents_its_response_schema(spec):
 
 
 async def test_list_endpoints_document_total_count_header(spec):
-    for path in ["/hospitals", "/providers", "/prices", "/devices", "/hospitals/{ccn}/providers"]:
+    for path in ["/v1/hospitals", "/v1/providers", "/v1/prices", "/v1/devices", "/v1/hospitals/{ccn}/providers"]:
         assert "X-Total-Count" in spec["paths"][path]["get"]["responses"]["200"]["headers"], path
 
 
 @pytest.mark.parametrize(
     "path",
     [
-        "/hospitals/{ccn}",
-        "/hospitals/{ccn}/providers",
-        "/providers/{npi}",
-        "/devices/{device_id}",
-        "/devices/{device_id}/recalls",
-        "/devices/{device_id}/adverse-events",
+        "/v1/hospitals/{ccn}",
+        "/v1/hospitals/{ccn}/providers",
+        "/v1/providers/{npi}",
+        "/v1/devices/{device_id}",
+        "/v1/devices/{device_id}/recalls",
+        "/v1/devices/{device_id}/adverse-events",
     ],
 )
 async def test_detail_endpoints_document_404(spec, path):

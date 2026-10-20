@@ -10,6 +10,7 @@ from fastapi.responses import RedirectResponse
 from psycopg import OperationalError
 
 from src.config import settings
+from src.constants import API_PREFIX
 from src.database import create_pool
 from src.devices.router import router as devices_router
 from src.docs import API_DESCRIPTION, TAGS_METADATA, VALIDATION_RESPONSES
@@ -99,7 +100,8 @@ for router, prefix in [
     (devices_router, "/devices"),
     (places_router, "/places"),
 ]:
-    app.include_router(router, prefix=prefix, tags=[prefix.strip("/")], responses=VALIDATION_RESPONSES)
+    app.include_router(router, prefix=f"{API_PREFIX}{prefix}", tags=[prefix.strip("/")], responses=VALIDATION_RESPONSES)
+# Unversioned: health checks describe the running service, not the API contract.
 app.include_router(health_router, prefix="/health", tags=["health"])
 
 
