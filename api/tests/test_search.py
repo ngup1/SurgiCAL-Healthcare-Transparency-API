@@ -4,7 +4,7 @@ GROUPS = {"procedures", "providers", "hospitals", "devices"}
 
 
 async def search(client, q, **params):
-    response = await client.get("/search", params={"q": q, **params})
+    response = await client.get("/v1/search", params={"q": q, **params})
     assert response.status_code == 200
     body = response.json()
     assert set(body) == GROUPS

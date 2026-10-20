@@ -22,7 +22,7 @@ surgeon quality, and check medical devices for recalls and adverse events.
 `503` means the database is temporarily unavailable (retry). Every response carries an
 `X-Request-ID` header to quote when reporting a problem.
 
-**Rate limits:** {per_minute} requests a minute per client ({search_per_minute} for `/search`). Past the
+**Rate limits:** {per_minute} requests a minute per client ({search_per_minute} for `/v1/search`). Past the
 limit you get `429` with a `Retry-After` header; `X-RateLimit-Remaining` shows what's left.
 """.strip().format(per_minute=settings.rate_limit_per_minute, search_per_minute=settings.rate_limit_search_per_minute)
 

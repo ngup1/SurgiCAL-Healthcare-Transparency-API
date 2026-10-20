@@ -79,10 +79,10 @@ jobs:
         run: |
           set -euo pipefail
           curl -fsS localhost:8000/health
-          count=$(curl -fsS localhost:8000/hospitals | python3 -c 'import json,sys; print(len(json.load(sys.stdin)))')
+          count=$(curl -fsS localhost:8000/v1/hospitals | python3 -c 'import json,sys; print(len(json.load(sys.stdin)))')
           echo "hospitals: $count"
           test "$count" -eq 27
-          curl -fsS 'localhost:8000/search?q=knee' | python3 -c 'import json,sys; assert "27447" in [p["code"] for p in json.load(sys.stdin)["procedures"]]'
+          curl -fsS 'localhost:8000/v1/search?q=knee' | python3 -c 'import json,sys; assert "27447" in [p["code"] for p in json.load(sys.stdin)["procedures"]]'
           echo "smoke test passed"
 
       - name: Show container logs
